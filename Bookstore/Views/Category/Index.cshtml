@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Category>
+
+
+
+
+<div class="container mt-5">
+
+    <div class="text-center">
+        <h2>Жанры</h2>
+    </div>
+
+    <div class="col-12 pd-2">
+        <div class="row justify-content-end">
+            <div class="col-4">
+                <a class="btn btn-success" asp-controller="Category" asp-action="Upsert">Add</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row col-6 mx-auto mt-2">
+        <div>
+            <table class="table table-hover table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Номер</th>
+                        <th>Название</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var category in Model)
+                    {
+                        <tr>
+                            <td>@category.Id</td>
+                            <td>
+                                @category.Name
+                            </td>
+                            <td class="mx-auto">
+                                <a>
+                                    <a class="btn btn-success" asp-area="" asp-controller="Category" asp-action="Upsert">Edit</a>
+                                </a>
+                            </td>
+                            <td class="mx-auto">
+                                <a>
+                                    <a class="btn btn-primary" asp-area="" asp-controller="" asp-action="Index">Show</a>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
