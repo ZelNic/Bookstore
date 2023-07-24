@@ -79,26 +79,18 @@ namespace Bookstore.Controllers
         [HttpPost]
         public IActionResult Delete(Book book)
         {
-            if (book == null)
+            var bookOnDelete = _db.Books.Find(book.Id);
+            if (bookOnDelete != null)
             {
-                return NotFound();
+                _db.Books.Remove(bookOnDelete);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
             }
             else
             {
-                var bookOnDelete = _db.Books.Find(book);
-                if (bookOnDelete != null)
-                {
-                    _db.Books.Remove(bookOnDelete);
-                    _db.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-                else
-                {
-                    NotFound();
-                    return RedirectToAction("Index");
-                }
+                NotFound();
+                return RedirectToAction("Index");
             }
         }
-
     }
 }
