@@ -1,7 +1,7 @@
 ﻿using Bookstore.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bookstore
+namespace Bookstore.DataAccess
 {
     public class ApplicationDbContext : DbContext
     {
@@ -11,8 +11,6 @@ namespace Bookstore
         }
         public DbSet<Book> Books { get; set; }
         public DbSet<Category> Categories { get; set; }
-
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,7 +24,8 @@ namespace Bookstore
                     Author = "Жауме Кабре",
                     ISBN = "978-5-389-22890-0",
                     Category = 1,
-                    Description = "Человек просыпается неизвестно где - возможно, в больничной палате, но это неточно - и не помнит о себе вообще ничего. \"Зовите меня Измаил\", - предлагает он врачам, которых, за неимением других версий, нарекает Юрием Живаго и мадам Бовари.",
+                    Description = "Человек просыпается неизвестно где - возможно, в больничной палате, но это неточно - и не помнит о себе вообще ничего. " +
+                    "\"Зовите меня Измаил\", - предлагает он врачам, которых, за неимением других версий, нарекает Юрием Живаго и мадам Бовари.",
                     Price = "417"
                 }
             );

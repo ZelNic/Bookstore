@@ -1,0 +1,8 @@
+﻿@model Book
+
+<div class="text-center">
+    <h2>Are you sure want to delete book?</h2>
+    <form method="post" class="row" enctype="multipart/form-data">
+        <a asp-controller="Book" asp-action="Delete" asp-route-id="@Model">Delete</a>
+    </form>
+</div>

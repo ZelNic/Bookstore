@@ -2,8 +2,8 @@
 
 namespace Bookstore.BookVM
 {
-    public class BookVM
-    {
-        public Book book;
-    }
+    //public class BookVM
+    //{
+    //    public Book book { get; set; }
+    //}
 }

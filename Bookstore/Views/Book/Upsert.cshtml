@@ -14,48 +14,53 @@
 </div>
 <div class="container">
     <div class="row">
-        <form method="post" class="row" enctype="text/plain">
-            <input asp-for="Id" hidden />
+        <form method="post" class="row" enctype="multipart/form-data">
+            <input asp-for="@Model.Id" hidden />
+            <input asp-for="@Model.ImageURL" hidden />
             <div class="form-floating py-2 col-5 mt-xxl-4">
-                <input asp-for="Title" class="form-control border-0 shadow" />
-                <label asp-for="Title" class="ms-1 my-1 text-dark"></label>
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <input asp-for="@Model.Title" class="form-control border-0 shadow" />
+                <label asp-for="@Model.Title" class="ms-1 my-1 text-dark"></label>
+                <span asp-validation-for="@Model.Title" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-5 mt-xxl-4">
-                <input asp-for="Author" class="form-control border-0 shadow" />
-                <label asp-for="Author" class="ms-1 my-1 text-dark"></label>
-                <span asp-validation-for="Author" class="text-danger"></span>
+                <input asp-for="@Model.Author" class="form-control border-0 shadow" />
+                <label asp-for="@Model.Author" class="ms-1 my-1 text-dark"></label>
+                <span asp-validation-for="@Model.Author" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-5 mt-xxl-4">
-                <input asp-for="ISBN" class="form-control border-0 shadow" />
-                <label asp-for="ISBN" class="ms-1 my-1 text-dark"></label>
-                <span asp-validation-for="ISBN" class="text-danger"></span>
+                <input asp-for="@Model.ISBN" class="form-control border-0 shadow" />
+                <label asp-for="@Model.ISBN" class="ms-1 my-1 text-dark"></label>
+                <span asp-validation-for="@Model.ISBN" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-5 mt-xxl-4">
-                <input asp-for="Price" class="form-control border-0 shadow" />
-                <label asp-for="Price" class="ms-1 my-1 text-dark"></label>
-                <span asp-validation-for="Price" class="text-danger"></span>
+                <input asp-for="@Model.Price" class="form-control border-0 shadow" />
+                <label asp-for="@Model.Price" class="ms-1 my-1 text-dark"></label>
+                <span asp-validation-for="@Model.Price" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-5 mt-xxl-4">
-                <input asp-for="Description" class="form-control border-0 shadow" />
-                <label asp-for="Description" class="ms-1 my-1 text-dark"></label>
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <input asp-for="@Model.Description" class="form-control border-0 shadow" />
+                <label asp-for="@Model.Description" class="ms-1 my-1 text-dark"></label>
+                <span asp-validation-for="@Model.Description" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-5 mt-xxl-4">
-                <input asp-for="ImageURL" class="form-control border-0 shadow" />
-                <label asp-for="ImageURL" class="ms-1 my-1 text-dark"></label>
-                <span asp-validation-for="ImageURL" class="text-danger"></span>
+                <input asp-for="@Model.ImageURL" class="form-control border-0 shadow" />
+                <label asp-for="@Model.ImageURL" class="ms-1 my-1 text-dark"></label>
+                <span asp-validation-for="@Model.ImageURL" class="text-danger"></span>
             </div>
             <div class="col-6">
                 @if (Model.Id != 0)
                 {
-                    <button type="submit" class="btn btn-success form-control">Update</button>
+                    <div class="row col-4">
+                        <div class="">
+                            <button type="submit" class="btn btn-success form-control">Update</button>
+                            <a asp-controller="Book" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+                        </div>
+                    </div>
                 }
                 else
                 {
                     <button type="submit" class="btn btn-success form-control">Create</button>
                 }
-                
             </div>
         </form>
     </div>

@@ -1,5 +1,7 @@
-﻿using Bookstore.Models;
+﻿using Bookstore.DataAccess;
+using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Controllers
 {
@@ -30,16 +32,16 @@ namespace Bookstore.Controllers
 
             var book = _db.Books.Find(bookId);
 
-            return View(book,);
+            return View(book);
         }
 
         [HttpPost]
         public IActionResult Upsert(Book book)
         {
-            if(book.Id == 0)
+            if (book.Id == 0)
             {
                 _db.Add(book);
-                
+
             }
             else
             {
@@ -49,5 +51,54 @@ namespace Bookstore.Controllers
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        //public IActionResult Delete(int? bookId)
+        //{
+        //    if (bookId == 0 || bookId == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var book = _db.Books.Find(bookId);
+
+        //    return View(book);
+        //}
+
+        [HttpGet]
+        [ActionName("Delete")]
+        public IActionResult ConfirmDelete(int? id)
+        {
+            if (id != null)
+            {
+                var bookOnDelete = _db.Books.Find(id);
+                return View(bookOnDelete);
+            }
+            else return NotFound();
+        }
+
+        [HttpPost]
+        public IActionResult Delete(Book book)
+        {
+            if (book == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var bookOnDelete = _db.Books.Find(book);
+                if (bookOnDelete != null)
+                {
+                    _db.Books.Remove(bookOnDelete);
+                    _db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    NotFound();
+                    return RedirectToAction("Index");
+                }
+            }
+        }
+
     }
 }

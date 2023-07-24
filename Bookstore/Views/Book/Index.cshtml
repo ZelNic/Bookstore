@@ -11,18 +11,13 @@
             <div class="row p-2">
                 <div class="col-12 p-1">
                     <div href="https://www.labirint.ru/books/957428/" class="btn" role="button" aria-disabled="true">
-                        <div class="card border-0 p-3 shadow rounded">
+                        <div class="card card-deck border-0 p-3 shadow rounded">
                             <img src="@book.ImageURL" class="card-img-top rounded" />
                             <div class="card-body pb-0">
                                 <div class="pl-1">
                                     <p class="card-title h6 text-black opacity-75 text-center"><b>@book.Title</b></p>
                                 </div>
                             </div>
-                            <div class="card-body pb-0">
-                                <div class="pl-1">
-                                    <p class="card-title h7 text-dark opacity-75 text-center"><b>@book.Author</b></p>
-                                </div>
-                            </div
                             <div class="card-body pb-0">
                                 <div class="pl-1">
                                     <p class="card-title h7 text-dark opacity-75 text-center"><b>@book.Author</b></p>
@@ -34,9 +29,9 @@
                                 </div>
                             </div>
                             <div>
-                                <a asp-action="Upsert" asp-route-bookId="@book.Id" class="btn btn-dark border-0 form-control">
+                                <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.Id" class="btn btn-dark border-0 form-control">
                                     Details
-                                </a>
+                                </a>                                
                             </div>
                         </div>
                     </div>
