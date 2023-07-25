@@ -45,7 +45,7 @@ namespace Bookstore.Controllers
             }
             else
             {
-                _db.Update(book);
+                _db.Books.Update(book);
             }
 
             _db.SaveChanges();
