@@ -15,25 +15,66 @@ namespace Bookstore.Controllers
 
         public IActionResult Index()
         {
-            IEnumerable<Category> categoryList = _db.Categories.ToList();
+            List<Category> categoryList = _db.Categories.ToList();
             return View(categoryList);
         }
 
-        public IActionResult Upsert(int? id)
+        public IActionResult Upsert(int? categoryId)
         {
-            if (id == null || id == 0)
+            if (categoryId == 0 || categoryId == null)
             {
-                Category newCategory = new Category();
-                return View(newCategory);
+                Category category = new Category();
+
+                return View(category);
+            }
+
+            var book = _db.Categories.Find(categoryId);
+
+            return View(book);
+        }
+
+        [HttpPost]
+        public IActionResult Upsert(Category category)
+        {
+            if (category.Id == 0)
+            {
+                _db.Add(category);
+
             }
             else
             {
-                var category = _db.Categories.FirstOrDefault(c => c.Id == id);
-                if(category == null)
-                {
-                    return NotFound();
-                }
-                return View(category);
+                _db.Update(category);
+            }
+
+            _db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        [ActionName("Delete")]
+        public IActionResult ConfirmDelete(int? categoryId)
+        {
+            if (categoryId != null)
+            {
+                var categoryOnDelete = _db.Categories.Find(categoryId);
+                return View(categoryOnDelete);
+            }
+            else return NotFound();
+        }
+
+        [HttpPost]
+        public IActionResult Delete(int? categoryId)
+        {
+            var categoryOnDelete = _db.Categories.Find(categoryId);
+            if (categoryOnDelete != null)
+            {
+                _db.Categories.Remove(categoryOnDelete);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return NotFound();
             }
         }
     }

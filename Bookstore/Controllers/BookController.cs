@@ -51,19 +51,7 @@ namespace Bookstore.Controllers
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
-
-        //public IActionResult Delete(int? bookId)
-        //{
-        //    if (bookId == 0 || bookId == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var book = _db.Books.Find(bookId);
-
-        //    return View(book);
-        //}
-
+               
         [HttpGet]
         [ActionName("Delete")]
         public IActionResult ConfirmDelete(int? id)
