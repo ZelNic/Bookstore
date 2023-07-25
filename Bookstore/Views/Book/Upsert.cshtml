@@ -50,10 +50,14 @@
             <div class="col-6">
                 @if (Model.Id != 0)
                 {
-                    <div class="row col-4">
-                        <div class="">
-                            <button type="submit" class="btn btn-success form-control">Update</button>
-                            <a asp-action="Delete" asp-controller="Book" asp-route-id="@Model.Id">Delete</a>
+                    <div class="container mt-4">
+                        <div class="row justify-content-center align-items-center">
+                            <div class="col text-center">
+                                <a class="btn btn-danger mb-1" asp-action="Delete" asp-controller="Book" asp-route-id="@Model.Id">Delete</a>                                
+                            </div>
+                            <div class="col text-center">
+                                <button type="submit" class="btn btn-success form-control">Update</button>
+                            </div>
                         </div>
                     </div>
                 }

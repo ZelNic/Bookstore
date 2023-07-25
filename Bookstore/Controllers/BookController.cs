@@ -87,9 +87,8 @@ namespace Bookstore.Controllers
                 return RedirectToAction("Index");
             }
             else
-            {
-                NotFound();
-                return RedirectToAction("Index");
+            {                
+                return NotFound();
             }
         }
     }
