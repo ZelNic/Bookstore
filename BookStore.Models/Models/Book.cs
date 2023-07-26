@@ -21,7 +21,6 @@ namespace Bookstore.Models
         public string? Price { get; set; }        
         
         public string? ImageURL { get; set; }
-
         public int? Category { get; set; } // need add
     }
 }

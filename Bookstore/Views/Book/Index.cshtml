@@ -1,36 +1,49 @@
-﻿@model IEnumerable<Book>
+﻿@model BookVM
 
 <div>
     <a asp-action="Upsert" class="btn btn-dark border-0 form-control">Add New Book</a>
 </div>
 
 <div class="row pb-5 mb-5 pt-5">
-    @foreach (var book in Model)
-    {
-        <div class="col-lg-3 col-sm-3">
-            <div class="row p-2" style="height: 100%">
-                <div class="col-12 p-1">
-                    <div class="card card-deck border-0 p-3 shadow rounded mx-auto h-100">
-                        <img src="@book.ImageURL" class="card-img-top rounded" />
-                        <div class="card-body h-100">
-                            <div class="pl-1">
-                                <p class="card-title h6 text-black opacity-75 text-center"><b>@book.Title</b></p>
-                            </div>
-                            <div class="pl-1">
-                                <p class="card-title h7 text-dark opacity-75 text-center"><b>@book.Author</b></p>
-                            </div>
-                            <div class="pl-1">
-                                <p class="text-dark text-opacity-75 text-center mb-0">@book.Price</p>
-                            </div>
-                            <div class="card-body align-self-end mt-auto">
-                                <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.Id" class="btn btn-dark border-0 form-control">
-                                    Details
-                                </a>
+    @if (Model.BooksList != null)
+        @foreach (var book in Model.BooksList)
+        {
+            <div class="col-lg-3 col-sm-3">
+                <div class="row p-2" style="height: 100%">
+                    <div class="col-12 p-1">
+                        <div class="card card-deck border-0 p-3 shadow rounded mx-auto h-100">
+                            <img src="@book.ImageURL" class="card-img-top rounded" />
+                            <div class="card-body h-100">
+                                <div class="pl-1">
+                                    <p class="card-title h6 text-black opacity-75 text-center"><b>@book.Title</b></p>
+                                </div>
+                                <div class="pl-1">
+                                    <p class="card-title h7 text-dark opacity-75 text-center"><b>@book.Author</b></p>
+                                </div>
+                                <div class="pl-1">
+                                    <p class="text-dark text-opacity-75 text-center mb-0">@book.Price</p>
+                                </div>
+
+                                @if (Model.CategoriesList != null)
+                                {
+                                    var category = Model.CategoriesList.FirstOrDefault(c => c.Id == book.Category);
+                                    if (category != null)
+                                    {
+                                        <div class="pl-1">
+                                            <p class="text-dark text-opacity-75 text-center mb-0">@category.Name</p>
+                                        </div>
+                                    }
+                                }
+
+                                <div class="card-body align-self-end mt-auto">
+                                    <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.Id" class="btn btn-dark border-0 form-control">
+                                        Details
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    }
+        }
 </div>

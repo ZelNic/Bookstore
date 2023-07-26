@@ -6,6 +6,6 @@
     "\\Bookstore\\Views",
     "\\Bookstore\\Views\\Book"
   ],
-  "SelectedNode": "\\Bookstore.sln",
+  "SelectedNode": "\\Bookstore\\Views\\Book\\Index.cshtml",
   "PreviewInSolutionExplorer": false
 }

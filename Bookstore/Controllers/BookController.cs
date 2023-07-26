@@ -1,7 +1,7 @@
-﻿using Bookstore.DataAccess;
+﻿
+using Bookstore.DataAccess;
 using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Controllers
 {
@@ -16,42 +16,56 @@ namespace Bookstore.Controllers
 
         public IActionResult Index()
         {
-            IEnumerable<Book> booksList = _db.Books.ToList();
+            List<Book> booksList = _db.Books.ToList();
+            List<Category> categoriesList = _db.Categories.ToList();
 
-            return View(booksList);
+            BookVM bookVM = new()
+            {
+                BooksList = booksList,
+                CategoriesList = categoriesList
+            };
+
+            return View(bookVM);
         }
 
+        [HttpGet]
         public IActionResult Upsert(int? bookId)
         {
-            if (bookId == 0 || bookId == null)
-            {
-                Book newBook = new Book();
+            var book = new Book();
 
-                return View(newBook);
+            if (bookId != null)
+            {
+                book = _db.Books.Find(bookId);
             }
 
-            var book = _db.Books.Find(bookId);
+            BookVM bookVM = new()
+            {
+                Book = book,
+                CategoriesList = _db.Categories.ToList()
+            };
 
-            return View(book);
+            return View(bookVM);
         }
 
         [HttpPost]
-        public IActionResult Upsert(Book book)
+        [ActionName("Upsert")]
+        public IActionResult UpsertPost(BookVM bookVM)
         {
-            if (book.Id == 0)
+            if (bookVM.Book.Id == 0)
             {
-                _db.Add(book);
-
+                _db.Books.Add(bookVM.Book);
             }
             else
             {
-                _db.Books.Update(book);
+                var oldBook = _db.Books.Find(bookVM.Book.Id);
+                if (oldBook != null)                
+                    _db.Books.Update(oldBook);                
             }
 
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
-               
+
         [HttpGet]
         [ActionName("Delete")]
         public IActionResult ConfirmDelete(int? id)
@@ -75,7 +89,7 @@ namespace Bookstore.Controllers
                 return RedirectToAction("Index");
             }
             else
-            {                
+            {
                 return NotFound();
             }
         }
