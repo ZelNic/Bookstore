@@ -1,13 +1,13 @@
-﻿@model BookVM
+﻿@model CategoryVM
 
-<div class="col-2 pb-5 mt-2 pt-3 text-right">
+<div class="col-2 pb-5 mt-2 pt-3">
     <a asp-action="Upsert" class="btn btn-success btn-outline-warning border-0 form-control">Add New Book</a>
 </div>
 
 <div class="container-fluid">
     <div class="row pb-5 mb-5 mb-2">
-        @if (Model.BooksList != null)
-            @foreach (var book in Model.BooksList)
+        @if (Model != null)
+            @foreach (var book in Model.BookList)
             {
                 <div class="col-lg-2 col-sm-2">
                     <div class="row p-1 mt-2" style="height: 100%">
@@ -22,16 +22,14 @@
                                         <div class="">
                                             <p class="card-title text-dark opacity-75"><b>@book.Author</b></p>
                                         </div>
-                                        @if (Model.CategoriesList != null)
-                                        {
-                                            var category = Model.CategoriesList.FirstOrDefault(c => c.Id == book.Category);
-                                            if (category != null)
+
+                                        <div class="pl-1">
+                                            @foreach (var categoryBook in Model.CategoryList.Where(u => u.Id == book.Category))
                                             {
-                                                <div class="pl-1">
-                                                    <p class="text-dark text-opacity-75  mb-0">@category.Name</p>
-                                                </div>
-                                            }
-                                        }
+                                                <p class="card-title text-dark opacity-75"><b>@categoryBook.Name</b></p>
+                                            }                                            
+                                        </div>
+
                                         <div class="">
                                             <p class="text-dark h4 text-center mb-0">@book.Price</p>
                                         </div>

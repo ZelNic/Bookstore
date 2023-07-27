@@ -1,7 +1,7 @@
-﻿
-using Bookstore.DataAccess;
+﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Bookstore.Controllers
 {
@@ -47,6 +47,8 @@ namespace Bookstore.Controllers
             return View(bookVM);
         }
 
+
+
         [HttpPost]
         [ActionName("Upsert")]
         public IActionResult UpsertPost(BookVM bookVM)
@@ -57,14 +59,26 @@ namespace Bookstore.Controllers
             }
             else
             {
-                var oldBook = _db.Books.Find(bookVM.Book.Id);
-                if (oldBook != null)                
-                    _db.Books.Update(oldBook);                
+                var oldVersionBook = _db.Books.Find(bookVM.Book.Id);
+
+                if (oldVersionBook != null)
+                {
+                    oldVersionBook.Title = bookVM.Book.Title;
+                    oldVersionBook.Author = bookVM.Book.Author;
+                    oldVersionBook.ISBN = bookVM.Book.ISBN;
+                    oldVersionBook.Description = bookVM.Book.Description;
+                    oldVersionBook.Price = bookVM.Book.Price;
+                    oldVersionBook.Category = bookVM.Book.Category;
+                    oldVersionBook.ImageURL = bookVM.Book.ImageURL;
+                    _db.Books.Update(oldVersionBook);
+                }                    
             }
 
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
+
+
 
         [HttpGet]
         [ActionName("Delete")]

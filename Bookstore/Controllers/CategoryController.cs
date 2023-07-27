@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Bookstore.DataAccess;
 using Bookstore.Models;
-using Bookstore.DataAccess;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Bookstore.Controllers
 {
@@ -17,6 +17,17 @@ namespace Bookstore.Controllers
         {
             List<Category> categoryList = _db.Categories.ToList();
             return View(categoryList);
+        }
+
+        public IActionResult BookCategory(int categoryId)
+        {
+            CategoryVM categoryVM = new()
+            {
+                BookList = _db.Books.Where(u => u.Category == categoryId).ToList(),
+                CategoryList = _db.Categories.ToList()
+            };
+
+            return View(categoryVM);
         }
 
         public IActionResult Upsert(int? categoryId)

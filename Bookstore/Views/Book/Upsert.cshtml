@@ -12,50 +12,51 @@
         }
     </div>
 
+
     <div class="container">
         <div class="row">
             <form method="post" class="row" enctype="multipart/form-data">
-                <input asp-for="@Model.Book.Id" hidden />
+                <input asp-for="Book.Id" hidden />
                 <div class="form-floating py-2 col-5 mt-xxl-4">
-                    <input asp-for="@Model.Book.Title" class="form-control border-0 shadow" />
-                    <label asp-for="@Model.Book.Title" class="ms-1 my-1 text-dark"></label>
-                    <span asp-validation-for="@Model.Book.Title" class="text-danger"></span>
+                    <input asp-for="Book.Title" class="form-control border-0 shadow" />
+                    <label asp-for="Book.Title" class="ms-1 my-1 text-dark"></label>
+                    <span asp-validation-for="Book.Title" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-2 col-5 mt-xxl-4">
-                    <input asp-for="@Model.Book.Author" class="form-control border-0 shadow" />
-                    <label asp-for="@Model.Book.Author" class="ms-1 my-1 text-dark"></label>
-                    <span asp-validation-for="@Model.Book.Author" class="text-danger"></span>
+                    <input asp-for="Book.Author" class="form-control border-0 shadow" />
+                    <label asp-for="Book.Author" class="ms-1 my-1 text-dark"></label>
+                    <span asp-validation-for="Book.Author" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-2 col-5 mt-xxl-4">
-                    <input asp-for="@Model.Book.ISBN" class="form-control border-0 shadow" />
-                    <label asp-for="@Model.Book.ISBN" class="ms-1 my-1 text-dark"></label>
-                    <span asp-validation-for="@Model.Book.ISBN" class="text-danger"></span>
+                    <input asp-for="Book.ISBN" class="form-control border-0 shadow" />
+                    <label asp-for="Book.ISBN" class="ms-1 my-1 text-dark"></label>
+                    <span asp-validation-for="Book.ISBN" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-2 col-5 mt-xxl-4">
-                    <input asp-for="@Model.Book.Price" class="form-control border-0 shadow" />
-                    <label asp-for="@Model.Book.Price" class="ms-1 my-1 text-dark"></label>
-                    <span asp-validation-for="@Model.Book.Price" class="text-danger"></span>
+                    <input asp-for="Book.Price" class="form-control border-0 shadow" />
+                    <label asp-for="Book.Price" class="ms-1 my-1 text-dark"></label>
+                    <span asp-validation-for="Book.Price" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-2 col-5 mt-xxl-4">
-                    <input asp-for="@Model.Book.Description" class="form-control border-0 shadow" />
-                    <label asp-for="@Model.Book.Description" class="ms-1 my-1 text-dark"></label>
-                    <span asp-validation-for="@Model.Book.Description" class="text-danger"></span>
+                    <input asp-for="Book.Description" class="form-control border-0 shadow" />
+                    <label asp-for="Book.Description" class="ms-1 my-1 text-dark"></label>
+                    <span asp-validation-for="Book.Description" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-2 col-5 mt-xxl-4">
-                    <input asp-for="@Model.Book.ImageURL" class="form-control border-0 shadow" />
-                    <label asp-for="@Model.Book.ImageURL" class="ms-1 my-1 text-dark"></label>
-                    <span asp-validation-for="@Model.Book.ImageURL" class="text-danger"></span>
+                    <input asp-for="Book.ImageURL" class="form-control border-0 shadow" />
+                    <label asp-for="Book.ImageURL" class="ms-1 my-1 text-dark"></label>
+                    <span asp-validation-for="Book.ImageURL" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-2 col-5 mt-xxl-4">
-                    <select asp-for="@Model.Book.Category" class="form-control border-0 shadow">
+                    <select asp-for="Book.Category" class="form-control border-0 shadow">
                         <option value="">Выберите категорию</option>
-                        @foreach (var category in Model.CategoriesList)
+                        @foreach (var category in Model.CategoriesList ?? Enumerable.Empty<Category>())
                         {
                             <option value="@category.Id">@category.Name</option>
                         }
                     </select>
-                    <label asp-for="@Model.Book.Category" class="ms-1 my-1 text-dark"></label>
-                    <span asp-validation-for="@Model.Book.Category" class="text-danger"></span>
+                    <label asp-for="Book.Category" class="ms-1 my-1 text-dark"></label>
+                    <span asp-validation-for="Book.Category" class="text-danger"></span>
                 </div>
 
                 <div class="col-6">
@@ -74,12 +75,14 @@
                     }
                     else
                     {
-                        <button type="submit" asp-action="Upsert" asp-route-bookVM="@Model" class="btn btn-success form-control">Create</button>
+                        <button type="submit" class="btn btn-success form-control">Create</button>
+                        @*<button type="submit" asp-action="Upsert" asp-route-bookVM="@Model" class="btn btn-success form-control">Create</button>*@
                     }
                 </div>
             </form>
         </div>
     </div>
+
 
 
 </div>
