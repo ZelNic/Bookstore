@@ -2,10 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\Bookstore",
-    "\\Bookstore\\Controllers",
-    "\\Bookstore\\Views",
-    "\\Bookstore\\Views\\Book"
+    "\\Bookstore\\Views"
   ],
-  "SelectedNode": "\\Bookstore\\Views\\Book\\Index.cshtml",
+  "SelectedNode": "\\Bookstore\\Properties",
   "PreviewInSolutionExplorer": false
 }

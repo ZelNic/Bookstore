@@ -3,7 +3,7 @@ using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace Bookstore.Controllers
+namespace Bookstore.Areas.Admin.Controllers
 {
     public class BookController : Controller
     {
@@ -71,7 +71,7 @@ namespace Bookstore.Controllers
                     oldVersionBook.Category = bookVM.Book.Category;
                     oldVersionBook.ImageURL = bookVM.Book.ImageURL;
                     _db.Books.Update(oldVersionBook);
-                }                    
+                }
             }
 
             _db.SaveChanges();
