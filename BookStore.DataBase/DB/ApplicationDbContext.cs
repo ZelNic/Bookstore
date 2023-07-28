@@ -11,6 +11,7 @@ namespace Bookstore.DataAccess
         }
         public DbSet<Book> Books { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<User> User { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +36,23 @@ namespace Bookstore.DataAccess
                 {
                     Id = 1,
                     Name = "Художественная литература",
+                }
+            );
+
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    UserId = 1,
+                    FirstName = "Nick",
+                    SecondName = "Zel",
+                    DateofBirth = "05.08.2000",
+                    Email = "ninileo55555@gmail.com",
+                    Password = "admin",
+                    Region = "KMAO",
+                    City = "Surgut",
+                    Ctreet = "Lenina",
+                    HouseNumber = 30,
+                    PhoneNumber = "89226578108"
                 }
             );
 

@@ -1,0 +1,51 @@
+﻿
+@model User
+
+<div class="container">
+    <div class="row">
+        <h1>Registration</h1>
+        <form method="post" enctype="multipart/form-data">
+            <div>
+                <div class="col-6">
+                    <label asp-for="FirstName" class="ms-1 my-1 text-dark"></label>
+                    <input asp-for="FirstName" class="form-control border-0 shadow" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="col-6">
+                    <label asp-for="SecondName" class="ms-1 my-1 text-dark"></label>
+                    <input asp-for="SecondName" class="form-control border-0 shadow" />
+                    <span asp-validation-for="SecondName" class="text-danger"></span>
+                </div>
+                <div class="col-6">
+                    <label asp-for="DateofBirth" class="ms-1 my-1 text-dark"></label>
+                    <input asp-for="DateofBirth" class="form-control border-0 shadow" />
+                    <span asp-validation-for="DateofBirth" class="text-danger"></span>
+                </div>
+                <div class="col-6">
+                    <label asp-for="Email" class="ms-1 my-1 text-dark"></label>
+                    <input asp-for="Email" class="form-control border-0 shadow" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="col-6">
+                    <label asp-for="Password" class="ms-1 my-1 text-dark"></label>
+                    <input asp-for="Password" class="form-control border-0 shadow" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="col-6">
+                    <label asp-for="PhoneNumber" class="ms-1 my-1 text-dark"></label>
+                    <input asp-for="PhoneNumber" class="form-control border-0 shadow" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mt-2">
+                <button type="submit" class="btn btn-success">LogIn</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
