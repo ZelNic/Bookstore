@@ -45,7 +45,7 @@ namespace Bookstore.DataAccess
                     UserId = 1,
                     FirstName = "Nick",
                     LastName = "Zel",
-                    DateofBirth = "05.08.2000",
+                    DateofBirth = "2018-10-25",
                     Email = "ninileo55555@gmail.com",
                     Password = "admin",
                     Region = "KMAO",

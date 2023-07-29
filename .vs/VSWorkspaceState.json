@@ -5,8 +5,10 @@
     "\\Bookstore\\Areas",
     "\\Bookstore\\Areas\\Customer",
     "\\Bookstore\\Areas\\Customer\\Controllers",
+    "\\Bookstore\\Areas\\Identity",
+    "\\Bookstore\\Areas\\Identity\\Controllers",
     "\\Bookstore\\Views"
   ],
-  "SelectedNode": "\\Bookstore\\Areas\\Customer\\Controllers\\HomeController.cs",
+  "SelectedNode": "\\Bookstore\\Areas\\Identity\\Controllers\\UserController.cs",
   "PreviewInSolutionExplorer": false
 }

@@ -1,15 +1,67 @@
 ﻿@model User
 
-<div class="container-fluid">
-    <div class="row col-6 col-lg-6">
-        <div class="col-6 pb-2">
-            @Model.FirstName
+<style>
+    .my-custom-spacing {
+        margin-top: 1px;
+        margin-bottom: 1px;
+    }
+</style>
+
+<div class="container-fluid mt-5">
+    <form method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card bg-dark text-white">
+                    <div class="card-body pb-0">
+                        <h4>Персональная информация</h4>
+                        <hr />
+                    </div>
+                    <div class="card-body my-custom-spacing">
+                        <h8>Фамилия</h8>
+                        <input asp-for="LastName" class="form-control border-0 shadow" />
+                        <label asp-for="LastName" class="ms-1 my-1 text-dark"></label>
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    <div class="card-body  my-custom-spacing">
+                        <h8>Имя</h8>
+                        <input asp-for="FirstName" class="form-control border-0 shadow" />
+                        <label asp-for="FirstName" class="ms-1 my-1 text-dark"></label>
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="card-body my-custom-spacing ">
+                        <h8>День рождения</h8>
+                        <input asp-for="DateofBirth" class="form-control border-0 shadow" />
+                        <label asp-for="DateofBirth" class="ms-1 my-1 text-dark"></label>
+                        <span asp-validation-for="DateofBirth" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card bg-dark text-white">
+                    <div class="card-body pb-0">
+                        <h4>Данные для входа</h4>
+                        <hr />
+                    </div>
+                    <div class="card-body pt-0 pb-0">
+                        <h8>Электронная почта</h8>
+                        <input asp-for="Email" class="form-control border-0 shadow" />
+                        <label asp-for="Email" class="ms-1 my-1 text-dark"></label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="card-body pt-0 pb-0">
+                        <h8>Телефонный номер</h8>
+                        <input asp-for="PhoneNumber" class="form-control border-0 shadow" />
+                        <label asp-for="PhoneNumber" class="ms-1 my-1 text-dark"></label>
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-6 pb-2">
-            @Model.LastName
+        <div class="mt-2">
+            <button type="submit" class="btn btn-warning">Save Changes</button>
         </div>
-        <div class="col-6 pb-2">
-            @Model.UserId
-        </div>
-    </div>
+    </form>
+
 </div>
+
