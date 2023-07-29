@@ -44,7 +44,7 @@ namespace Bookstore.DataAccess
                 {
                     UserId = 1,
                     FirstName = "Nick",
-                    SecondName = "Zel",
+                    LastName = "Zel",
                     DateofBirth = "05.08.2000",
                     Email = "ninileo55555@gmail.com",
                     Password = "admin",

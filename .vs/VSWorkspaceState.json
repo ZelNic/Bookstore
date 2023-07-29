@@ -2,8 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\Bookstore",
+    "\\Bookstore\\Areas",
+    "\\Bookstore\\Areas\\Customer",
+    "\\Bookstore\\Areas\\Customer\\Controllers",
     "\\Bookstore\\Views"
   ],
-  "SelectedNode": "\\Bookstore.sln",
+  "SelectedNode": "\\Bookstore\\Areas\\Customer\\Controllers\\HomeController.cs",
   "PreviewInSolutionExplorer": false
 }

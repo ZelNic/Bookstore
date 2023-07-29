@@ -1,17 +1,20 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using System.Linq;
 
 namespace Bookstore.Areas.Identity
 {
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserController(ApplicationDbContext db)
+        public UserController(ApplicationDbContext db, IHttpContextAccessor httpContextAccessor)
         {
             _db = db;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public IActionResult LogIn()
@@ -28,15 +31,15 @@ namespace Bookstore.Areas.Identity
             {
                 return NotFound("Пользователь не найден.");
             }
-            if(user.Password == password)
+            if (user.Password == password)
             {
-                return RedirectToAction("Index", "Home");
+                _httpContextAccessor.HttpContext.Session.SetInt32("Username", user.UserId);
+                return RedirectToAction("Index", "Home", new { area = "Customer" });
             }
             else
             {
                 return NotFound("Пользователь не найден.");
             }
-            
         }
 
         [HttpGet]
@@ -53,10 +56,26 @@ namespace Bookstore.Areas.Identity
             _db.User.Add(newUser);
             _db.SaveChanges();
 
-            HttpContext.Session.SetString("Username", newUser.FirstName);
+            _httpContextAccessor.HttpContext.Session.SetInt32("Username", newUser.UserId);
 
-            return LocalRedirect("~/Customer/Views/Home/Index");
+            return RedirectToAction("Index", "Home", new { area = "Customer" });
         }
+
+        [HttpGet]
+        public IActionResult Profile()
+        {
+            int? id = _httpContextAccessor.HttpContext.Session.GetInt32("Username");
+            if (id != null)
+            {
+                User user = _db.User.FirstOrDefault(u => u.UserId == id);
+                return View(user);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
 
     }
 }

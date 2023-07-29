@@ -10,7 +10,7 @@ namespace Bookstore.Models
         [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "Можно вводить только буквы.")]
         public string? FirstName { get; set; }
         [Required]
-        public string? SecondName { get; set; }
+        public string? LastName { get; set; }
         [DataType(DataType.Date)]
         [Required]
         public string? DateofBirth { get; set; }
