@@ -1,11 +1,10 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 
 namespace Bookstore.Areas.Identity
 {
+    [Area("Identity")]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -76,6 +75,25 @@ namespace Bookstore.Areas.Identity
             }
         }
 
+        [HttpPost]
+        public IActionResult Profile(User user)
+        {
+            User oldVerUser = _db.User.FirstOrDefault(u => u.UserId == user.UserId);
+
+            if (oldVerUser != null)
+            {
+                oldVerUser.FirstName = user.FirstName;
+                oldVerUser.LastName = user.LastName;
+                oldVerUser.Email = user.Email;
+                oldVerUser.PhoneNumber = user.PhoneNumber;
+                oldVerUser.DateofBirth = user.DateofBirth;
+
+                _db.User.Update(oldVerUser);
+                _db.SaveChanges();
+            }
+
+            return RedirectToAction("Profile");
+        }
 
     }
 }

@@ -36,12 +36,12 @@
                             <form method="post" enctype="multipart/form-data">
                             <td class="mx-auto">
                                 <a>
-                                    <a class="btn btn-success" asp-controller="Category" asp-action="Upsert" asp-route-categoryId="@category.Id">Edit</a>
+                                    <a class="btn btn-success" asp-area="Admin" asp-controller="Category" asp-action="Upsert" asp-route-categoryId="@category.Id">Edit</a>
                                 </a>
                             </td>
                             <td class="mx-auto">
                                 <a>
-                                    <a class="btn btn-primary" asp-area="" asp-controller="Category" asp-action="BookCategory" asp-route-categoryId="@category.Id">Show</a> @*!!!*@
+                                    <a class="btn btn-primary" asp-area="Admin" asp-controller="Category" asp-action="BookCategory" asp-route-categoryId="@category.Id">Show</a> @*!!!*@
                                 </a>
                             </td>
                             </form>

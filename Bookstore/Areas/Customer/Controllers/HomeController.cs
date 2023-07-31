@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Bookstore.Areas.Customer
 {
-
+    [Area("Customer")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

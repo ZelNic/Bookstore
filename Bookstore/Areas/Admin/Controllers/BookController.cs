@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 namespace Bookstore.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -75,7 +76,7 @@ namespace Bookstore.Areas.Admin.Controllers
             }
 
             _db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index","Book");
         }
 
 
@@ -100,7 +101,7 @@ namespace Bookstore.Areas.Admin.Controllers
             {
                 _db.Books.Remove(bookOnDelete);
                 _db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Book");
             }
             else
             {

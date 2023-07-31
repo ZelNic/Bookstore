@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bookstore.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -58,7 +59,7 @@ namespace Bookstore.Areas.Admin.Controllers
             }
 
             _db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Category");
         }
 
         [HttpGet]
@@ -81,7 +82,7 @@ namespace Bookstore.Areas.Admin.Controllers
             {
                 _db.Categories.Remove(categoryOnDelete);
                 _db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index","Category");
             }
             else
             {

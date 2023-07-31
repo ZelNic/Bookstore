@@ -1,14 +1,8 @@
 ﻿@model User
 
-<style>
-    .my-custom-spacing {
-        margin-top: 1px;
-        margin-bottom: 1px;
-    }
-</style>
-
 <div class="container-fluid mt-5">
     <form method="post">
+        <input asp-for="UserId" hidden />
         <div class="row">
             <div class="col-md-6">
                 <div class="card bg-dark text-white">
@@ -16,19 +10,19 @@
                         <h4>Персональная информация</h4>
                         <hr />
                     </div>
-                    <div class="card-body my-custom-spacing">
+                    <div class="card-body pb-0 pt-0 mt-0 mb-0">
                         <h8>Фамилия</h8>
                         <input asp-for="LastName" class="form-control border-0 shadow" />
                         <label asp-for="LastName" class="ms-1 my-1 text-dark"></label>
                         <span asp-validation-for="LastName" class="text-danger"></span>
                     </div>
-                    <div class="card-body  my-custom-spacing">
+                    <div class="card-body pb-0 pt-0 mt-0 mb-0">
                         <h8>Имя</h8>
                         <input asp-for="FirstName" class="form-control border-0 shadow" />
                         <label asp-for="FirstName" class="ms-1 my-1 text-dark"></label>
                         <span asp-validation-for="FirstName" class="text-danger"></span>
                     </div>
-                    <div class="card-body my-custom-spacing ">
+                    <div class="card-body pb-0 pt-0 mt-0 mb-0">
                         <h8>День рождения</h8>
                         <input asp-for="DateofBirth" class="form-control border-0 shadow" />
                         <label asp-for="DateofBirth" class="ms-1 my-1 text-dark"></label>
@@ -43,13 +37,13 @@
                         <h4>Данные для входа</h4>
                         <hr />
                     </div>
-                    <div class="card-body pt-0 pb-0">
+                    <div class="card-body pb-0 pt-0 mt-0 mb-0">
                         <h8>Электронная почта</h8>
                         <input asp-for="Email" class="form-control border-0 shadow" />
                         <label asp-for="Email" class="ms-1 my-1 text-dark"></label>
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
-                    <div class="card-body pt-0 pb-0">
+                    <div class="card-body pb-0 pt-0 mt-0 mb-0">
                         <h8>Телефонный номер</h8>
                         <input asp-for="PhoneNumber" class="form-control border-0 shadow" />
                         <label asp-for="PhoneNumber" class="ms-1 my-1 text-dark"></label>
