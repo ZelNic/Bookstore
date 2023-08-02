@@ -3,12 +3,15 @@
     "",
     "\\Bookstore",
     "\\Bookstore\\Areas",
+    "\\Bookstore\\Areas\\Admin",
+    "\\Bookstore\\Areas\\Admin\\Views",
+    "\\Bookstore\\Areas\\Admin\\Views\\Category",
     "\\Bookstore\\Areas\\Customer",
     "\\Bookstore\\Areas\\Customer\\Controllers",
     "\\Bookstore\\Areas\\Identity",
     "\\Bookstore\\Areas\\Identity\\Controllers",
     "\\Bookstore\\Views"
   ],
-  "SelectedNode": "\\Bookstore.sln",
+  "SelectedNode": "\\Bookstore\\Areas\\Admin\\Views\\Category\\Index.cshtml",
   "PreviewInSolutionExplorer": false
 }

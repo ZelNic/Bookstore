@@ -1,5 +1,6 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
+using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bookstore.Areas.Customer
@@ -35,9 +36,18 @@ namespace Bookstore.Areas.Customer
             return NotFound();
         }
 
+        [HttpPost]
         public void AddBasket(int productId)
         {
-
+            ShoppingBasket newProductInShopBasket = new()
+            {
+                BasketId = _user.UserId,
+                ProductId = productId,
+                UserId = _user.UserId,
+                CountProduct = 1
+            };
+            _db.ShoppingBasket.Add(newProductInShopBasket);
+            _db.SaveChanges();
         }
     }
 }
