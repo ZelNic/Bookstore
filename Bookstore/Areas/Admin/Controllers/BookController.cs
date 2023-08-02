@@ -54,13 +54,13 @@ namespace Bookstore.Areas.Admin.Controllers
         [ActionName("Upsert")]
         public IActionResult UpsertPost(BookVM bookVM)
         {
-            if (bookVM.Book.Id == 0)
+            if (bookVM.Book.BookId == 0)
             {
                 _db.Books.Add(bookVM.Book);
             }
             else
             {
-                var oldVersionBook = _db.Books.Find(bookVM.Book.Id);
+                var oldVersionBook = _db.Books.Find(bookVM.Book.BookId);
 
                 if (oldVersionBook != null)
                 {
@@ -96,7 +96,7 @@ namespace Bookstore.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult Delete(Book book)
         {
-            var bookOnDelete = _db.Books.Find(book.Id);
+            var bookOnDelete = _db.Books.Find(book.BookId);
             if (bookOnDelete != null)
             {
                 _db.Books.Remove(bookOnDelete);

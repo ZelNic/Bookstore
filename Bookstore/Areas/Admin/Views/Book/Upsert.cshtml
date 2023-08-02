@@ -2,7 +2,7 @@
 
 <div class="container">
     <div class="text-center">
-        @if (Model.Book.Id != 0)
+        @if (Model.Book.BookId != 0)
         {
             <h2>Change the book</h2>
         }
@@ -16,7 +16,7 @@
     <div class="container">
         <div class="row">
             <form method="post" class="row" enctype="multipart/form-data">
-                <input asp-for="Book.Id" hidden />
+                <input asp-for="Book.BookId" hidden />
                 <div class="form-floating py-2 col-5 mt-xxl-4">
                     <input asp-for="Book.Title" class="form-control border-0 shadow" />
                     <label asp-for="Book.Title" class="ms-1 my-1 text-dark"></label>
@@ -60,12 +60,12 @@
                 </div>
 
                 <div class="col-6">
-                    @if (Model.Book.Id != 0)
+                    @if (Model.Book.BookId != 0)
                     {
                         <div class="container mt-4">
                             <div class="row justify-content-center align-items-center">
                                 <div class="col text-center">
-                                    <a class="btn btn-danger mb-1" asp-action="Delete" asp-controller="Book" asp-route-id="@Model.Book.Id">Delete</a>
+                                    <a class="btn btn-danger mb-1" asp-action="Delete" asp-controller="Book" asp-route-id="@Model.Book.BookId">Delete</a>
                                 </div>
                                 <div class="col text-center">
                                     <button type="submit" class="btn btn-success form-control">Update</button>

@@ -8,7 +8,7 @@ namespace Bookstore.Models
     public class Book
     {
         [Key]
-        public int Id { get; set; }
+        public int BookId { get; set; }
         [Required]
         public string? Title { get; set; }
         [Required]

@@ -1,4 +1,5 @@
 ﻿using Bookstore.Models;
+using Bookstore.Models.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.DataAccess
@@ -12,6 +13,8 @@ namespace Bookstore.DataAccess
         public DbSet<Book> Books { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<PurchaseHistory> PurchaseHistory { get; set; }
+        public DbSet<ShoppingBasket> ShoppingBasket { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,7 +23,7 @@ namespace Bookstore.DataAccess
             modelBuilder.Entity<Book>().HasData(
                 new Book
                 {
-                    Id = 1,
+                    BookId = 1,
                     Title = "И нас пожирает пламя",
                     Author = "Жауме Кабре",
                     ISBN = "978-5-389-22890-0",
@@ -53,6 +56,25 @@ namespace Bookstore.DataAccess
                     Ctreet = "Lenina",
                     HouseNumber = 30,
                     PhoneNumber = "89226578108"
+                }
+            );
+
+            modelBuilder.Entity<PurchaseHistory>().HasData(
+                new PurchaseHistory
+                {
+                    PurchaseId = 1,
+                    UserId = 1,
+                    ProductId = 1,
+                    PurchaseDate = new DateTime()
+                }
+            );
+            modelBuilder.Entity<ShoppingBasket>().HasData(
+                new ShoppingBasket
+                {
+                    BasketId = 1,
+                    UserId = 1,
+                    ProductId = 1,
+                    CountProduct = 1
                 }
             );
 

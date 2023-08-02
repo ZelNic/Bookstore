@@ -1,5 +1,51 @@
-﻿ @{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model BookVM
 
 
+<div class="container-fluid">
+    <div class="row pb-5 mb-5 mb-2">
+        @if (Model.BooksList != null)
+            @foreach (var book in Model.BooksList)
+            {
+                <div class="col-lg-2 col-sm-2">
+                    <div class="row p-1 mt-2" style="height: 100%">
+                        <div class="col-12">
+                            <div class="card card-deck border-0 p-1 shadow mx-auto h-100">
+                                <img src="@book.ImageURL" class="card-img" />
+                                <div class="card-body border-light ">
+                                    <div class="card-body mt-auto mt-2">
+                                        <div class="">
+                                            <p class="card-title text-black"><b>@book.Title</b></p>
+                                        </div>
+                                        <div class="">
+                                            <p class="card-title text-dark opacity-75"><b>@book.Author</b></p>
+                                        </div>
+                                        @if (Model.CategoriesList != null)
+                                        {
+                                            var category = Model.CategoriesList.FirstOrDefault(c => c.Id == book.Category);
+                                            if (category != null)
+                                            {
+                                                <div class="pl-1">
+                                                    <p class="text-dark text-opacity-75  mb-0">@category.Name</p>
+                                                </div>
+                                            }
+                                        }
+                                        <div class="">
+                                            <p class="text-dark h4 text-center mb-0">@book.Price</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.BookId" class="btn btn-success border-0 form-control">
+                                        Details
+                                    </a>
+                                    <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket" asp-route-productId="@book.BookId" class="btn btn-warning border-0 form-control mt-1">
+                                        Buy
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+    </div>
+</div>

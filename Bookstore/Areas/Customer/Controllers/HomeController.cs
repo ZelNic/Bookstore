@@ -22,19 +22,16 @@ namespace Bookstore.Areas.Customer
 
         public IActionResult Index()
         {
-            //if (_httpContextAccessor.HttpContext.Session.GetInt32("Username") != null)
-            //{
-            //    int? idUserFromHttpContext = _httpContextAccessor.HttpContext.Session.GetInt32("Username");
+            List<Book> booksList = _db.Books.ToList();
+            List<Category> categoriesList = _db.Categories.ToList();
 
-            //    User user = _db.User.FirstOrDefault(u => u.UserId == idUserFromHttpContext);
+            BookVM bookVM = new()
+            {
+                BooksList = booksList,
+                CategoriesList = categoriesList
+            };
 
-            //    if (user != null)
-            //    {
-
-            //    }
-            //}
-
-            return View();
+            return View(bookVM);
         }
 
         public IActionResult Privacy()

@@ -1,0 +1,28 @@
+﻿@model User
+
+@inject ApplicationDbContext DB
+@{
+    var db = DB;
+}
+
+@if (Model == null)
+{
+    <h1>Please Log In</h1>
+}
+else
+{
+    <h1>Your order</h1>
+
+    var basket = db.ShoppingBasket.Find(Model.UserId); 
+
+    <div class="container">
+        <div class="row">
+            <div class="card">
+                @foreach (var product in db.Books.Where(u => u.BookId == basket.ProductId))
+                {
+                   <h2>@product.Title</h2>
+                }
+            </div>
+        </div>
+    </div>
+}

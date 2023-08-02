@@ -38,8 +38,11 @@
                                     </div>
                                 </div>
                                 <div class="card-footer bg-transparent">
-                                    <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.Id" class="btn btn-success border-0 form-control">
+                                    <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.BookId" class="btn btn-success border-0 form-control">
                                         Details
+                                    </a>
+                                    <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="Index" asp-route-bookId="@book.BookId" class="btn btn-warning border-0 form-control mt-1">
+                                        Buy
                                     </a>
                                 </div>
                             </div>
