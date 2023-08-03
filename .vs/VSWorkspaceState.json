@@ -10,8 +10,9 @@
     "\\Bookstore\\Areas\\Customer\\Controllers",
     "\\Bookstore\\Areas\\Identity",
     "\\Bookstore\\Areas\\Identity\\Controllers",
-    "\\Bookstore\\Views"
+    "\\Bookstore\\Views",
+    "\\Bookstore\\Views\\Shared"
   ],
-  "SelectedNode": "\\Bookstore\\Areas\\Admin\\Views\\Category\\Index.cshtml",
+  "SelectedNode": "\\Bookstore\\Views\\Shared\\_Layout.cshtml",
   "PreviewInSolutionExplorer": false
 }

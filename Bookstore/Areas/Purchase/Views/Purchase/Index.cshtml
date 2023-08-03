@@ -1,23 +1,24 @@
-﻿
+﻿@inject IHttpContextAccessor HttpContextAccessor
 @{
-    ViewData["Title"] = "Оплата";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    var httpContext = HttpContextAccessor.HttpContext;
 }
 
-<h1>Оплата</h1>
+<div class="container">
+    <h1>Оплата</h1>
+    <form asp-controller="Payment" asp-action="ProcessPayment" method="post">
+        <div class="form-group">
+            <label for="cardNumber">Номер карты</label>
+            <input type="text" class="form-control" id="cardNumber" name="CardNumber">
+        </div>
+        <div class="form-group">
+            <label for="expirationDate">Срок действия</label>
+            <input type="text" class="form-control" id="expirationDate" name="ExpirationDate">
+        </div>
+        <div class="form-group">
+            <label for="cvv">CVV</label>
+            <input type="text" class="form-control" id="cvv" name="CVV">
+        </div>
+        <button type="submit" class="btn btn-primary">Оплатить</button>
+    </form>
+</div>
 
-<form asp-controller="Payment" asp-action="ProcessPayment" method="post">
-    <div class="form-group">
-        <label for="cardNumber">Номер карты</label>
-        <input type="text" class="form-control" id="cardNumber" name="CardNumber">
-    </div>
-    <div class="form-group">
-        <label for="expirationDate">Срок действия</label>
-        <input type="text" class="form-control" id="expirationDate" name="ExpirationDate">
-    </div>
-    <div class="form-group">
-        <label for="cvv">CVV</label>
-        <input type="text" class="form-control" id="cvv" name="CVV">
-    </div>
-    <button type="submit" class="btn btn-primary">Оплатить</button>
-</form>

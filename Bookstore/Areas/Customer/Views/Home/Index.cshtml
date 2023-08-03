@@ -30,7 +30,7 @@
                                             }
                                         }
                                         <div class="">
-                                            <p class="text-dark h4 text-center mb-0">@book.Price</p>
+                                            <p class="text-dark h4 text-center mb-0">@book.Price ₽</p>
                                         </div>
                                     </div>
                                 </div>
@@ -39,9 +39,9 @@
                                         Details
                                     </a>
                                     <form method="post">
-                                        <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket" asp-route-productId="@book.BookId" class="btn btn-warning border-0 form-control mt-1">
+                                        <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket" asp-route-productId="@book.BookId" class="btn btn-warning border-0 form-control mt-1">
                                             Buy
-                                        </a>
+                                        </button>
                                     </form>
                                 </div>
                             </div>

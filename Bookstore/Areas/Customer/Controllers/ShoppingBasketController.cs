@@ -37,17 +37,41 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public void AddBasket(int productId)
+        public IActionResult AddBasket(int productId)
         {
-            ShoppingBasket newProductInShopBasket = new()
+            if (_user == null)
             {
-                BasketId = _user.UserId,
-                ProductId = productId,
-                UserId = _user.UserId,
-                CountProduct = 1
-            };
-            _db.ShoppingBasket.Add(newProductInShopBasket);
-            _db.SaveChanges();
+                return RedirectToAction("LogIn", "User", new { area = "Identity" });
+            }
+            else
+            {
+                ShoppingBasket newProductInShopBasket = new()
+                {
+                    ProductId = productId,
+                    UserId = _user.UserId,
+                    CountProduct = 1
+                };
+
+                _db.ShoppingBasket.Add(newProductInShopBasket);
+                _db.SaveChanges();
+
+
+                return RedirectToAction("Index", "Home", new { area = "Customer" });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RemoveFromBasket(int productId)
+        {
+            var basketId = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId);
+            if (basketId != null)
+            {
+                var productOnRemove = _db.ShoppingBasket.First(p => p.ProductId == productId);
+                _db.ShoppingBasket.Remove(productOnRemove);
+                _db.SaveChanges();
+            }
+
+            return RedirectToAction("Index");     
         }
     }
 }

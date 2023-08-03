@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Bookstore.Areas.Purchase
+namespace Bookstore.Areas.Admin.Controllers
 {
-    [Area("Purchase")]
-    public class PurchaseController : Controller
+    public class RolesController : Controller
     {
         public IActionResult Index()
         {

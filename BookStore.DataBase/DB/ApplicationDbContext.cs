@@ -1,5 +1,6 @@
 ﻿using Bookstore.Models;
 using Bookstore.Models.Models;
+using Bookstore.Models.SD;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.DataAccess
@@ -15,6 +16,8 @@ namespace Bookstore.DataAccess
         public DbSet<User> User { get; set; }
         public DbSet<PurchaseHistory> PurchaseHistory { get; set; }
         public DbSet<ShoppingBasket> ShoppingBasket { get; set; }
+
+        public DbSet<Roles> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -77,6 +80,16 @@ namespace Bookstore.DataAccess
                     CountProduct = 1
                 }
             );
+
+            modelBuilder.Entity<Roles>().HasData(
+                new Roles
+                {
+                    RoleId = 1,
+                    UserId = 1,
+                    RoleName = SD.Role_Admin,                    
+                }
+            );
+
 
         }
 

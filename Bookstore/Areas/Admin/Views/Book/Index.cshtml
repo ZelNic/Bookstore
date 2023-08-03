@@ -1,7 +1,16 @@
-﻿@model BookVM
+﻿@inject ApplicationDbContext DB
+@{
+    var db = DB;
+}
 
-<div class="col-2 pb-5 mt-2 pt-3 text-right">
-    <a asp-action="Upsert" class="btn btn-success btn-outline-warning border-0 form-control">Add New Book</a>
+@model BookVM
+
+<div class="col-2 pb-3 mt-2 pt-3 text-right">
+    <a asp-action="Upsert" class="btn btn-warning border-0 form-control">Add New Book</a>
+</div>
+
+<div class="">
+    <h5>Total: @db.Books.Count()</h5>
 </div>
 
 <div class="container-fluid">
@@ -33,16 +42,13 @@
                                             }
                                         }
                                         <div class="">
-                                            <p class="text-dark h4 text-center mb-0">@book.Price</p>
+                                            <p class="text-dark h4 text-center mb-0">@book.Price ₽</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.BookId" class="btn btn-success border-0 form-control">
                                         Details
-                                    </a>
-                                    <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="Index" asp-route-bookId="@book.BookId" class="btn btn-warning border-0 form-control mt-1">
-                                        Buy
                                     </a>
                                 </div>
                             </div>

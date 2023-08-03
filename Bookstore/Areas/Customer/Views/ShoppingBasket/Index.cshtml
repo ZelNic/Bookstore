@@ -13,16 +13,66 @@ else
 {
     <h1>Your order</h1>
 
-    var basket = db.ShoppingBasket.Find(Model.UserId); 
+    var basket = db.ShoppingBasket.Where(u => u.UserId == Model.UserId);
+    var sumPurchase = 0;
 
-    <div class="container">
-        <div class="row">
-            <div class="card">
-                @foreach (var product in db.Books.Where(u => u.BookId == basket.ProductId))
+    <div class="row row-cols-2">
+        <div class="container col-10">
+            <div class="row row-cols-2 row-cols-md-6 mb-5">
+                @foreach (var product in basket)
                 {
-                   <h2>@product.Title</h2>
+                    var pr = @db.Books.Find(product.ProductId);
+                    <div class="col-2 mb-3">
+                        <div class="card card-subtitle h-100 shadow pt-1 border-0">
+                            <img src="@pr.ImageURL" class="card-img-top mx-auto rounded-1" style="object-fit: cover; width: 50%; height: 150px;" />
+                            <div class="card-body mt-0 pb-0">
+                                @pr.Title
+                            </div>
+                            <div class="card-body mt-0 pb-0">
+                                @pr.Price p
+                            </div>
+                            <div class="card card-footer bg-transparent border-0">
+                                <form method="post">
+                                    <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="RemoveFromBasket" asp-route-productId="@pr.BookId"
+                                            type="submit" class="btn btn-danger">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 }
+            </div>
+        </div>
+
+        <div class="container col-2">
+            <div class="col-12">
+                @foreach (var product in basket)
+                {
+                    var pr = @db.Books.Find(product.ProductId).Price;
+                    sumPurchase += Convert.ToInt32(pr);
+                }
+                
+                <div>
+                    @if (basket.Count() == 1)
+                    {
+                        <text>There is @basket.Count() item in the cart</text>
+                        <h5>Total: @sumPurchase ₽</h5>
+                    }
+                    else
+                    {
+                        <text>There are @basket.Count() items in the cart</text>
+                        <h5>Total: @sumPurchase ₽</h5>
+                    }
+                </div>
+                <form method="post">
+                    <button asp-area="Purchase" asp-controller="Purchase" asp-action="Index"
+                            type="submit" class="btn btn-success">
+                        <i class="bi bi-bag-fill"></i> Сheckout
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 }
+
