@@ -2,12 +2,11 @@
 
 namespace Bookstore.Models.Models
 {
-    public class ShoppingBasket
+    public class WishList
     {
-        [Key] public int BasketId { get; set; }
+        [Key] public int WishListId { get; set; }
         [Required] public int UserId { get; set; }
         [Required] public int ProductId { get; set; }
         [Required] public int CountProduct { get; set; }
-
     }
 }

@@ -11,10 +11,19 @@
 }
 else
 {
-    <h1>Your order</h1>
-
-    var basket = db.ShoppingBasket.Where(u => u.UserId == Model.UserId);
+    var basket = db.WishLists.Where(u => u.UserId == Model.UserId);
     var sumPurchase = 0;
+    var countProduct = 0;
+    var sumCountProduct = 0;
+
+    @if (basket.Count() == 0)
+    {
+        <h1>Empty cart</h1>
+    }
+    else
+    {
+        <h1>Your order</h1>
+    }
 
     <div class="row row-cols-2">
         <div class="container col-10">
@@ -24,7 +33,7 @@ else
                     var pr = @db.Books.Find(product.ProductId);
                     <div class="col-2 mb-3">
                         <div class="card card-subtitle h-100 shadow pt-1 border-0">
-                            <img src="@pr.ImageURL" class="card-img-top mx-auto rounded-1" style="object-fit: cover; width: 50%; height: 150px;" />
+                            <img src="@pr.ImageURL" alt="Image" class="card-img-top mx-auto rounded-1" style="object-fit: cover; width: 50%; height: 150px;" />
                             <div class="card-body mt-0 pb-0">
                                 @pr.Title
                             </div>
@@ -33,10 +42,30 @@ else
                             </div>
                             <div class="card card-footer bg-transparent border-0">
                                 <form method="post">
-                                    <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="RemoveFromBasket" asp-route-productId="@pr.BookId"
+                                    <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="RemoveFromBasket" asp-route-productId="@pr.BookId" asp-route-delete="true"
                                             type="submit" class="btn btn-danger">
                                         <i class="bi bi-x-circle"></i>
                                     </button>
+                                    <div class="row border border-1 rounded-1">
+                                        <div class="col-3">
+                                            <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="RemoveFromBasket" asp-route-productId="@pr.BookId" asp-route-minus="true"
+                                                    type="submit" class="btn">
+                                                <i class="bi bi-dash-circle"></i>
+                                            </button>
+                                        </div>
+                                        <div class="col-3">
+                                            @{
+                                                var count = db.WishLists.Where(u => u.UserId == Model.UserId).Where(c => c.ProductId == product.ProductId).FirstOrDefault().CountProduct;
+                                                @count
+                                            }
+                                        </div>
+                                        <div class="col-3">
+                                            <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="RemoveFromBasket" asp-route-productId="@pr.BookId" asp-route-plus="true"
+                                                    type="submit" class="btn">
+                                                <i class="bi bi-plus-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -49,19 +78,23 @@ else
             <div class="col-12">
                 @foreach (var product in basket)
                 {
-                    var pr = @db.Books.Find(product.ProductId).Price;
-                    sumPurchase += Convert.ToInt32(pr);
+                    var price = @db.Books.Find(product.ProductId).Price;
+                    countProduct = db.WishLists.Where(u => u.UserId == Model.UserId)
+                    .Where(c => c.ProductId == product.ProductId)
+                    .FirstOrDefault().CountProduct;
+                    sumCountProduct += countProduct;
+                    sumPurchase += Convert.ToInt32(price) * countProduct;
                 }
-                
+
                 <div>
-                    @if (basket.Count() == 1)
+                    @if (sumCountProduct == 1)
                     {
-                        <text>There is @basket.Count() item in the cart</text>
+                        <text>There is @sumCountProduct item in the cart</text>
                         <h5>Total: @sumPurchase ₽</h5>
                     }
                     else
                     {
-                        <text>There are @basket.Count() items in the cart</text>
+                        <text>There are @sumCountProduct items in the cart</text>
                         <h5>Total: @sumPurchase ₽</h5>
                     }
                 </div>

@@ -1,6 +1,5 @@
 ﻿@model BookVM
 
-
 <div class="container-fluid">
     <div class="row pb-5 mb-5 mb-2">
         @if (Model.BooksList != null)
@@ -35,14 +34,29 @@
                                     </div>
                                 </div>
                                 <div class="card-footer bg-transparent">
-                                    <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.BookId" class="btn btn-success border-0 form-control">
-                                        Details
-                                    </a>
-                                    <form method="post">
-                                        <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket" asp-route-productId="@book.BookId" class="btn btn-warning border-0 form-control mt-1">
-                                            Buy
-                                        </button>
-                                    </form>
+                                    <div class="row">
+                                        <form method="post">
+                                            <div class="col-0">
+                                                <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.BookId"
+                                                   class="btn btn-primary border-0 ">
+                                                    <i class="bi bi-three-dots"></i>
+                                                </a>
+                                            </div>
+                                            <div class="col-0">
+                                                @*ТУТ ХУЙНЯ*@
+                                                <a asp-controller="Wishlist" asp-action="AddWishList" asp-route-bookId="@book.BookId" class="btn btn-warning border-0">
+                                                    <i class="bi bi-bookmark-heart-fill"></i>
+                                                </a>
+                                            </div>
+                                            <div class="col-0">
+                                                <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
+                                                        asp-route-productId="@book.BookId" class="btn btn-success border-0">
+                                                    <i class="bi bi-bag-plus"></i>
+                                                </button>
+
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>

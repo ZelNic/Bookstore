@@ -16,8 +16,9 @@ namespace Bookstore.DataAccess
         public DbSet<User> User { get; set; }
         public DbSet<PurchaseHistory> PurchaseHistory { get; set; }
         public DbSet<ShoppingBasket> ShoppingBasket { get; set; }
-
         public DbSet<Roles> Roles { get; set; }
+
+        public DbSet<WishList> WishLists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -86,9 +87,19 @@ namespace Bookstore.DataAccess
                 {
                     RoleId = 1,
                     UserId = 1,
-                    RoleName = SD.Role_Admin,                    
+                    RoleName = SD.Role_Admin,
                 }
             );
+
+            modelBuilder.Entity<WishList>().HasData(
+                new WishList
+                {
+                    WishListId = 1,
+                    UserId = 1,
+                    ProductId = 1,
+                    CountProduct = 1                    
+                }
+            ); 
 
 
         }

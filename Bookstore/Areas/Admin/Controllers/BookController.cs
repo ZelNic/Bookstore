@@ -1,7 +1,6 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace Bookstore.Areas.Admin.Controllers
 {
@@ -76,7 +75,7 @@ namespace Bookstore.Areas.Admin.Controllers
             }
 
             _db.SaveChanges();
-            return RedirectToAction("Index","Book");
+            return RedirectToAction("Index", "Book");
         }
 
 

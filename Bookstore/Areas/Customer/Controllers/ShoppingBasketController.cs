@@ -45,14 +45,32 @@ namespace Bookstore.Areas.Customer
             }
             else
             {
-                ShoppingBasket newProductInShopBasket = new()
-                {
-                    ProductId = productId,
-                    UserId = _user.UserId,
-                    CountProduct = 1
-                };
+                var basket = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId)
+                    .Where(u => u.ProductId == productId)
+                    .FirstOrDefault();
 
-                _db.ShoppingBasket.Add(newProductInShopBasket);
+                if (basket != null)
+                {
+                    var count = basket.CountProduct;
+                    count++;
+                    basket.CountProduct = count;
+                    _db.ShoppingBasket.Update(basket);
+                }
+
+
+                if (basket == null)
+                {
+                    ShoppingBasket newProductInShopBasket = new()
+                    {
+                        ProductId = productId,
+                        UserId = _user.UserId,
+                        CountProduct = 1
+                    };
+
+                    _db.ShoppingBasket.Add(newProductInShopBasket);
+                }
+
+
                 _db.SaveChanges();
 
 
@@ -61,33 +79,33 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public IActionResult RemoveFromBasket(int productId)
+        public IActionResult RemoveFromBasket(int productId, bool delete = false, bool minus = false, bool plus = false)
         {
-            var basketId = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId);
-            if (basketId != null)
+            var productInBasket = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefault();
+            int countProductInBasket = productInBasket.CountProduct;
+
+            if ((delete == true) || (countProductInBasket == 1))
             {
-                var productOnRemove = _db.ShoppingBasket.First(p => p.ProductId == productId);
-                _db.ShoppingBasket.Remove(productOnRemove);
+                _db.ShoppingBasket.Remove(productInBasket);
+
                 _db.SaveChanges();
+                return RedirectToAction("Index");
+            }            
+
+            if (minus == true)
+            {
+                countProductInBasket--;
+            }
+            else if (plus == true)
+            {
+                countProductInBasket++;
             }
 
-            return RedirectToAction("Index");     
+            productInBasket.CountProduct = countProductInBasket;
+            _db.ShoppingBasket.Update(productInBasket);
+            _db.SaveChanges();
+
+            return RedirectToAction("Index");
         }
     }
 }
-
-
-
-
-
-//if (bookId == null)
-//{
-//    return View();
-//}
-
-//var book = _db.Books.FirstOrDefault(u => u.BookId == bookId);
-//if (book == null)
-//{
-//    return NotFound();
-//}
-//return View(book);

@@ -63,7 +63,9 @@
                         {
                             <ul class="navbar-nav flex-grow-1 justify-content-end">
                                 <li>
-                                    <a class="nav-link text-light" asp-area="" asp-controller="" asp-action=""><i class="bi bi-bookmark-fill"></i>Wish List</a>
+                                    <a class="nav-link text-light" asp-area="Customer" asp-controller="Wishlist" asp-action="Index">
+                                        <i class="bi bi-bookmark-fill"></i>Wish List
+                                    </a>
                                 </li>
                                 <li>
                                     <a class="nav-link text-light" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="Index" asp-route-bookId="null">
@@ -71,10 +73,14 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="nav-link text-light" asp-area="" asp-controller="" asp-action=""><i class="bi bi-chat-dots-fill"></i> Messages</a>
+                                    <a class="nav-link text-light" asp-area="" asp-controller="" asp-action="">
+                                        <i class="bi bi-chat-dots-fill"></i> Messages
+                                    </a>
                                 </li>
                                 <li>
-                                    <a class="nav-link text-light" asp-area="Identity" asp-controller="User" asp-action="Profile"><i class="bi bi-person-circle"></i> @user.FirstName</a>
+                                    <a class="nav-link text-light" asp-area="Identity" asp-controller="User" asp-action="Profile">
+                                        <i class="bi bi-person-circle"></i> @user.FirstName
+                                    </a>
                                 </li>
                             </ul>
                         }
