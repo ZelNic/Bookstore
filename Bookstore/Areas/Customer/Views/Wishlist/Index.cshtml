@@ -42,30 +42,7 @@ else
                                     <button asp-area="" asp-controller="" asp-action="" asp-route-productId="@pr.BookId" asp-route-delete="true"
                                             type="submit" class="btn btn-danger">
                                         <i class="bi bi-x-circle"></i>
-                                    </button>
-                                    <div class="row border border-1 rounded-1">
-                                        <div class="col-3">
-                                            <button asp-area="" asp-controller="" asp-action="" asp-route-productId="@pr.BookId" asp-route-minus="true"
-                                                    type="submit" class="btn">
-                                                <i class="bi bi-dash-circle"></i>
-                                            </button>
-                                        </div>
-                                        <div class="col-3">
-                                            @{
-                                                if (db.ShoppingBasket.Where(u => u.UserId == Model.UserId).Where(c => c.ProductId == product.ProductId).FirstOrDefault() != null)
-                                                {
-                                                    var count = db.ShoppingBasket.Where(u => u.UserId == Model.UserId).Where(c => c.ProductId == product.ProductId).FirstOrDefault().CountProduct;
-                                                    <h6>@count</h6>
-                                                }
-                                            }
-                                        </div>
-                                        <div class="col-3">
-                                            <button asp-area="" asp-controller="" asp-action="" asp-route-productId="@pr.BookId" asp-route-plus="true"
-                                                    type="submit" class="btn">
-                                                <i class="bi bi-plus-circle"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                                    </button>                                    
                                 </form>
                             </div>
                         </div>

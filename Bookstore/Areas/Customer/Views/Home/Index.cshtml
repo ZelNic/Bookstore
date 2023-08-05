@@ -42,18 +42,17 @@
                                                     <i class="bi bi-three-dots"></i>
                                                 </a>
                                             </div>
-                                            <div class="col-0">
-                                                @*ТУТ ХУЙНЯ*@
-                                                <a asp-controller="Wishlist" asp-action="AddWishList" asp-route-bookId="@book.BookId" class="btn btn-warning border-0">
-                                                    <i class="bi bi-bookmark-heart-fill"></i>
-                                                </a>
+                                            <div class="col-0">                                               
+                                                <button type="submit" asp-area="Customer" asp-controller="Wishlist" asp-action="AddWishList"
+                                                        asp-route-productId="@book.BookId" class="btn btn-warning border-0">
+                                                    <i class="bi bi-bookmark-plus"></i>
+                                                </button>
                                             </div>
                                             <div class="col-0">
                                                 <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
                                                         asp-route-productId="@book.BookId" class="btn btn-success border-0">
                                                     <i class="bi bi-bag-plus"></i>
                                                 </button>
-
                                             </div>
                                         </form>
                                     </div>

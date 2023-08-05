@@ -81,16 +81,16 @@ namespace Bookstore.Areas.Customer
         [HttpPost]
         public IActionResult RemoveFromBasket(int productId, bool delete = false, bool minus = false, bool plus = false)
         {
-            var productInBasket = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefault();
+            ShoppingBasket productInBasket = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefault();
             int countProductInBasket = productInBasket.CountProduct;
 
-            if ((delete == true) || (countProductInBasket == 1))
+            if (delete == true || countProductInBasket == 1)
             {
                 _db.ShoppingBasket.Remove(productInBasket);
 
                 _db.SaveChanges();
                 return RedirectToAction("Index");
-            }            
+            }
 
             if (minus == true)
             {

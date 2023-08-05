@@ -37,7 +37,7 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public IActionResult AddWishList(int bookId)
+        public IActionResult AddWishList(int productId)
         {
             if (_user == null)
             {
@@ -46,21 +46,55 @@ namespace Bookstore.Areas.Customer
             else
             {
                 var wishList = _db.WishLists.Where(u => u.UserId == _user.UserId)
-                    .Where(u => u.ProductId == bookId)
+                    .Where(u => u.ProductId == productId)
                     .FirstOrDefault();
 
                 if (wishList != null)
                 {
                     var count = wishList.CountProduct;
-                    count++;
-                    wishList.CountProduct = count;
                     _db.WishLists.Update(wishList);
                 }
                 else
                 {
                     WishList newProductInWishList = new()
                     {
-                        ProductId = bookId,
+                        ProductId = productId,
+                        UserId = _user.UserId,
+                        CountProduct = 1
+                    };
+
+                    _db.WishLists.Add(newProductInWishList);
+                }
+
+                _db.SaveChanges();
+
+                return RedirectToAction("Index", "Home", new { area = "Customer" });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult AddWishList(int productId)
+        {
+            if (_user == null)
+            {
+                return RedirectToAction("LogIn", "User", new { area = "Identity" });
+            }
+            else
+            {
+                var wishList = _db.WishLists.Where(u => u.UserId == _user.UserId)
+                    .Where(u => u.ProductId == productId)
+                    .FirstOrDefault();
+
+                if (wishList != null)
+                {
+                    var count = wishList.CountProduct;
+                    _db.WishLists.Update(wishList);
+                }
+                else
+                {
+                    WishList newProductInWishList = new()
+                    {
+                        ProductId = productId,
                         UserId = _user.UserId,
                         CountProduct = 1
                     };

@@ -11,7 +11,7 @@
 }
 else
 {
-    var basket = db.WishLists.Where(u => u.UserId == Model.UserId);
+    var basket = db.ShoppingBasket.Where(u => u.UserId == Model.UserId);
     var sumPurchase = 0;
     var countProduct = 0;
     var sumCountProduct = 0;
@@ -55,7 +55,7 @@ else
                                         </div>
                                         <div class="col-3">
                                             @{
-                                                var count = db.WishLists.Where(u => u.UserId == Model.UserId).Where(c => c.ProductId == product.ProductId).FirstOrDefault().CountProduct;
+                                                var count = db.ShoppingBasket.Where(u => u.UserId == Model.UserId).Where(c => c.ProductId == product.ProductId).FirstOrDefault().CountProduct;
                                                 @count
                                             }
                                         </div>
@@ -79,7 +79,7 @@ else
                 @foreach (var product in basket)
                 {
                     var price = @db.Books.Find(product.ProductId).Price;
-                    countProduct = db.WishLists.Where(u => u.UserId == Model.UserId)
+                    countProduct = db.ShoppingBasket.Where(u => u.UserId == Model.UserId)
                     .Where(c => c.ProductId == product.ProductId)
                     .FirstOrDefault().CountProduct;
                     sumCountProduct += countProduct;
