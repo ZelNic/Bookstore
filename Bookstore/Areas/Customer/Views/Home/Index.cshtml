@@ -1,4 +1,24 @@
-﻿@model BookVM
+﻿@inject ApplicationDbContext DB
+@{
+    var db = DB;
+}
+
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var httpContext = HttpContextAccessor.HttpContext;
+    User? user = null;
+    if (httpContext.Session.GetInt32("Username") != null)
+    {
+        int? userId = httpContext.Session.GetInt32("Username");
+        if ((userId != null) && (db.User.Find(userId) != null))
+        {
+            user = db.User.Find(userId);
+        }
+    }
+}
+
+
+@model BookVM
 
 <div class="container-fluid">
     <div class="row pb-5 mb-5 mb-2">
@@ -6,7 +26,7 @@
             @foreach (var book in Model.BooksList)
             {
                 <div class="col-lg-2 col-sm-2">
-                    <div class="row p-1 mt-2" style="height: 100%">
+                    <div class="row p-2 mt-1" style="height: 100%">
                         <div class="col-12">
                             <div class="card card-deck border-0 p-1 shadow mx-auto h-100">
                                 <img src="@book.ImageURL" class="card-img" />
@@ -37,16 +57,26 @@
                                     <div class="row">
                                         <form method="post">
                                             <div class="col-0">
-                                                <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.BookId"
+                                                <a asp-controller="Home" asp-action="Details" asp-route-productId="@book.BookId"
                                                    class="btn btn-primary border-0 ">
                                                     <i class="bi bi-three-dots"></i>
                                                 </a>
                                             </div>
-                                            <div class="col-0">                                               
-                                                <button type="submit" asp-area="Customer" asp-controller="Wishlist" asp-action="AddWishList"
-                                                        asp-route-productId="@book.BookId" class="btn btn-warning border-0">
-                                                    <i class="bi bi-bookmark-plus"></i>
-                                                </button>
+                                            <div class="col-0">
+                                                @if (db.WishLists.Where(u=>u.UserId == user.UserId).Where(u=>u.ProductId==book.BookId) != null)
+                                                {
+                                                    <button type="submit" asp-area="Customer" asp-controller="Wishlist" asp-action="AddWishList"
+                                                            asp-route-productId="@book.BookId" class="btn btn-warning border-0">
+                                                        <i class="bi bi-bookmark-check-fill"></i>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" asp-area="Customer" asp-controller="Wishlist" asp-action="AddWishList"
+                                                            asp-route-productId="@book.BookId" class="btn btn-warning border-0">
+                                                        <i class="bi bi-bookmark-plus"></i>
+                                                    </button>
+                                                }          
                                             </div>
                                             <div class="col-0">
                                                 <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"

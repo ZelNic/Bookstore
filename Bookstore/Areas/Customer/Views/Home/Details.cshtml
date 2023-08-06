@@ -1,1 +1,78 @@
-﻿<h1>Details</h1>
+﻿@model Book
+
+<div class="container">
+    <div>
+        <h1>@Model.Author : @Model.Title</h1>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <img src="@Model.ImageURL" alt="Image" class="rounded rounded-1 col-12" />
+        </div>
+        <div class="col-3 bg-body-tertiary rounded rounded-1">
+            <div>
+                Author:
+                <a asp-area="" asp-controller="" asp-action="" asp-route-author=""> @Model.Author</a>
+            </div>
+            <div>
+                Editor:
+                <a asp-area="" asp-controller="" asp-action="" asp-route-author=""> Piter</a>
+            </div>
+            <div>
+                ISBN: @Model.ISBN
+            </div>
+            <hr class="col-8 mb-1" />
+            <div class="mt-0 pt-0">
+                <div class="fs-5 fw-bolder">@Model.Price ₽</div>
+                <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket" asp-route-author="productId" class="btn btn-warning col-8 fw-bolder">Buy</a>
+            </div>
+            <hr class="col-8" />
+            <div>
+                <i class="bi bi-bookmark-plus-fill"></i>
+                <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket" asp-route-author="productId" class="col-3 mt-8">Add to WishList</a>
+            </div>
+        </div>
+        <div class="col-4">
+            <div>
+                Рейтинг: 9.6
+                <i class="bi bi-star-fill"></i>
+            </div>
+            <div>
+                Оценить:
+                @for (int i = 0; i < 10; i++)
+                {
+                    <i class="bi bi-star"></i>
+                }
+            </div>
+            <div class="">
+                @Model.Description
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="text-dark ">
+        Oтзывы
+    </div>
+    <hr />
+    <div class="mb-5 pb-5">
+        <div>
+            Обожаю слушать лекции Сурдина на ютубе, и вот наконец-то он написал книгу!
+            Как всегда, замечательное изложение, множество интересных и неочевидных на первый взгляд фактов - и все это изложено понятным языком.
+            Рекомендую всем, кто очарован красотой науки и любит астрономию!
+        </div>
+        <hr />
+        <div>
+            Очень довольна, что купила эту книгу. Тоже люблю смотреть и слушать лекции Владимира Сурдина на Ютубе, с моей точки зрения это один из лучших, а, возможно, и самый лучший популяризатор науки, во всяком случае из российских.
+            Единственный недостаток книги - мелковатый шрифт для литературы подобного рода. Понятно, что более крупный шрифт привёл бы к удорожанию, но я, например, предпочла бы заплатить побольше, чем напрягать зрение.
+            В остальном недостатков пока не обнаружила.
+            Книгу рекомендую
+        </div>
+        <hr />
+        <div>
+            ЛУНА ЦВЕТНАЯ. Это первое поразившее меня открытие из этой книги.
+            Больше спойлерить не буду, читайте сами. Здесь много такого, о чем мы вообще не подозреваем.
+            Ужасно жаль, что в школе такого и ТАК не преподавали. Ну или хорошо — иначе все бы захотели быть поголовно астрономами.
+            Не знаю, есть ли сейчас астрономия в школах, но точно знаю, что эта книга лучше любого учебника.
+            Нравится, что построена не в хронологическом порядке — мол, так учёные начали изучать космос, а теперь вот так изучают— а...
+        </div>
+    </div>
+</div>

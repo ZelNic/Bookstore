@@ -1,6 +1,5 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -32,6 +31,13 @@ namespace Bookstore.Areas.Customer
             };
 
             return View(bookVM);
+        }
+
+        public IActionResult Details(int productId)
+        {
+            var product = _db.Books.Find(productId);
+
+            return View(product);
         }
 
         public IActionResult Privacy()

@@ -39,10 +39,14 @@ else
                             </div>
                             <div class="card card-footer bg-transparent border-0">
                                 <form method="post">
-                                    <button asp-area="" asp-controller="" asp-action="" asp-route-productId="@pr.BookId" asp-route-delete="true"
+                                    <button asp-area="Customer" asp-controller="WishList" asp-action="RemoveFromWL" asp-route-productId="@pr.BookId"
                                             type="submit" class="btn btn-danger">
                                         <i class="bi bi-x-circle"></i>
-                                    </button>                                    
+                                    </button>
+                                    <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
+                                            asp-route-productId="@pr.BookId" asp-route-isWishList="true" class="btn btn-success border-0">
+                                        <i class="bi bi-bag-plus"></i>
+                                    </button>
                                 </form>
                             </div>
                         </div>

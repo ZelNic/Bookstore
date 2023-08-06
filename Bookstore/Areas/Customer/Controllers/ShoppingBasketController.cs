@@ -37,7 +37,7 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public IActionResult AddBasket(int productId)
+        public IActionResult AddBasket(int productId, bool isWishList = false)
         {
             if (_user == null)
             {
@@ -57,7 +57,6 @@ namespace Bookstore.Areas.Customer
                     _db.ShoppingBasket.Update(basket);
                 }
 
-
                 if (basket == null)
                 {
                     ShoppingBasket newProductInShopBasket = new()
@@ -73,8 +72,14 @@ namespace Bookstore.Areas.Customer
 
                 _db.SaveChanges();
 
-
-                return RedirectToAction("Index", "Home", new { area = "Customer" });
+                if (isWishList == true)
+                {
+                    return RedirectToAction("Index", "WishList", new { area = "Customer" });
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home", new { area = "Customer" });
+                }
             }
         }
 
