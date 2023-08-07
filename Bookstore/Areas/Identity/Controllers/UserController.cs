@@ -41,6 +41,13 @@ namespace Bookstore.Areas.Identity
             }
         }
 
+        [HttpPost]
+        public IActionResult GoOut()
+        {
+            _httpContextAccessor.HttpContext.Session.Remove("Username");
+            return RedirectToAction("LogIn");
+        }
+
         [HttpGet]
         public IActionResult Registration()
         {

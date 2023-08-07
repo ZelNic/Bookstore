@@ -49,13 +49,22 @@
                         <label asp-for="PhoneNumber" class="ms-1 my-1 text-dark"></label>
                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
+                    <div class="card-body pb-0 pt-0 mt-0 mb-0">
+                        <h8>Личный счет</h8>
+                        <input asp-for="PersonalWallet" disabled class="form-control border-0 shadow" />
+                        <label asp-for="PersonalWallet" class="ms-1 my-1 text-dark"></label>
+                        <span asp-validation-for="PersonalWallet" class="text-danger"></span>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="mt-2">
             <button type="submit" class="btn btn-warning">Save Changes</button>
         </div>
+        <div class="mt-2">
+            <button asp-area="Identity" asp-controller="User" asp-action="GoOut" class="btn btn-link">Go out</button>
+        </div>
     </form>
-
 </div>
 
+                        

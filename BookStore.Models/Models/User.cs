@@ -27,6 +27,7 @@ namespace Bookstore.Models
         [DataType(DataType.PhoneNumber)]
         [Required]
         public string? PhoneNumber { get; set; }
-
+        
+        public int PersonalWallet { get; set; } 
     }
 }

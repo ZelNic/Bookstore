@@ -255,6 +255,9 @@ namespace Bookstore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PersonalWallet")
+                        .HasColumnType("int");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -278,6 +281,7 @@ namespace Bookstore.Migrations
                             HouseNumber = 30,
                             LastName = "Zel",
                             Password = "admin",
+                            PersonalWallet = 0,
                             PhoneNumber = "89226578108",
                             Region = "KMAO"
                         });

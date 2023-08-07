@@ -3,9 +3,15 @@
     var httpContext = HttpContextAccessor.HttpContext;
 }
 
+@inject ApplicationDbContext DB
+@{
+    var db = DB;
+}
+
+
 <div class="container">
     <h1>Оплата</h1>
-    <form asp-controller="Payment" asp-action="ProcessPayment" method="post">
+    <form asp-area="Purchase" asp-controller="Payment" asp-action="ProcessPayment" method="post">
         <div class="form-group">
             <label for="cardNumber">Номер карты</label>
             <input type="text" class="form-control" id="cardNumber" name="CardNumber">
