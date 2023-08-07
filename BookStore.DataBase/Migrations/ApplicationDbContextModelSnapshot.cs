@@ -48,9 +48,8 @@ namespace Bookstore.Migrations
                     b.Property<string>("ImageURL")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Price")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -68,7 +67,7 @@ namespace Bookstore.Migrations
                             Category = 1,
                             Description = "Человек просыпается неизвестно где - возможно, в больничной палате, но это неточно - и не помнит о себе вообще ничего. \"Зовите меня Измаил\", - предлагает он врачам, которых, за неимением других версий, нарекает Юрием Живаго и мадам Бовари.",
                             ISBN = "978-5-389-22890-0",
-                            Price = "417",
+                            Price = 417,
                             Title = "И нас пожирает пламя"
                         });
                 });
@@ -99,33 +98,48 @@ namespace Bookstore.Migrations
 
             modelBuilder.Entity("Bookstore.Models.Models.PurchaseHistory", b =>
                 {
-                    b.Property<int>("PurchaseId")
+                    b.Property<int>("OrderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
 
-                    b.Property<int>("ProductId")
+                    b.Property<string>("CurrentPosition")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductCount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductPrice")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PurchaseAmount")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("TravelHistory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("PurchaseId");
+                    b.HasKey("OrderId");
 
                     b.ToTable("PurchaseHistory");
-
-                    b.HasData(
-                        new
-                        {
-                            PurchaseId = 1,
-                            ProductId = 1,
-                            PurchaseDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UserId = 1
-                        });
                 });
 
             modelBuilder.Entity("Bookstore.Models.Models.Roles", b =>

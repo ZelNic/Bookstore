@@ -2,6 +2,7 @@
 using Bookstore.Models;
 using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 
 namespace Bookstore.Areas.Customer
 {
@@ -84,30 +85,42 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public IActionResult RemoveFromBasket(int productId, bool delete = false, bool minus = false, bool plus = false)
+        public IActionResult RemoveFromBasket(int productId)
         {
             ShoppingBasket productInBasket = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefault();
             int countProductInBasket = productInBasket.CountProduct;
 
-            if (delete == true || countProductInBasket == 1)
+            _db.ShoppingBasket.Remove(productInBasket);
+
+            _db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult ChangeCountProduct(int productId, bool minus = false, bool plus = false)
+        {
+            ShoppingBasket productInBasket = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefault();
+            int countProductInBasket = productInBasket.CountProduct;
+
+            if (countProductInBasket == 1 && minus == true)
             {
                 _db.ShoppingBasket.Remove(productInBasket);
-
-                _db.SaveChanges();
-                return RedirectToAction("Index");
             }
-
-            if (minus == true)
+            else
             {
-                countProductInBasket--;
-            }
-            else if (plus == true)
-            {
-                countProductInBasket++;
-            }
+                if (minus == true)
+                {
+                    countProductInBasket--;
+                }
+                else if (plus == true)
+                {
+                    countProductInBasket++;
+                }
 
-            productInBasket.CountProduct = countProductInBasket;
-            _db.ShoppingBasket.Update(productInBasket);
+                productInBasket.CountProduct = countProductInBasket;
+                _db.ShoppingBasket.Update(productInBasket);
+            }     
+            
             _db.SaveChanges();
 
             return RedirectToAction("Index");

@@ -48,7 +48,7 @@ else
                                     </button>
                                     <div class="row border border-1 rounded-1">
                                         <div class="col-3">
-                                            <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="RemoveFromBasket" asp-route-productId="@pr.BookId" asp-route-minus="true"
+                                            <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="ChangeCountProduct" asp-route-productId="@pr.BookId" asp-route-minus="true"
                                                     type="submit" class="btn">
                                                 <i class="bi bi-dash-circle"></i>
                                             </button>
@@ -60,7 +60,7 @@ else
                                             }
                                         </div>
                                         <div class="col-3">
-                                            <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="RemoveFromBasket" asp-route-productId="@pr.BookId" asp-route-plus="true"
+                                            <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="ChangeCountProduct" asp-route-productId="@pr.BookId" asp-route-plus="true"
                                                     type="submit" class="btn">
                                                 <i class="bi bi-plus-circle"></i>
                                             </button>
@@ -99,7 +99,7 @@ else
                     }
                 </div>
                 <form method="post">
-                    <button asp-area="Purchase" asp-controller="Purchase" asp-action="Index"
+                    <button asp-area="Purchase" asp-controller="Purchase" asp-action="Index" asp-route-purchaseАmount="@sumPurchase"
                             type="submit" class="btn btn-success">
                         <i class="bi bi-bag-fill"></i> Сheckout
                     </button>

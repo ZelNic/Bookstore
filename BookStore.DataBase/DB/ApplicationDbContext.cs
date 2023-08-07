@@ -1,6 +1,7 @@
 ﻿using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
+using Bookstore.Models.ViewModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.DataAccess
@@ -14,11 +15,10 @@ namespace Bookstore.DataAccess
         public DbSet<Book> Books { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> User { get; set; }
-        public DbSet<PurchaseHistory> PurchaseHistory { get; set; }
         public DbSet<ShoppingBasket> ShoppingBasket { get; set; }
         public DbSet<Roles> Roles { get; set; }
-
         public DbSet<WishList> WishLists { get; set; }
+        public DbSet<PurchaseHistory> PurchaseHistory { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,7 +34,7 @@ namespace Bookstore.DataAccess
                     Category = 1,
                     Description = "Человек просыпается неизвестно где - возможно, в больничной палате, но это неточно - и не помнит о себе вообще ничего. " +
                     "\"Зовите меня Измаил\", - предлагает он врачам, которых, за неимением других версий, нарекает Юрием Живаго и мадам Бовари.",
-                    Price = "417"
+                    Price = 417
                 }
             );
 
@@ -66,12 +66,19 @@ namespace Bookstore.DataAccess
             modelBuilder.Entity<PurchaseHistory>().HasData(
                 new PurchaseHistory
                 {
-                    PurchaseId = 1,
+                    OrderId = 1,
                     UserId = 1,
-                    ProductId = 1,
-                    PurchaseDate = new DateTime()
+                    ProductId = "test",
+                    ProductCount = "test",
+                    ProductPrice = "test",
+                    PurchaseDate = new DateTime(),
+                    PurchaseAmount = 1,
+                    OrderStatus = SD.StatusRefunded,
+                    CurrentPosition = "Moskow",
+                    TravelHistory = "SPB,Moskow"
                 }
             );
+
             modelBuilder.Entity<ShoppingBasket>().HasData(
                 new ShoppingBasket
                 {
@@ -97,9 +104,9 @@ namespace Bookstore.DataAccess
                     WishListId = 1,
                     UserId = 1,
                     ProductId = 1,
-                    CountProduct = 1                    
+                    CountProduct = 1
                 }
-            ); 
+            );
 
 
         }
