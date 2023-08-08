@@ -96,7 +96,7 @@ namespace Bookstore.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Bookstore.Models.Models.PurchaseHistory", b =>
+            modelBuilder.Entity("Bookstore.Models.Models.Order", b =>
                 {
                     b.Property<int>("OrderId")
                         .ValueGeneratedOnAdd()
@@ -104,23 +104,28 @@ namespace Bookstore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
 
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CurrentPosition")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeliveryAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HouseNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("OrderStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProductCount")
-                        .IsRequired()
+                    b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProductId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductPrice")
+                    b.Property<string>("ProductData")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -130,6 +135,12 @@ namespace Bookstore.Migrations
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Region")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("TravelHistory")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -137,9 +148,28 @@ namespace Bookstore.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isCourierDelivery")
+                        .HasColumnType("bit");
+
                     b.HasKey("OrderId");
 
-                    b.ToTable("PurchaseHistory");
+                    b.ToTable("Order");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderId = 1,
+                            CurrentPosition = "Moskow",
+                            DeliveryAddress = "",
+                            HouseNumber = 0,
+                            OrderStatus = "Refunded",
+                            ProductData = "test",
+                            PurchaseAmount = 1,
+                            PurchaseDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            TravelHistory = "SPB,Moskow",
+                            UserId = 1,
+                            isCourierDelivery = false
+                        });
                 });
 
             modelBuilder.Entity("Bookstore.Models.Models.Roles", b =>
@@ -243,9 +273,6 @@ namespace Bookstore.Migrations
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Ctreet")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("DateofBirth")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -279,6 +306,9 @@ namespace Bookstore.Migrations
                     b.Property<string>("Region")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("UserId");
 
                     b.ToTable("User");
@@ -288,7 +318,6 @@ namespace Bookstore.Migrations
                         {
                             UserId = 1,
                             City = "Surgut",
-                            Ctreet = "Lenina",
                             DateofBirth = "2018-10-25",
                             Email = "ninileo55555@gmail.com",
                             FirstName = "Nick",
@@ -297,7 +326,8 @@ namespace Bookstore.Migrations
                             Password = "admin",
                             PersonalWallet = 0,
                             PhoneNumber = "89226578108",
-                            Region = "KMAO"
+                            Region = "KMAO",
+                            Street = "Lenina"
                         });
                 });
 #pragma warning restore 612, 618

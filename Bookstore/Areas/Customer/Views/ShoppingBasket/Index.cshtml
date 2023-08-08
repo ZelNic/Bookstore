@@ -89,17 +89,17 @@ else
                 <div>
                     @if (sumCountProduct == 1)
                     {
-                        <text>There is @sumCountProduct item in the cart</text>
+                        <div>There is @sumCountProduct item in the cart</div>
                         <h5>Total: @sumPurchase ₽</h5>
                     }
                     else
                     {
-                        <text>There are @sumCountProduct items in the cart</text>
+                        <div>There are @sumCountProduct items in the cart</div>
                         <h5>Total: @sumPurchase ₽</h5>
                     }
                 </div>
                 <form method="post">
-                    <button asp-area="Purchase" asp-controller="Purchase" asp-action="Index" asp-route-purchaseАmount="@sumPurchase"
+                    <button asp-area="Purchase" asp-controller="Purchase" asp-action="DeliveryInformation" asp-route-purchaseАmount="@sumPurchase"
                             type="submit" class="btn btn-success">
                         <i class="bi bi-bag-fill"></i> Сheckout
                     </button>

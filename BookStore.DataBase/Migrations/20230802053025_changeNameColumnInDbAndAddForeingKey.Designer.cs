@@ -99,37 +99,7 @@ namespace Bookstore.Migrations
                             Name = "Художественная литература"
                         });
                 });
-
-            modelBuilder.Entity("Bookstore.Models.Models.PurchaseHistory", b =>
-                {
-                    b.Property<int>("PurchaseId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseId"));
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PurchaseId");
-
-                    b.ToTable("PurchaseHistory");
-
-                    b.HasData(
-                        new
-                        {
-                            PurchaseId = 1,
-                            ProductId = 1,
-                            PurchaseDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UserId = 1
-                        });
-                });
+            
 
             modelBuilder.Entity("Bookstore.Models.Models.ShoppingBasket", b =>
                 {

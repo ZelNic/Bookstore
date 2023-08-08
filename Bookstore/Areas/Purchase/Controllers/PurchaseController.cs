@@ -30,56 +30,69 @@ namespace Bookstore.Areas.Purchase
         }
 
         [HttpPost]
-        public IActionResult Index(int purchaseАmount)
+        public IActionResult DeliveryInformation(int purchaseАmount)
         {
-            ViewBag.Number = purchaseАmount;
-            return View();
+            if (purchaseАmount == 0)
+            {
+                return RedirectToAction("Index", "ShoppingBasket", new { area = "Customer" });
+            }
+
+            Order order = new()
+            {
+                UserId = _user.UserId,
+                PurchaseAmount = purchaseАmount,
+            };
+
+            return View(order);
         }
 
+
+
+
+        //-----------------------------------------------------------------------Разбить на несколько методов.-------------------------------------------------------------------
         [HttpPost]
-        public IActionResult FundsVerification(int purchaseАmount)
+        public IActionResult FundsVerification(Order orderData)
         {
-            if (_user.PersonalWallet >= purchaseАmount)
+            if (_user.PersonalWallet >= orderData.PurchaseAmount)
             {
-                _user.PersonalWallet -= purchaseАmount;
+                _user.PersonalWallet -= orderData.PurchaseAmount;
 
                 var admin = _db.User.Find(1);
-                admin.PersonalWallet += purchaseАmount;
+                admin.PersonalWallet += orderData.PurchaseAmount;
 
                 _db.User.UpdateRange(_user, admin);
 
 
                 var sb = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId);
 
-                var priceAndIdProduct = _db.ShoppingBasket
+
+                var productData = _db.ShoppingBasket
                     .Where(sb => sb.UserId == _user.UserId)
                     .Join(_db.Books, sb => sb.ProductId, b => b.BookId, (sb, b) => new { sb, b })
-                    .Select(x => new { x.sb.ProductId, x.b.Price })
+                    .Select(x => new
+                    {
+                        x.sb.ProductId,
+                        x.b.Price,
+                        x.sb.CountProduct
+                    })
                     .ToList();
 
-                List<int> productIdList = priceAndIdProduct.Select(s => s.ProductId).ToList();
-                List<int> productPriceList = priceAndIdProduct.Select(s => s.Price).ToList();
-                List<int> productCountList = sb.Select(s => s.CountProduct).ToList();
+                //получение времени москового
+                TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Moscow");
+                DateTime currentTimeInMoscow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
 
-                string productId = string.Join(",", priceAndIdProduct);
-                string productCount = string.Join(",", productCountList);
-                string productPrice = string.Join(",", productCountList);
+                //преобразование данных продукта в строку
+                string prodDataString = string.Join(",", productData);
 
-                PurchaseHistory purchase = new()
-                {
-                    UserId = _user.UserId,
-                    ProductId = productId,
-                    ProductCount = productCount,
-                    ProductPrice = "test",
-                    PurchaseDate = new DateTime(),
-                    PurchaseAmount = 1,
-                    OrderStatus = SD.StatusRefunded,
-                    CurrentPosition = "Moskow",
-                    TravelHistory = "SPB,Moskow"
-                };
+                //orderData.ProductData. = prodDataString;
+                orderData.PurchaseDate = currentTimeInMoscow;
+                orderData.OrderStatus = SD.StatusRefunded;
+                
+               
 
                 _db.ShoppingBasket.RemoveRange(sb);
-                _db.PurchaseHistory.Add(purchase);
+
+                _db.Order.Add(orderData);
 
                 _db.SaveChanges();
                 return RedirectToAction("Index", "Orders", new { area = "Customer" });
@@ -89,5 +102,8 @@ namespace Bookstore.Areas.Purchase
                 return NotFound("Не хватает средств");
             }
         }
+
+
+
     }
 }

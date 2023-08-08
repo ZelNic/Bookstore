@@ -18,7 +18,7 @@ namespace Bookstore.DataAccess
         public DbSet<ShoppingBasket> ShoppingBasket { get; set; }
         public DbSet<Roles> Roles { get; set; }
         public DbSet<WishList> WishLists { get; set; }
-        public DbSet<PurchaseHistory> PurchaseHistory { get; set; }
+        public DbSet<Order> Order { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -57,25 +57,24 @@ namespace Bookstore.DataAccess
                     Password = "admin",
                     Region = "KMAO",
                     City = "Surgut",
-                    Ctreet = "Lenina",
+                    Street = "Lenina",
                     HouseNumber = 30,
                     PhoneNumber = "89226578108"
                 }
             );
 
-            modelBuilder.Entity<PurchaseHistory>().HasData(
-                new PurchaseHistory
+            modelBuilder.Entity<Order>().HasData(
+                new Order
                 {
                     OrderId = 1,
                     UserId = 1,
-                    ProductId = "test",
-                    ProductCount = "test",
-                    ProductPrice = "test",
+                    ProductData = "test",
                     PurchaseDate = new DateTime(),
                     PurchaseAmount = 1,
+                    isCourierDelivery = false,
                     OrderStatus = SD.StatusRefunded,
                     CurrentPosition = "Moskow",
-                    TravelHistory = "SPB,Moskow"
+                    TravelHistory = "SPB,Moskow"                    
                 }
             );
 
