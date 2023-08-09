@@ -2,8 +2,10 @@
 using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
+using Bookstore.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using Newtonsoft.Json;
 
 namespace Bookstore.Areas.Purchase
 {
@@ -66,29 +68,25 @@ namespace Bookstore.Areas.Purchase
                 var sb = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId);
 
 
-                var productData = _db.ShoppingBasket
+                IEnumerable<ProductData> productData = _db.ShoppingBasket
                     .Where(sb => sb.UserId == _user.UserId)
                     .Join(_db.Books, sb => sb.ProductId, b => b.BookId, (sb, b) => new { sb, b })
-                    .Select(x => new
+                    .Select(x => new ProductData
                     {
-                        x.sb.ProductId,
-                        x.b.Price,
-                        x.sb.CountProduct
-                    })
-                    .ToList();
+                        ProdId = x.sb.ProductId,
+                        Price = x.b.Price,
+                        Count = x.sb.CountProduct
+                    }).ToList();
 
-                //получение времени москового
-                TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Moscow");
-                DateTime currentTimeInMoscow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+                string prodDataJson = JsonConvert.SerializeObject(productData);
 
-                //преобразование данных продукта в строку
-                string prodDataString = string.Join(",", productData);
-
-                //orderData.ProductData. = prodDataString;
-                orderData.PurchaseDate = currentTimeInMoscow;
+                //
+                orderData.ProductData = prodDataJson;
+                orderData.PurchaseDate = MoscowTime.GetTime();
                 orderData.OrderStatus = SD.StatusRefunded;
                 
-               
+
+
 
                 _db.ShoppingBasket.RemoveRange(sb);
 
@@ -102,8 +100,5 @@ namespace Bookstore.Areas.Purchase
                 return NotFound("Не хватает средств");
             }
         }
-
-
-
     }
 }

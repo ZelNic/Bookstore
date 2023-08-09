@@ -1,61 +1,98 @@
-﻿@inject IHttpContextAccessor HttpContextAccessor
-@{
-    var httpContext = HttpContextAccessor.HttpContext;
-}
-
+﻿@model OrderVM
 @inject ApplicationDbContext DB
 @{
     var db = DB;
 }
-@{
-    var userId = HttpContextAccessor.HttpContext.Session.GetInt32("Username");
-    var order = db.Order.Where(u => u.UserId == userId).FirstOrDefault();
-}
+
+
 
 <h1>Orders</h1>
-<div>
-    <div class="form-group">
-        <label asp-for="@order.UserId"></label>
-        <input asp-for="@order.UserId" class="form-control" />
-    </div>
-    @*<div class="form-group">
-        <label asp-for="@order.ProductData"></label>
-        <input asp-for="@order.ProductData" class="form-control" />
-    </div>*@
-    <div class="form-group">
-        <label asp-for="@order.PurchaseDate"></label>
-        <input asp-for="@order.PurchaseDate" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="@order.PurchaseAmount"></label>
-        <input asp-for="@order.PurchaseAmount" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="@order.OrderStatus"></label>
-        <input asp-for="@order.OrderStatus" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="@order.CurrentPosition"></label>
-        <input asp-for="@order.CurrentPosition" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="@order.DeliveryAddress"></label>
-        <input asp-for="@order.DeliveryAddress" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="@order.TravelHistory"></label>
-        <input asp-for="@order.TravelHistory" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="@order.isCourierDelivery"></label>
-        <input asp-for="@order.isCourierDelivery" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="@order.Region"></label>
-        <input asp-for="@order.Region" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="@order.City"></label>
-        <input asp-for="@order.City" class="form-control" />
+<div class="container">
+    <div class="row ">
+        @foreach (Order order in Model.OrderData)
+        {
+            <div class="form-group border border-1 rounded rounded-1 p-4">
+                <div>
+                    <label>Дата и время заказа: @order.PurchaseDate по МСК</label>
+                </div>
+
+                @{
+                    IEnumerable<ProductData>
+                    productsData = JsonConvert.DeserializeObject<IEnumerable<ProductData>>(order.ProductData);
+                }
+                @{
+                    int countProduct = 0;
+                    int sumPrice = 0;
+                }
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">Название</th>
+                            <th scope="col">Цена</th>
+                            <th scope="col">Количество</th>
+                        </tr>
+                    </thead>
+                    @foreach (ProductData product in productsData)
+                    {
+                        <tbody class="table-group-divider">
+                            <tr>
+                                <td>@product.ProdId</td>
+                                <td>@db.Books.Find(product.ProdId).Title</td>
+                                <td>@product.Price</td>
+                                <td>@product.Count</td>
+                                @{
+                                    countProduct += product.Count;
+                                    sumPrice += product.Count * product.Price;
+                                }
+                            </tr>
+                        </tbody>
+                    }
+                </table>
+                <div>
+                    <label>Количество товаров: @countProduct</label>
+                    <label>Стоимость: @sumPrice</label>
+                </div>
+                <div class="form-group">
+                    <label>Оплачено:</label>
+                    <label>@order.PurchaseAmount</label>
+                </div>
+                @if (order.isCourierDelivery == true)
+                {
+                    <label>Доставка курьером</label>
+                }
+                else
+                {
+                    <label>Доставка в пункт выдачи</label>
+                }
+            </div>
+            <hr class="mt-5 mb-5" />
+        }
     </div>
 </div>
+
+@*
+            <div class="form-group">
+                <input asp-for="@order.OrderStatus" class="form-control" />
+            </div>
+
+
+        }*@
+
+
+@*<div class="form-group">
+    <input asp-for="@order.CurrentPosition" class="form-control" />
+</div>
+<div class="form-group">
+    <input asp-for="@order.DeliveryAddress" class="form-control" />
+</div>
+<div class="form-group">
+    <input asp-for="@order.TravelHistory" class="form-control" />
+</div>
+<div class="form-group">
+    <input asp-for="@order.Region" class="form-control" />
+</div>
+<div class="form-group">
+    <input asp-for="@order.City" class="form-control" />
+</div>*@
