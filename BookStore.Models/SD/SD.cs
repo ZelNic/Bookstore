@@ -4,20 +4,16 @@
     {        
         public const string Role_Admin = "Admin";
 
-        public const string StatusPending = "Pending";
-        public const string StatusApproved = "Approved";
-        public const string StatusInProcess = "Processing";
-        public const string StatusShipped = "Shipped";
-        public const string StatusCancelled = "Cancelled";
-        public const string StatusRefunded = "Refunded";
+        public const string StatusPending = "В ожидании";
+        public const string StatusApproved = "Одобренный";
+        public const string StatusInProcess = "Обработка";
+        public const string StatusShipped = "Отправленный";
+        public const string StatusCancelled = "Отменено";
+        public const string StatusRefunded = "Возмещено";
 
-        public const string PaymentStatusPending = "Pending";
-        public const string PaymentStatusApproved = "Approved";
-        public const string PaymentStatusDelayedPayment = "ApprovedForDelayedPayment";
-        public const string PaymentStatusRejected = "Rejected";
-
-
-        public const string SessionCart = "SessionShoppingCart";
-
+        public const string PaymentStatusPending = "В ожидании";
+        public const string PaymentStatusApproved = "Одобренный";
+        public const string PaymentStatusDelayedPayment = "Утверждено для задержанного платежа";
+        public const string PaymentStatusRejected = "Отклоненный";
     }
 }

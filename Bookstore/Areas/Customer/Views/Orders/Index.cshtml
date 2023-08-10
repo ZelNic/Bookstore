@@ -5,13 +5,23 @@
 }
 
 
-
 <h1>Orders</h1>
 <div class="container">
     <div class="row ">
         @foreach (Order order in Model.OrderData)
         {
             <div class="form-group border border-1 rounded rounded-1 p-4">
+                <div class="d-inline-flex align-items-center">
+                    <span class="mr-3">Номер заказа: </span>
+                    <div class="rouden rounded-1 text-bg-primary m-1">
+                        @order.OrderId
+                    </div>
+                </div>
+                <div class="d-inline-flex align-items-center">
+                    <span class="mr-3">Статус заказа: </span>
+                    <div class="rouden rounded-1 text-bg-primary m-1">@order.OrderStatus</div>
+                </div>
+
                 <div>
                     <label>Дата и время заказа: @order.PurchaseDate по МСК</label>
                 </div>
@@ -39,7 +49,11 @@
                         <tbody class="table-group-divider">
                             <tr>
                                 <td>@product.ProdId</td>
-                                <td>@db.Books.Find(product.ProdId).Title</td>
+                                <td>
+                                    <a class="" asp-area="Customer" asp-controller="Home" asp-action="Details" asp-route-productId="@product.ProdId">
+                                        @db.Books.Find(product.ProdId).Title
+                                    </a>                                    
+                                </td>
                                 <td>@product.Price</td>
                                 <td>@product.Count</td>
                                 @{
@@ -52,20 +66,33 @@
                 </table>
                 <div>
                     <label>Количество товаров: @countProduct</label>
-                    <label>Стоимость: @sumPrice</label>
+                    <label class="m-3">Стоимость: @sumPrice</label>
                 </div>
                 <div class="form-group">
                     <label>Оплачено:</label>
                     <label>@order.PurchaseAmount</label>
                 </div>
-                @if (order.isCourierDelivery == true)
-                {
-                    <label>Доставка курьером</label>
-                }
-                else
-                {
-                    <label>Доставка в пункт выдачи</label>
-                }
+                <div>
+                    Доставка:
+                    @if (order.isCourierDelivery == true)
+                    {
+                        <label> Курьером</label>
+                        <div class="form-group">
+                            Адрес доставки:
+                            @order.DeliveryAddress
+                        </div>
+                    }
+                    else
+                    {
+                        <label> В пункт выдачи</label>
+                    }
+                    <div class="form-group">
+                        Данные получателя:
+                        @order.ReceiverName
+                        @order.RecipientsLastName
+                        @order.PhoneNumber
+                    </div>
+                </div>
             </div>
             <hr class="mt-5 mb-5" />
         }
@@ -73,26 +100,26 @@
 </div>
 
 @*
-            <div class="form-group">
-                <input asp-for="@order.OrderStatus" class="form-control" />
-            </div>
+    <div class="form-group">
+    <input asp-for="@order.OrderStatus" class="form-control" />
+    </div>
 
 
-        }*@
+    }*@
 
 
 @*<div class="form-group">
     <input asp-for="@order.CurrentPosition" class="form-control" />
-</div>
-<div class="form-group">
+    </div>
+    <div class="form-group">
     <input asp-for="@order.DeliveryAddress" class="form-control" />
-</div>
-<div class="form-group">
+    </div>
+    <div class="form-group">
     <input asp-for="@order.TravelHistory" class="form-control" />
-</div>
-<div class="form-group">
+    </div>
+    <div class="form-group">
     <input asp-for="@order.Region" class="form-control" />
-</div>
-<div class="form-group">
+    </div>
+    <div class="form-group">
     <input asp-for="@order.City" class="form-control" />
-</div>*@
+    </div>*@

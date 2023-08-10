@@ -40,6 +40,17 @@ namespace Bookstore.Areas.Customer
             return View(product);
         }
 
+        [HttpPost]
+        public IActionResult Search(string searchString)
+        {            
+            IEnumerable<Book> books = _db.Books.Where(book => book.Title.Contains(searchString.ToLower()));
+
+            return View(books);
+        }
+
+
+
+
         public IActionResult Privacy()
         {
             return View();

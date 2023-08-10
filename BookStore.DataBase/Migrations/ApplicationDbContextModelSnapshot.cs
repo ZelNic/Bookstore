@@ -108,25 +108,21 @@ namespace Bookstore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CurrentPosition")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DeliveryAddress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("HouseNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("HouseNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OrderStatus")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductData")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PurchaseAmount")
@@ -135,6 +131,12 @@ namespace Bookstore.Migrations
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ReceiverName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecipientsLastName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Region")
                         .HasColumnType("nvarchar(max)");
 
@@ -142,7 +144,6 @@ namespace Bookstore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TravelHistory")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
@@ -160,9 +161,7 @@ namespace Bookstore.Migrations
                         {
                             OrderId = 1,
                             CurrentPosition = "Moskow",
-                            DeliveryAddress = "",
-                            HouseNumber = 0,
-                            OrderStatus = "Refunded",
+                            OrderStatus = "Возмещено",
                             ProductData = "test",
                             PurchaseAmount = 1,
                             PurchaseDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

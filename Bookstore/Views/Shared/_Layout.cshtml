@@ -31,9 +31,9 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div>
-                    <form class="d-flex">
-                        <input class="form-control me-sm-1" type="search" placeholder="Search">
-                        <button class="btn btn-secondary my-4 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
+                    <form class="d-flex" method="post" asp-area="Customer" asp-controller="Home" asp-action="Search">
+                        <input class="form-control me-sm-1 bg-light" type="search" name="searchString" placeholder=" Search">
+                        <button class="btn btn-dark my-4 my-sm-0" type="submit" ><i class="bi bi-search"></i></button>
                     </form>
                 </div>
                 <div class="navbar-collapse collapse d-sm-inline-flex">
@@ -127,3 +127,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+

@@ -16,12 +16,12 @@
                     <h6>Получатель</h6>
                     <div>
                         <label class="ms-1 my-1 text-dark">Имя</label>
-                        <input asp-for="@db.User.Find(Model.UserId).FirstName" class="form-control border-0 shadow" />
+                        <input asp-for="ReceiverName" value="@db.User.Find(Model.UserId).FirstName" class="form-control border-0 shadow" />
                         <span asp-validation-for="@db.User.Find(Model.UserId).FirstName" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label class="ms-1 my-1 text-dark">Фамилия</label>
-                        <input asp-for="@db.User.Find(Model.UserId).LastName" class="form-control border-0 shadow" />
+                        <input asp-for="RecipientsLastName" value="@db.User.Find(Model.UserId).LastName" class="form-control border-0 shadow" />
                         <span asp-validation-for="@db.User.Find(Model.UserId).LastName" class="text-danger"></span>
                     </div>
                     <div class="form-group">
@@ -33,14 +33,15 @@
                 <div class="form-group p-3">
                     <div>
                         <label asp-for="isCourierDelivery">Способ доставки</label>
-                        <select class="rounded">
-                            <option value="@Model.isCourierDelivery = false">Пункт выдачи</option>
-                            <option value="@Model.isCourierDelivery = true">Курьером</option>
+                        <select class="rounded" asp-for="isCourierDelivery">
+                            <option value="false">Пункт выдачи</option>
+                            <option value="true">Курьером</option>
                         </select>
                     </div>
+
                     <div>
                         @*Добавить пункты выдачи в базу данных*@
-                        <label asp-for="isCourierDelivery">Выберите пункт выдачи</label>
+                        <label>Выберите пункт выдачи</label>
                         <select class="rounded mt-1">
                             <option value="">Доставка курьером</option>
                             <option value="">Ленина</option>
@@ -74,7 +75,7 @@
                         <span asp-validation-for="@db.User.Find(Model.UserId).HouseNumber" class="text-danger"></span>
                     </div>
                 </div>
-                <button asp-area="Purchase" asp-controller="Purchase" asp-action="FundsVerification"
+                <button asp-area="Purchase" asp-controller="Purchase" asp-action="Payment"
                         type="submit" class="btn btn-primary w-100 mt-3 mb-5">
                     Buy
                 </button>

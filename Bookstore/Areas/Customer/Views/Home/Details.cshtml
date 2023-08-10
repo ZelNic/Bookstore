@@ -9,27 +9,36 @@
             <img src="@Model.ImageURL" alt="Image" class="rounded rounded-1 col-12" />
         </div>
         <div class="col-3 bg-body-tertiary rounded rounded-1">
-            <div>
-                Author:
-                <a asp-area="" asp-controller="" asp-action="" asp-route-author=""> @Model.Author</a>
-            </div>
-            <div>
-                Editor:
-                <a asp-area="" asp-controller="" asp-action="" asp-route-author=""> Piter</a>
-            </div>
-            <div>
-                ISBN: @Model.ISBN
-            </div>
-            <hr class="col-8 mb-1" />
-            <div class="mt-0 pt-0">
-                <div class="fs-5 fw-bolder">@Model.Price ₽</div>
-                <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket" asp-route-author="productId" class="btn btn-warning col-8 fw-bolder">Buy</a>
-            </div>
-            <hr class="col-8" />
-            <div>
-                <i class="bi bi-bookmark-plus-fill"></i>
-                <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket" asp-route-author="productId" class="col-3 mt-8">Add to WishList</a>
-            </div>
+            <form method="post" enctype="multipart/form-data">
+
+                <div>
+                    Author:
+                    <a asp-area="" asp-controller="" asp-action="" asp-route-author=""> @Model.Author</a>
+                </div>
+                <div>
+                    Editor:
+                    <a asp-area="" asp-controller="" asp-action="" asp-route-author=""> Piter</a>
+                </div>
+                <div>
+                    ISBN: @Model.ISBN
+                </div>
+                <hr class="col-8 mb-1" />
+                <div class="mt-0 pt-0">
+                    <div class="fs-5 fw-bolder">@Model.Price ₽</div>
+                    <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
+                            asp-route-productId="@Model.BookId" class="btn btn-warning border-0 col-3">Buy
+                    </button>
+                </div>
+                <hr class="col-8" />
+                <div>
+                    <i class="bi bi-bookmark-plus-fill"></i>
+                    <button type="submit" asp-area="Customer" asp-controller="Wishlist" asp-action="AddWishList"
+                            asp-route-productId="@Model.BookId" class="btn">
+                        Add to WishList
+                    </button>
+                </div>
+
+            </form>
         </div>
         <div class="col-4">
             <div>
