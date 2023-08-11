@@ -5,30 +5,55 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bookstore.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [CustomAuthorization(ApplicationDbContext, IHttpContextAccessor)]
+    //[CustomAuthorization(ApplicationDbContext, IHttpContextAccessor)]
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly bool _isAdmin;
 
         public BookController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
         {
             _db = db;
             _contextAccessor = contextAccessor;
+
+            if (_contextAccessor.HttpContext.Session.GetInt32("Username") != null)
+            {
+                CustomAuthorizationAttribute checkUserIsAdmin = new();
+                _isAdmin = checkUserIsAdmin.CheckUserIsAdmin(_db, _contextAccessor);
+            }
         }
 
         public IActionResult Index()
         {
-            List<Book> booksList = _db.Books.ToList();
-            List<Category> categoriesList = _db.Categories.ToList();
+            if (_isAdmin == false)
+                return NotFound("Отказано в доступе");
 
-            BookVM bookVM = new()
+            if (_contextAccessor.HttpContext.Session.GetInt32("Username") != null)
             {
-                BooksList = booksList,
-                CategoriesList = categoriesList
-            };
+                int? userId = _contextAccessor.HttpContext.Session.GetInt32("Username");
+                if ((userId != null) && (_db.Roles.Find(userId) != null))
+                {
+                    List<Book> booksList = _db.Books.ToList();
+                    List<Category> categoriesList = _db.Categories.ToList();
 
-            return View(bookVM);
+                    BookVM bookVM = new()
+                    {
+                        BooksList = booksList,
+                        CategoriesList = categoriesList
+                    };
+
+                    return View(bookVM);
+                }
+                else
+                {
+                    return NotFound("Отказано в доступе.");
+                }
+            }
+            else
+            {
+                return NotFound("Отказано в доступе.");
+            }
         }
 
         [HttpGet]
@@ -112,3 +137,4 @@ namespace Bookstore.Areas.Admin.Controllers
         }
     }
 }
+

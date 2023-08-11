@@ -1,25 +1,17 @@
 ﻿using Bookstore.DataAccess;
+using Bookstore.Models.SD;
 
 namespace Bookstore.Areas.Admin
 {
     public class CustomAuthorizationAttribute : Attribute
     {
-        private readonly ApplicationDbContext _db;
-        private readonly IHttpContextAccessor _contextAccessor;
-
-        public CustomAuthorizationAttribute(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
+        public bool CheckUserIsAdmin(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
         {
-            _db = db;
-            _contextAccessor = contextAccessor;
-        }
-
-
-        private bool CheckIfUserIsAdmin()
-        {
-            if (_contextAccessor.HttpContext.Session.GetInt32("Username") != null)
+            if (contextAccessor.HttpContext.Session.GetInt32("Username") != null)
             {
-                int? userId = _contextAccessor.HttpContext.Session.GetInt32("Username");
-                if ((userId != null) && (_db.Roles.Find(userId) != null))
+                int? userId = contextAccessor.HttpContext.Session.GetInt32("Username");
+
+                if ((db.Roles.Find(userId) != null) && (db.Roles.Find(userId).RoleName == SD.Role_Admin))
                 {
                     return true;
                 }
@@ -28,7 +20,10 @@ namespace Bookstore.Areas.Admin
                     return false;
                 }
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
     }
 }

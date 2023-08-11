@@ -66,6 +66,7 @@ namespace Bookstore.Areas.Purchase
                     admin.PersonalWallet += orderData.PurchaseAmount;
 
                     _db.User.UpdateRange(_user, admin);
+                    _db.SaveChanges();
                     orderData.PurchaseDate = MoscowTime.GetTime();
                 }
 
