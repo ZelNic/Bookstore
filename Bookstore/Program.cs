@@ -1,5 +1,7 @@
+using Bookstore.Areas.Admin;
 using Bookstore.DataAccess;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddScoped<CustomAuthorizationAttribute>();
 
 var app = builder.Build();
 

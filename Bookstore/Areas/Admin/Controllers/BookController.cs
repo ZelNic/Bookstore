@@ -5,13 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bookstore.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [CustomAuthorization(ApplicationDbContext, IHttpContextAccessor)]
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public BookController(ApplicationDbContext db)
+        public BookController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
         {
             _db = db;
+            _contextAccessor = contextAccessor;
         }
 
         public IActionResult Index()
