@@ -2,14 +2,16 @@
 {
     public static class SD
     {        
-        public const string Role_Admin = "Admin";
+        public const string RoleAdmin = "Admin";
+        public const string RoleWorkerOrderPickupPoint = "WorkerOrderPickupPoint";
 
-        public const string StatusPending = "В ожидании";
-        public const string StatusApproved = "Одобренный";
-        public const string StatusInProcess = "Обработка";
-        public const string StatusShipped = "Отправленный";
-        public const string StatusCancelled = "Отменено";
-        public const string StatusRefunded = "Возмещено";
+        public const string StatusPending_0 = "В ожидании";
+        public const string StatusApproved_1 = "Одобренный";
+        public const string StatusInProcess_2 = "Обработка";
+        public const string StatusShipped_3 = "Отправленный";
+        public const string StatusDelivered_4 = "Доставлен";
+        public const string StatusCancelled_5 = "Отменено";
+        public const string StatusRefunded_6 = "Возмещено";
 
         public const string PaymentStatusPending = "В ожидании";
         public const string PaymentStatusApproved = "Одобренный";

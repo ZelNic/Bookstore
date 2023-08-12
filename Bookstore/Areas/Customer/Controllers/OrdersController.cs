@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bookstore.Areas.Customer
 {
-    [Area("Customer")]    
+    [Area("Customer")]
     public class OrdersController : Controller
     {
         private readonly ApplicationDbContext _db;

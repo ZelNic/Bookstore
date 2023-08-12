@@ -100,7 +100,7 @@ namespace Bookstore.Areas.Purchase
 
             //
             orderData.ProductData = prodDataJson;
-            orderData.OrderStatus = SD.StatusPending;
+            orderData.OrderStatus = SD.StatusPending_0;
             orderData.DeliveryAddress += orderData.Region + ' ' + orderData.City + ' ' + orderData.Street + ' ' + orderData.HouseNumber;
 
 

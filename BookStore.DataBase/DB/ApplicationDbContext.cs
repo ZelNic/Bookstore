@@ -19,6 +19,8 @@ namespace Bookstore.DataAccess
         public DbSet<Roles> Roles { get; set; }
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<Order> Order { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<OrderPickupPoint> OrderPickupPoint { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -72,7 +74,7 @@ namespace Bookstore.DataAccess
                     PurchaseDate = new DateTime(),
                     PurchaseAmount = 1,
                     isCourierDelivery = false,
-                    OrderStatus = SD.StatusRefunded,
+                    OrderStatus = SD.StatusRefunded_6,
                     CurrentPosition = "Moskow",
                     TravelHistory = "SPB,Moskow"                    
                 }
@@ -93,7 +95,13 @@ namespace Bookstore.DataAccess
                 {
                     RoleId = 1,
                     UserId = 1,
-                    RoleName = SD.Role_Admin,
+                    RoleName = SD.RoleAdmin,
+                },
+                new Roles
+                {
+                    RoleId = 3,
+                    UserId = 10,
+                    RoleName = SD.RoleWorkerOrderPickupPoint,
                 }
             );
 

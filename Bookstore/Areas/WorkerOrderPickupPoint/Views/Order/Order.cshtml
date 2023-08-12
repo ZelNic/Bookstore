@@ -1,0 +1,106 @@
+﻿@inject ApplicationDbContext DB
+@{
+    var db = DB;
+}
+
+@model Order
+
+
+<div>
+    <form class="d-flex" method="post" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">
+        <input class="form-control me-sm-1 bg-light" type="search" pattern="[0-9]+" name="searchOrderId" placeholder="Введите номер заказа">
+        <button class="btn btn-dark my-4 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
+    </form>
+</div>
+
+@if (Model != null)
+{
+    <div class="container m-4">
+        <div class="form-group border border-1 rounded rounded-1 p-4">
+            <div class="d-inline-flex align-items-center">
+                <span class="mr-3">Номер заказа: </span>
+                <div class="rouden rounded-1 text-bg-primary m-1">
+                    @Model.OrderId
+                </div>
+            </div>
+            <div class="d-inline-flex align-items-center">
+                <span class="mr-3">Статус заказа: </span>
+                <div class="rouden rounded-1 text-bg-primary m-1">@Model.OrderStatus</div>
+            </div>
+
+            <div>
+                <label>Дата и время заказа: @Model.PurchaseDate по МСК</label>
+            </div>
+
+            @{
+                IEnumerable<ProductData>
+                productsData = JsonConvert.DeserializeObject<IEnumerable<ProductData>>(@Model.ProductData);
+            }
+            @{
+                int countProduct = 0;
+                int sumPrice = 0;
+            }
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Название</th>
+                        <th scope="col">Цена</th>
+                        <th scope="col">Количество</th>
+                    </tr>
+                </thead>
+                @foreach (ProductData product in productsData)
+                {
+                    <tbody class="table-group-divider">
+                        <tr>
+                            <td>@product.ProdId</td>
+                            <td>
+                                <a class="" asp-area="Customer" asp-controller="Home" asp-action="Details" asp-route-productId="@product.ProdId">
+                                    @db.Books.Find(product.ProdId).Title
+                                </a>
+                            </td>
+                            <td>@product.Price</td>
+                            <td>@product.Count</td>
+                            @{
+                                countProduct += product.Count;
+                                sumPrice += product.Count * product.Price;
+                            }
+                        </tr>
+                    </tbody>
+                }
+            </table>
+            <div>
+                <label>Количество товаров: @countProduct</label>
+                <label class="m-3">Стоимость: @sumPrice</label>
+            </div>
+            <div class="form-group">
+                <label>Оплачено:</label>
+                <label>@Model.PurchaseAmount</label>
+            </div>
+            <div>
+                Доставка:
+                @if (@Model.isCourierDelivery == true)
+                {
+                    <label> Курьером</label>
+                    <div class="form-group">
+                        Адрес доставки:
+                        @Model.DeliveryAddress
+                    </div>
+                }
+                else
+                {
+                    <label> В пункт выдачи</label>
+                }
+                <div class="form-group">
+                    Данные получателя:
+                    @Model.ReceiverName
+                    @Model.RecipientsLastName
+                    @Model.PhoneNumber
+                </div>
+            </div>
+        </div>
+        <hr class="mt-5 mb-5" />
+                
+    </div>
+}

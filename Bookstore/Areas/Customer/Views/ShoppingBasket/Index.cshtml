@@ -18,11 +18,11 @@ else
 
     @if (basket.Count() == 0)
     {
-        <h1>Empty cart</h1>
+        <h1>Пустая корзина</h1>
     }
     else
     {
-        <h1>Your order</h1>
+        <h1>Ваш заказ</h1>
     }
 
     <div class="row row-cols-2">
@@ -89,19 +89,19 @@ else
                 <div>
                     @if (sumCountProduct == 1)
                     {
-                        <div>There is @sumCountProduct item in the cart</div>
+                        <div>В вашей корзине @sumCountProduct позиция</div>
                         <h5>Total: @sumPurchase ₽</h5>
                     }
                     else
                     {
-                        <div>There are @sumCountProduct items in the cart</div>
-                        <h5>Total: @sumPurchase ₽</h5>
+                        <div>Всего @sumCountProduct позиций в вашей корзине.</div>
+                        <h5>Итого: @sumPurchase ₽</h5>
                     }
                 </div>
                 <form method="post">
                     <button asp-area="Purchase" asp-controller="Purchase" asp-action="DeliveryInformation" asp-route-purchaseАmount="@sumPurchase"
                             type="submit" class="btn btn-success">
-                        <i class="bi bi-bag-fill"></i> Сheckout
+                        <i class="bi bi-bag-fill"></i> Оформить заказ
                     </button>
                 </form>
             </div>

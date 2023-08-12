@@ -4,11 +4,11 @@
     <div>
         @if (Model.Id != 0)
         {
-            <h1>Edit</h1>
+            <h1>Изменить</h1>
         }
         else
         {
-            <h1>Add</h1>
+            <h1>Добавить</h1>
         }
     </div>
     <form method="post" enctype="multipart/form-data">
@@ -16,7 +16,7 @@
             <input asp-for="@Model.Id" hidden />
             <div class="form-floating py-2 col-5 mt-xxl-4">
                 <input asp-for="@Model.Name" class="form-control border-0 shadow" />
-                <label asp-for="@Model.Name" class="ms-1 my-1 text-dark"></label>
+                <label asp-for="@Model.Name" class="ms-1 my-1 text-dark">Название</label>
                 <span asp-validation-for="@Model.Name" class="text-danger"></span>
             </div>
         </div>
@@ -25,16 +25,16 @@
             {
                 <div class="row justify-content-center align-items-center">
                     <div class="col text-center">
-                        <a class="btn btn-danger mb-1" asp-controller="Category" asp-action="Delete" asp-route-categoryId="@Model.Id">Delete</a>
+                        <a class="btn btn-danger mb-1" asp-controller="Category" asp-action="Delete" asp-route-categoryId="@Model.Id">Удалить</a>
                     </div>
                     <div class="col text-center">
-                        <button type="submit" class="btn btn-success form-control">Update</button>
+                        <button type="submit" class="btn btn-success form-control">Обновить</button>
                     </div>
                 </div>
             }
             else
             {
-                <button type="submit" class="btn btn-success form-control">Create</button>
+                <button type="submit" class="btn btn-success form-control">Создать</button>
             }
         </div>
     </form>

@@ -17,7 +17,7 @@ namespace Bookstore.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.9")
+                .HasAnnotation("ProductVersion", "7.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -171,6 +171,75 @@ namespace Bookstore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Bookstore.Models.Models.OrderPickupPoint", b =>
+                {
+                    b.Property<int>("PointId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PointId"));
+
+                    b.Property<string>("BuildingNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkingHours")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PointId");
+
+                    b.ToTable("OrderPickupPoint");
+                });
+
+            modelBuilder.Entity("Bookstore.Models.Models.Review", b =>
+                {
+                    b.Property<int>("ReviewsId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewsId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsShowReview")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProductRating")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReviewsId");
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("Bookstore.Models.Models.Roles", b =>
                 {
                     b.Property<int>("RoleId")
@@ -196,6 +265,12 @@ namespace Bookstore.Migrations
                             RoleId = 1,
                             RoleName = "Admin",
                             UserId = 1
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            RoleName = "WorkerOrderPickupPoint",
+                            UserId = 10
                         });
                 });
 

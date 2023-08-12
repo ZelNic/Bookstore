@@ -9,7 +9,7 @@
     <div class="col-12 pd-2">
         <div class="row justify-content-end">
             <div class="col-4">
-                <a class="btn btn-success" asp-controller="Category" asp-action="Upsert">Add</a>
+                <a class="btn btn-success" asp-controller="Category" asp-action="Upsert">Добавить</a>
             </div>
         </div>
     </div>
@@ -19,8 +19,8 @@
             <table class="table table-hover table-bordered table-striped text-center">
                 <thead>
                     <tr>
-                        <th>Nubmer</th>
-                        <th>Name</th>
+                        <th>Номер</th>
+                        <th>Название</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -36,12 +36,12 @@
                             <form method="post" enctype="multipart/form-data">
                             <td class="mx-auto">
                                 <a>
-                                    <a class="btn btn-success" asp-area="Admin" asp-controller="Category" asp-action="Upsert" asp-route-categoryId="@category.Id">Edit</a>
+                                    <a class="btn btn-success" asp-area="Admin" asp-controller="Category" asp-action="Upsert" asp-route-categoryId="@category.Id">Изменить</a>
                                 </a>
                             </td>
                             <td class="mx-auto">
                                 <a>
-                                    <a class="btn btn-primary" asp-area="Admin" asp-controller="Category" asp-action="BookCategory" asp-route-categoryId="@category.Id">Show</a> @*!!!*@
+                                    <a class="btn btn-primary" asp-area="Admin" asp-controller="Category" asp-action="BookCategory" asp-route-categoryId="@category.Id">Показать</a> @*!!!*@
                                 </a>
                             </td>
                             </form>
