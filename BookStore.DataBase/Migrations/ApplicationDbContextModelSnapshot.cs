@@ -96,6 +96,34 @@ namespace Bookstore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Bookstore.Models.Models.Employees", b =>
+                {
+                    b.Property<int>("EmployeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EmployeeId");
+
+                    b.ToTable("Employees");
+
+                    b.HasData(
+                        new
+                        {
+                            EmployeeId = 1,
+                            RoleName = "Admin",
+                            UserId = 1
+                        });
+                });
+
             modelBuilder.Entity("Bookstore.Models.Models.Order", b =>
                 {
                     b.Property<int>("OrderId")
@@ -187,9 +215,8 @@ namespace Bookstore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Region")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CountOfOrders")
+                        .HasColumnType("int");
 
                     b.Property<string>("Street")
                         .IsRequired()
@@ -202,6 +229,17 @@ namespace Bookstore.Migrations
                     b.HasKey("PointId");
 
                     b.ToTable("OrderPickupPoint");
+
+                    b.HasData(
+                        new
+                        {
+                            PointId = 1,
+                            BuildingNumber = "1",
+                            City = "Москва",
+                            CountOfOrders = 0,
+                            Street = "Советская",
+                            WorkingHours = "08:00 - 20:00"
+                        });
                 });
 
             modelBuilder.Entity("Bookstore.Models.Models.Review", b =>
@@ -238,40 +276,6 @@ namespace Bookstore.Migrations
                     b.HasKey("ReviewsId");
 
                     b.ToTable("Reviews");
-                });
-
-            modelBuilder.Entity("Bookstore.Models.Models.Roles", b =>
-                {
-                    b.Property<int>("RoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"));
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RoleId");
-
-                    b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            RoleId = 1,
-                            RoleName = "Admin",
-                            UserId = 1
-                        },
-                        new
-                        {
-                            RoleId = 3,
-                            RoleName = "WorkerOrderPickupPoint",
-                            UserId = 10
-                        });
                 });
 
             modelBuilder.Entity("Bookstore.Models.Models.ShoppingBasket", b =>

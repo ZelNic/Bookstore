@@ -44,9 +44,9 @@
 
                         User? user = db.User.FirstOrDefault(u => u.UserId == idUserFromHttpContext);
 
-                        if (db.Roles.First(u => u.UserId == user.UserId) != null)
+                        if (db.Employees.First(u => u.UserId == user.UserId) != null)
                         {
-                            if (db.Roles.First(u => u.UserId == user.UserId).RoleName == SD.RoleAdmin)
+                            if (db.Employees.First(u => u.UserId == user.UserId).RoleName == SD.RoleAdmin)
                             {
                                 <ul class="navbar-nav flex-grow-1">
                                     <li class="nav-item dropdown">
@@ -62,7 +62,7 @@
                             }
 
 
-                            if ((db.Roles.First(u => u.UserId == user.UserId) != null) && (db.Roles.First(u => u.UserId == user.UserId).RoleName == SD.RoleWorkerOrderPickupPoint))
+                            if ((db.Employees.First(u => u.UserId == user.UserId) != null) && (db.Employees.First(u => u.UserId == user.UserId).RoleName == SD.RoleWorkerOrderPickupPoint))
                             {
                                 <ul class="navbar-nav flex-grow-1">
                                     <li class="nav-item dropdown">

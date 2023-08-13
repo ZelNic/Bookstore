@@ -5,13 +5,19 @@
 
 @model Order
 
-
-<div>
-    <form class="d-flex" method="post" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">
-        <input class="form-control me-sm-1 bg-light" type="search" pattern="[0-9]+" name="searchOrderId" placeholder="Введите номер заказа">
-        <button class="btn btn-dark my-4 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
-    </form>
+<div class="container">
+    <div>
+        <h3>Проверка заказа</h3>
+    </div>
+    <div>
+        <form class="d-flex" method="post" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">
+            <input class="form-control me-sm-1 bg-light" type="search" pattern="[0-9]+" name="searchOrderId" placeholder="Введите номер заказа">
+            <button class="btn btn-dark my-4 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
 </div>
+
+
 
 @if (Model != null)
 {

@@ -32,7 +32,7 @@ namespace Bookstore.Areas.Purchase
         }
 
         [HttpPost]
-        public IActionResult DeliveryInformation(int purchaseАmount)
+        public IActionResult FillRecipientDate(int purchaseАmount)
         {
             if (purchaseАmount == 0)
             {
@@ -48,8 +48,13 @@ namespace Bookstore.Areas.Purchase
             return View(order);
         }
 
+        [HttpPost]
+        public IActionResult FillDeliveryDate(Order orderData)
+        {
+            
 
-
+            return View(orderData);
+        }
 
         //-----------------------------------------------------------------------Разбить на несколько методов.-------------------------------------------------------------------
 
@@ -58,23 +63,25 @@ namespace Bookstore.Areas.Purchase
         {
             if (_user.PersonalWallet >= orderData.PurchaseAmount)
             {
-                _user.PersonalWallet -= orderData.PurchaseAmount;
-
                 User? admin = _db.User.Find(1);
                 if (admin != null)
                 {
+                    _user.PersonalWallet -= orderData.PurchaseAmount;
                     admin.PersonalWallet += orderData.PurchaseAmount;
 
                     _db.User.UpdateRange(_user, admin);
                     _db.SaveChanges();
-                    orderData.PurchaseDate = MoscowTime.GetTime();
-                }
 
-                return View(orderData);
+                    return View(orderData);
+                }
+                else
+                {
+                    return NotFound("Технические проблемы.");
+                }
             }
             else
             {
-                return NotFound("Не хватает средств");
+                return NotFound("Не хватает средств.");
             }
         }
 
@@ -102,8 +109,7 @@ namespace Bookstore.Areas.Purchase
             orderData.ProductData = prodDataJson;
             orderData.OrderStatus = SD.StatusPending_0;
             orderData.DeliveryAddress += orderData.Region + ' ' + orderData.City + ' ' + orderData.Street + ' ' + orderData.HouseNumber;
-
-
+            orderData.PurchaseDate = MoscowTime.GetTime();
 
             _db.ShoppingBasket.RemoveRange(sb);
 

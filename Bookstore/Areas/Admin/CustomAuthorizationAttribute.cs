@@ -11,7 +11,7 @@ namespace Bookstore.Areas.Admin
             {
                 int? userId = contextAccessor.HttpContext.Session.GetInt32("Username");
 
-                if ((db.Roles.Find(userId) != null) && (db.Roles.Find(userId).RoleName == SD.RoleAdmin))
+                if ((db.Employees.Find(userId) != null) && (db.Employees.Find(userId).RoleName == SD.RoleAdmin))
                 {
                     return true;
                 }

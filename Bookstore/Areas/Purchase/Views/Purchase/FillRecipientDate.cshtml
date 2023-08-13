@@ -1,0 +1,51 @@
+﻿@inject ApplicationDbContext DB
+@{
+    var db = DB;
+}
+
+@model Order
+
+<div class="container mb-5">
+    <div class="row justify-content-center ">
+        <div class="col-sm-8 col-md-6 col-lg-5">
+            <h1 class="text-center">Информация о доставке</h1>
+            <form method="post" enctype="multipart/form-data">
+                <input asp-for="UserId" hidden />
+                <input asp-for="PurchaseAmount" hidden />
+                <div class="form-group p-3">
+                    <h6>Получатель</h6>
+                    <div>
+                        <label class="ms-1 my-1 text-dark">Имя</label>
+                        <input asp-for="ReceiverName" value="@db.User.Find(Model.UserId).FirstName" class="form-control border-0 shadow" />
+                        <span asp-validation-for="@db.User.Find(Model.UserId).FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="ms-1 my-1 text-dark">Фамилия</label>
+                        <input asp-for="RecipientsLastName" value="@db.User.Find(Model.UserId).LastName" class="form-control border-0 shadow" />
+                        <span asp-validation-for="@db.User.Find(Model.UserId).LastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="ms-1 my-1 text-dark">Номер телефона</label>
+                        <input asp-for="@db.User.Find(Model.UserId).PhoneNumber" class="form-control border-0 shadow" />
+                        <span asp-validation-for="@db.User.Find(Model.UserId).PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group p-3">
+                    <div>
+                        <label asp-for="isCourierDelivery">Способ доставки</label>
+                        <select class="rounded" asp-for="isCourierDelivery">
+                            <option value="false">Пункт выдачи</option>
+                            <option value="true">Курьером</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button asp-area="Purchase" asp-controller="Purchase" asp-action="FillDeliveryDate"
+                                type="submit" class="btn btn-primary w-100 mt-3 mb-5">
+                            Перейти к следующему этапу
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

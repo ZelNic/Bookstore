@@ -1,8 +1,9 @@
 ﻿using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
-using Bookstore.Models.ViewModel;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 
 namespace Bookstore.DataAccess
 {
@@ -16,7 +17,7 @@ namespace Bookstore.DataAccess
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<ShoppingBasket> ShoppingBasket { get; set; }
-        public DbSet<Roles> Roles { get; set; }
+        public DbSet<Employees> Employees { get; set; }
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<Order> Order { get; set; }
         public DbSet<Review> Reviews { get; set; }
@@ -76,7 +77,7 @@ namespace Bookstore.DataAccess
                     isCourierDelivery = false,
                     OrderStatus = SD.StatusRefunded_6,
                     CurrentPosition = "Moskow",
-                    TravelHistory = "SPB,Moskow"                    
+                    TravelHistory = "SPB,Moskow"
                 }
             );
 
@@ -90,18 +91,12 @@ namespace Bookstore.DataAccess
                 }
             );
 
-            modelBuilder.Entity<Roles>().HasData(
-                new Roles
+            modelBuilder.Entity<Employees>().HasData(
+                new Employees
                 {
-                    RoleId = 1,
+                    EmployeeId = 1,
                     UserId = 1,
                     RoleName = SD.RoleAdmin,
-                },
-                new Roles
-                {
-                    RoleId = 3,
-                    UserId = 10,
-                    RoleName = SD.RoleWorkerOrderPickupPoint,
                 }
             );
 
@@ -115,9 +110,18 @@ namespace Bookstore.DataAccess
                 }
             );
 
-
+            modelBuilder.Entity<OrderPickupPoint>().HasData(
+                new OrderPickupPoint
+                {
+                    PointId = 1,
+                    City = Cities.Moskow,
+                    Street = Streets.Soviet,
+                    BuildingNumber = "1",
+                    WorkingHours = "08:00 - 20:00",
+                    CountOfOrders = 0,
+                }
+            ); 
         }
-
     }
 }
 

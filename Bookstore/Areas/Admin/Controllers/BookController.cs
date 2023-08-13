@@ -32,7 +32,7 @@ namespace Bookstore.Areas.Admin.Controllers
             if (_contextAccessor.HttpContext.Session.GetInt32("Username") != null)
             {
                 int? userId = _contextAccessor.HttpContext.Session.GetInt32("Username");
-                if ((userId != null) && (_db.Roles.Find(userId) != null))
+                if ((userId != null) && (_db.Employees.Find(userId) != null))
                 {
                     List<Book> booksList = _db.Books.ToList();
                     List<Category> categoriesList = _db.Categories.ToList();
