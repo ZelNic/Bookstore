@@ -44,45 +44,45 @@
 
                         User? user = db.User.FirstOrDefault(u => u.UserId == idUserFromHttpContext);
 
-                        if (db.Employees.First(u => u.UserId == user.UserId) != null)
-                        {
-                            if (db.Employees.First(u => u.UserId == user.UserId).RoleName == SD.RoleAdmin)
-                            {
-                                <ul class="navbar-nav flex-grow-1">
-                                    <li class="nav-item dropdown">
-                                        <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Управление
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-dark">
-                                            <li><a class="dropdown-item" asp-area="Admin" asp-controller="Book" asp-action="Index">Книги</a></li>
-                                            <li><a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">Категории</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            }
-
-
-                            if ((db.Employees.First(u => u.UserId == user.UserId) != null) && (db.Employees.First(u => u.UserId == user.UserId).RoleName == SD.RoleWorkerOrderPickupPoint))
-                            {
-                                <ul class="navbar-nav flex-grow-1">
-                                    <li class="nav-item dropdown">
-                                        <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Управление заказами
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-dark">
-                                            <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">Проверить заказ</a></li>
-                                            <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">Прием заказа</a></li>
-                                            <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">Выдача заказ</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            }
-                        }
-
-
-
                         if (user != null)
                         {
+                            if (db.Employees.Where(u => u.UserId == user.UserId).FirstOrDefault() != null)
+                            {
+                                var employees = db.Employees.First(u => u.UserId == user.UserId);
+                                switch (employees.RoleName)
+                                {
+                                    case SD.RoleAdmin:
+                                        <ul class="navbar-nav flex-grow-1">
+                                            <li class="nav-item dropdown">
+                                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Управление
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-dark">
+                                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Book" asp-action="Index">Книги</a></li>
+                                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">Категории</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                        break;
+
+                                    case SD.RoleWorkerOrderPickupPoint:
+                                        <ul class="navbar-nav flex-grow-1">
+                                            <li class="nav-item dropdown">
+                                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Управление заказами
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-dark">
+                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">Проверить заказ</a></li>
+                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">Прием заказа</a></li>
+                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">Выдача заказ</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                        break;
+                                }
+                            }
+
+
                             <ul class="navbar-nav flex-grow-1 justify-content-end">
                                 <li>
                                     <a class="nav-link text-light" asp-area="Customer" asp-controller="Wishlist" asp-action="Index">
@@ -124,7 +124,6 @@
 
                         </ul>
                     }
-
                 </div>
             </div>
         </nav>

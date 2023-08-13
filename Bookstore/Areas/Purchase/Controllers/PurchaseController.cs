@@ -108,7 +108,7 @@ namespace Bookstore.Areas.Purchase
             //
             orderData.ProductData = prodDataJson;
             orderData.OrderStatus = SD.StatusPending_0;
-            orderData.DeliveryAddress += orderData.Region + ' ' + orderData.City + ' ' + orderData.Street + ' ' + orderData.HouseNumber;
+            orderData.DeliveryAddress += orderData.City + ',' + orderData.Street + ' ' + orderData.HouseNumber;
             orderData.PurchaseDate = MoscowTime.GetTime();
 
             _db.ShoppingBasket.RemoveRange(sb);

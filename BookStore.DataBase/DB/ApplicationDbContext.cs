@@ -22,7 +22,7 @@ namespace Bookstore.DataAccess
         public DbSet<Order> Order { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<OrderPickupPoint> OrderPickupPoint { get; set; }
-
+        public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -11,8 +11,7 @@ namespace Bookstore.Models.Models
         public string? ReceiverName { get; set; }
         public string? RecipientsLastName { get; set; }
         public string? ProductData { get; set; }
-        [DataType(DataType.DateTime)]
-        public DateTime PurchaseDate { get; set; }
+        [DataType(DataType.DateTime)] public DateTime PurchaseDate { get; set; }
         public int PurchaseAmount { get; set; }
         public string? OrderStatus { get; set; }
         public string? CurrentPosition { get; set; }
