@@ -132,6 +132,12 @@ namespace Bookstore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
                     b.Property<int>("RecipientId")
                         .HasColumnType("int");
 
@@ -148,6 +154,18 @@ namespace Bookstore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Notifications");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsHidden = false,
+                            OrderId = 0,
+                            RecipientId = 1,
+                            SenderId = 1,
+                            SendingTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "seed"
+                        });
                 });
 
             modelBuilder.Entity("Bookstore.Models.Models.Order", b =>

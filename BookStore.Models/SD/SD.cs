@@ -1,9 +1,12 @@
-﻿namespace Bookstore.Models.SD
+﻿using Bookstore.Models.Models;
+
+namespace Bookstore.Models.SD
 {
     public static class SD
     {        
         public const string RoleAdmin = "Admin";
         public const string RoleWorkerOrderPickupPoint = "WorkerOrderPickupPoint";
+        public const string RoleOderPicker = "OderPicker";
 
         public const string StatusPending_0 = "В ожидании";
         public const string StatusApproved_1 = "Одобренный";

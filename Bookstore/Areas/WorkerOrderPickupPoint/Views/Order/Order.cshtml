@@ -105,8 +105,12 @@
                     @Model.PhoneNumber
                 </div>
             </div>
-
-            <button class="btn btn-success mt-2">Уведомить клиента</button>
+            <form method="post" enctype="multipart/form-data">
+                <button type="submit" class="btn btn-success mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
+                        asp-action="Send" asp-route-notificationСode="5" asp-route-orderId="@Model.OrderId" >
+                    Уведомить клиента
+                </button>
+            </form>
         </div>
         <hr class="mt-5 mb-5" />
 

@@ -2,8 +2,10 @@
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver.Core.Servers;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Bookstore.DataAccess
 {
@@ -120,7 +122,22 @@ namespace Bookstore.DataAccess
                     WorkingHours = "08:00 - 20:00",
                     CountOfOrders = 0,
                 }
-            ); 
+            );
+
+            modelBuilder.Entity<Notification>().HasData(
+                new Notification
+                {
+                    Id = 1,
+                    SenderId = 1,
+                    RecipientId = 1,
+                    Text = "seed",
+                    IsHidden = false,
+                    SendingTime = new DateTime(),
+                }
+            );
+
+
+
         }
     }
 }

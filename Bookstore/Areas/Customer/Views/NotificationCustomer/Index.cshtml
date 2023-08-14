@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Notification>
+
+@if (Model.Count() == 0)
+{
+    <h1>Сообщений нет.</h1>
+}
+
+<div class="container-fluid">
+    <div class="row col-12">
+        @foreach (var notification in Model)
+        {
+            <div class="border border-1 rounded rounded-1 p-3 col-5 m-2">
+                <div class="d-inline-flex align-items-center position-relative">
+                    <label class="">Номер заказа: </label>
+                    <div class="rouden rounded-1 text-bg-primary col-auto">
+                        @notification.OrderId
+                    </div>
+                </div>
+                <div class="col-1">
+                </div>
+                <div>
+                    @notification.Text
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                    <button class="btn btn-sm btn-secondary" asp-area="Customer" asp-controller="NotificationCustomer" asp-action="Delete"
+                            asp-route-notificationId="@notification.Id">
+                        <i class="bi bi-x-square"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning" asp-area="Customer" asp-controller="Orders" asp-action="Index">Перейти к заказу</button>
+                    <button class="btn btn-sm btn-success">Получить код выдачи</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
