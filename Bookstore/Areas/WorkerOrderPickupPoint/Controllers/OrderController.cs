@@ -2,7 +2,11 @@
 using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
+using Bookstore.Models.ViewModel;
+using Bookstore.Utility;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol.Core.Types;
+using System;
 
 namespace Bookstore.Areas.WorkerOrderPickupPoint
 {
@@ -28,15 +32,39 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
             }
         }
 
-        public IActionResult Order()
+        public IActionResult Order(string operation)
         {
+            if (operation == null)
+            {
+                return NotFound("Такой операции нет.");
+            }
+
+            switch (operation)
+            {
+                case SD.ViewOrderDetails:
+                    ViewBag.operation = SD.ViewOrderDetails;
+                    break;
+                case SD.AcceptOrder:
+                    ViewBag.operation = SD.AcceptOrder;
+                    break;
+                case SD.IssueOrder:
+                    ViewBag.operation = SD.IssueOrder;
+                    break;
+                default:
+                    return NotFound(operation);
+            }
+
             return View();
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult Order(int searchOrderId)
         {
-            Order order = _db.Order.Find(searchOrderId);
+            Order? order = _db.Order.Find(searchOrderId);
+            if(order == null)
+            {
+                return NotFound(SD.NotFoundUser);
+            }
 
             return View(order);
         }
@@ -44,7 +72,7 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
 
         public IActionResult Deliver(int orderId, int? statusCode)
         {
-            Order order = _db.Order.Find(orderId);
+            Order? order = _db.Order.Find(orderId);
             if (order != null)
             {
                 switch (statusCode)
@@ -75,6 +103,37 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
                 _db.SaveChanges();
             }
             return RedirectToAction("Index", "Orders", new { area = "Customer" });
+        }
+
+       
+        [HttpPost]
+        public IActionResult IssuePackage(int orderId)
+        {
+            var order = _db.Order.Find(orderId);
+
+            if (order == null)
+            {
+                return NotFound(SD.NotFoundOrder);
+            }
+
+            Random random = new Random();
+            int confirmationСode = random.Next(100000, 999999);
+
+            Notification notification = new()
+            {
+                OrderId = orderId,
+                RecipientId = _user.UserId,
+                SenderId = order.UserId,
+                SendingTime = MoscowTime.GetTime(),
+                Text = NotificationSD.IssueCode + ' ' + confirmationСode + ' ' + "Скажите его оператору для выдачи заказа."
+            };
+
+            ViewBag.confirmationСode = $"{confirmationСode}";
+
+            _db.Notifications.Add(notification);
+            _db.SaveChanges();
+
+            return View();
         }
     }
 }

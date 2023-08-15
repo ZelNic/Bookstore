@@ -37,54 +37,61 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
         }
 
         [HttpPost]
-        public void Send(int notificationСode, int orderId)
+        public IActionResult Send(int notificationСode, int orderId)
         {
             string text = "";
-            Order order = _db.Order.Find(orderId);
-            switch (notificationСode)
+            Order? order = _db.Order.Find(orderId);
+
+            if (order != null)
             {
-                case 0:
-                    text = NotificationSD.TechnicalProblems_0;
-                    break;
-                case 1:
-                    text = NotificationSD.PaymentNotPassed_1;
-                    break;
-                case 2:
-                    text = NotificationSD.PaymentPassed_2;
-                    break;
-                case 3:
-                    text = NotificationSD.OrderIsGoing_3;
-                    break;
-                case 4:
-                    text = NotificationSD.OrderSent_4;
-                    break;
-                case 5:
-                    text = NotificationSD.OrderArrived_5;
-                    break;
-                case 6:
-                    text = NotificationSD.CourierDelivery_6;
-                    break;
-                case 7:
-                    text = NotificationSD.OrderСancelled_7;
-                    break;
-                default:
-                    NotFound("Неверная команда.");
-                    break;
+                switch (notificationСode)
+                {
+                    case 0:
+                        text = NotificationSD.TechnicalProblems_0;
+                        break;
+                    case 1:
+                        text = NotificationSD.PaymentNotPassed_1;
+                        break;
+                    case 2:
+                        text = NotificationSD.PaymentPassed_2;
+                        break;
+                    case 3:
+                        text = NotificationSD.OrderIsGoing_3;
+                        break;
+                    case 4:
+                        text = NotificationSD.OrderSent_4;
+                        break;
+                    case 5:
+                        text = NotificationSD.OrderArrived_5;
+                        break;
+                    case 6:
+                        text = NotificationSD.CourierDelivery_6;
+                        break;
+                    case 7:
+                        text = NotificationSD.OrderСancelled_7;
+                        break;
+                    default:
+                        NotFound("Неверная команда.");
+                        break;
+                }
+
+                Notification notification = new()
+                {
+                    SenderId = _user.UserId,
+                    RecipientId = order.UserId,
+                    OrderId = order.OrderId,
+                    Text = text,
+                    IsHidden = false,
+                    SendingTime = MoscowTime.GetTime(),
+                };
+
+
+                _db.Notifications.Add(notification);
+                _db.SaveChanges();
+
+                return Ok("Уведомление отправлено успешно.");
             }
-
-            Notification notification = new()
-            {
-                SenderId = _user.UserId,
-                RecipientId = order.UserId,
-                OrderId = order.OrderId,
-                Text = text,
-                IsHidden = false,
-                SendingTime = MoscowTime.GetTime(),
-            };
-
-
-            _db.Notifications.Add(notification);
-            _db.SaveChanges();
+            return NotFound("Пользователь не найден");
         }
     }
 }

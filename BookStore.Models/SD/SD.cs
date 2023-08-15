@@ -1,9 +1,7 @@
-﻿using Bookstore.Models.Models;
-
-namespace Bookstore.Models.SD
+﻿namespace Bookstore.Models.SD
 {
     public static class SD
-    {        
+    {
         public const string RoleAdmin = "Admin";
         public const string RoleWorkerOrderPickupPoint = "WorkerOrderPickupPoint";
         public const string RoleOderPicker = "OderPicker";
@@ -20,5 +18,13 @@ namespace Bookstore.Models.SD
         public const string PaymentStatusApproved = "Одобренный";
         public const string PaymentStatusDelayedPayment = "Утверждено для задержанного платежа";
         public const string PaymentStatusRejected = "Отклоненный";
+
+        public const string ViewOrderDetails = "Проверить состояние";
+        public const string AcceptOrder = "Принять заказ";
+        public const string IssueOrder = "Выдать заказ";
+
+
+        public const string NotFoundUser = "Пользователь не найден.";
+        public const string NotFoundOrder = "Заказ не найден.";
     }
 }

@@ -72,9 +72,9 @@
                                                     Управление заказами
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-dark">
-                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">Проверить заказ</a></li>
-                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">Прием заказа</a></li>
-                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order">Выдача заказ</a></li>
+                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order" asp-route-operation="@SD.ViewOrderDetails">Проверить состояние</a></li>
+                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order" asp-route-operation="@SD.AcceptOrder">Прием</a></li>
+                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="Order" asp-action="Order" asp-route-operation="@SD.IssueOrder">Выдача</a></li>
                                                 </ul>
                                             </li>
                                         </ul>

@@ -179,6 +179,9 @@ namespace Bookstore.Migrations
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ConfirmationСode")
+                        .HasColumnType("int");
+
                     b.Property<string>("CurrentPosition")
                         .HasColumnType("nvarchar(max)");
 
@@ -232,6 +235,7 @@ namespace Bookstore.Migrations
                         new
                         {
                             OrderId = 1,
+                            ConfirmationСode = 0,
                             CurrentPosition = "Moskow",
                             OrderStatus = "Возмещено",
                             ProductData = "test",

@@ -23,5 +23,6 @@ namespace Bookstore.Models.Models
         public string? Street { get; set; }
         public string? HouseNumber { get; set; }
         [DataType(DataType.PhoneNumber)] public string? PhoneNumber { get; set; }
+        public int ConfirmationСode { get; set; }
     }
 }

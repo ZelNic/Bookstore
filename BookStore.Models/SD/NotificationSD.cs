@@ -12,5 +12,7 @@ namespace Bookstore.Models.SD
         public const string OrderArrived_5 = "Заказ прибыл в пункт выдачи.";
         public const string CourierDelivery_6 = "Ожидайте звонка курьера.";
         public const string OrderСancelled_7 = "Заказ отменен.";
+
+        public const string IssueCode = "Код выдачи:";
     }
 }

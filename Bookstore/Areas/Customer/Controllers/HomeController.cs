@@ -41,8 +41,12 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public IActionResult Search(string searchString)
+        public IActionResult Search(string? searchString)
         {            
+            if(searchString == null)
+            {
+                return RedirectToAction("Index");
+            }
             IEnumerable<Book> books = _db.Books.Where(book => book.Title.Contains(searchString.ToLower()));
 
             return View(books);
