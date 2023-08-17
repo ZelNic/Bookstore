@@ -6,5 +6,7 @@ namespace Bookstore.Models.ViewModel
     {
         //public IEnumerable<ProductData> ProductData { get; set; }
         public IEnumerable<Order> OrderData { get; set; }
+        public Order? Order { get; set; }
+        public string? OperationName { get; set; }
     }
 }
