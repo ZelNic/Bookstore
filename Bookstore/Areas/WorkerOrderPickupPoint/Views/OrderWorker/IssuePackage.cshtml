@@ -98,9 +98,9 @@
                 </div>
             </div>
             <form method="post" enctype="multipart/form-data">
-                <input asp-for="" class="form-control border-0 shadow" />
+                <input asp-for="@Model.Order.ConfirmationСode" class="form-control border-0 shadow" />
                 <label class="ms-1 my-1 text-dark">Введите код для получения</label>
-                <span asp-validation-for="MOdel." class="text-danger"></span>
+                <span asp-validation-for="@Model.Order.ConfirmationСode" class="text-danger"></span>
             </form>
         </div>
         <hr class="mt-5 mb-5" />

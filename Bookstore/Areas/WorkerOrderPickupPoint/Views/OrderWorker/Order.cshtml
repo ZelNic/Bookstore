@@ -5,6 +5,9 @@
 
 @model OrderVM
 
+
+
+
 <div class="container">
     <div>
         <h3>@ViewBag.operation</h3>
@@ -122,17 +125,31 @@
                         </button>
                         break;
                     case SD.IssueOrder:
+                        //<button type="submit" class="btn btn-success mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
+                        //        asp-action="Send" asp-route-notificationСode="5" asp-route-orderId="@Model.Order.OrderId">
+                        //    Отправить код подтверждения
+                        //</button>
+
+
+
+
                         <button type="submit" class="btn btn-success mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
-                                asp-action="Send" asp-route-notificationСode="5" asp-route-orderId="@Model.Order.OrderId">
-                            Отправить код подтверждения
+                                asp-action="IssuePackage" asp-route-orderId="@Model.Order.OrderId">
+                            Ввести код подтверждения
                         </button>
                         break;
                     default:
                         break;
                 }
             </form>
+            <button onclick="showConfirmation(@Model.Order.ConfirmationСode)">Нажми меня</button>
         </div>
         <hr class="mt-5 mb-5" />
 
     </div>
+}
+
+
+@section Scripts{
+    <script src="~/js/SendNotification.js"></script>
 }
