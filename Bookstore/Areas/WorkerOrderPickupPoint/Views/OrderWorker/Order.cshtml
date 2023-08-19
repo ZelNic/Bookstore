@@ -114,23 +114,26 @@
                     @Model.Order.PhoneNumber
                 </div>
             </div>
-            <form method="post" enctype="multipart/form-data">
-
+            <div>
                 @switch (Model.OperationName)
                 {
                     case SD.AcceptOrder:
-                        <button type="submit" class="btn btn-success mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
+                        <button type="submit" class="btn btn-warning mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
                                 asp-action="Send" asp-route-notificationСode="5" asp-route-orderId="@Model.Order.OrderId">
                             Уведомить клиента о прибытие посылки
                         </button>
                         break;
+
                     case SD.IssueOrder:
                         //<button type="submit" class="btn btn-success mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
                         //        asp-action="Send" asp-route-notificationСode="5" asp-route-orderId="@Model.Order.OrderId">
-                        //    Отправить код подтверждения
+                        //    Отправить код подтверждения тест
                         //</button>
 
-
+                        <button onclick="SendNotification('/WorkerOrderPickupPoint/NotificationWorker/Send?notificationCode=5&orderId=@Model.Order.OrderId')"
+                                class="btn btn-success mt-2">
+                            Отправить код подтверждения
+                        </button>
 
 
                         <button type="submit" class="btn btn-success mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
@@ -141,8 +144,7 @@
                     default:
                         break;
                 }
-            </form>
-            <button onclick="showConfirmation(@Model.Order.ConfirmationСode)">Нажми меня</button>
+            </div>
         </div>
         <hr class="mt-5 mb-5" />
 
@@ -150,6 +152,10 @@
 }
 
 
+
+
 @section Scripts{
     <script src="~/js/SendNotification.js"></script>
 }
+
+

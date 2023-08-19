@@ -120,7 +120,7 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
                 return NotFound(SD.NotFoundOrder);
             }
 
-            Random random = new Random();
+            Random random = new();
             int confirmationСode = random.Next(100000, 999999);
 
             Notification notification = new()

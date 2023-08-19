@@ -37,14 +37,14 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
         }
 
         [HttpPost]
-        public IActionResult Send(int notificationСode, int orderId)
+        public void Send(int notificationCode, int orderId)
         {
             string text = "";
             Order? order = _db.Order.Find(orderId);
 
             if (order != null)
             {
-                switch (notificationСode)
+                switch (notificationCode)
                 {
                     case 0:
                         text = NotificationSD.TechnicalProblems_0;
@@ -88,10 +88,7 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
 
                 _db.Notifications.Add(notification);
                 _db.SaveChanges();
-
-                return Ok("Уведомление отправлено успешно.");
             }
-            return NotFound("Пользователь не найден");
         }
     }
 }
