@@ -1,12 +1,13 @@
 
 function SendNotification(url) {
     Swal.fire({
-        title: 'Отправить уведомление о прибытие посылки?',        
+        title: 'Подтвердить прибытие посылки в пункт выдачи?',    
+        text: 'Клиент получит уведомление о прибытие посылки.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Да, отправить!',
+        confirmButtonText: 'Да, подтвердить!',
         cancelButtonText: 'Отмена'
     }).then((result) => {
         if (result.isConfirmed) 
@@ -17,7 +18,7 @@ function SendNotification(url) {
             })
 
             Swal.fire(
-                'Отправлено!',
+                'Подтверждено!',
                 'Пользователь получил уведомление',
                 'success'
             )

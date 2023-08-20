@@ -10,12 +10,17 @@
         @foreach (var notification in Model)
         {
             <div class="border border-1 rounded rounded-1 p-3 col-5 m-2">
+                <style>
+                    .mr {
+                        margin-right:5px;
+                    }
+                </style>
                 <div class="d-inline-flex align-items-center position-relative">
                     <label class="">Номер заказа: </label>
-                    <div class="rouden rounded-1 text-bg-primary col-auto">
+                    <div class="rouden rounded-1 text-bg-primary col-auto mr">
                         @notification.OrderId
                     </div>
-                    <div class="rouden rounded-1 text-bg-primary col-auto">
+                    <div class="rouden rounded-1 text-bg-warning col-auto">
                         @notification.SendingTime
                     </div>
                 </div>

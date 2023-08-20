@@ -40,11 +40,45 @@
             </div>
             <div class="d-inline-flex align-items-center">
                 <span class="mr-3">Статус заказа: </span>
-                <div class="rouden rounded-1 text-bg-primary m-1">@Model.Order.OrderStatus</div>
+
+                @{
+                    string colorStatus = "";
+
+                    switch (Model.Order.OrderStatus)
+                    {
+                        case SD.StatusPending_0:
+                            colorStatus = "secondary";
+                            break;
+                        case SD.StatusApproved_1:
+                            colorStatus = "info";
+                            break;
+                        case SD.StatusInProcess_2:
+                            colorStatus = "warning";
+                            break;
+                        case SD.StatusShipped_3:
+                            colorStatus = "primary";
+                            break;
+                        case SD.StatusDelivered_4:
+                            colorStatus = "success";
+                            break;
+                        case SD.StatusCancelled_5:
+                            colorStatus = "danger";
+                            break;
+                        case SD.StatusRefunded_6:
+                            colorStatus = "dark";
+                            break;
+                    }
+                }
+                <div class="rouden rounded-1 bg-@colorStatus m-1">@Model.Order.OrderStatus</div>
             </div>
 
+
             <div>
-                <label>Дата и время заказа: @Model.Order.PurchaseDate по МСК</label>
+                <label>
+                    Дата и время заказа:
+                    @Model.Order.PurchaseDate
+                    по МСК
+                </label>
             </div>
 
             @{
@@ -115,39 +149,44 @@
                 </div>
             </div>
             <div>
-                @switch (Model.OperationName)
+                @if (Model.Order.OrderStatus != SD.StatusDelivered_4)
                 {
-                    case SD.AcceptOrder:
-                        <button type="submit" class="btn btn-warning mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
-                                asp-action="Send" asp-route-notificationСode="5" asp-route-orderId="@Model.Order.OrderId">
-                            Уведомить клиента о прибытие посылки
-                        </button>
-                        break;
-
-                    case SD.IssueOrder:
-                        //<button type="submit" class="btn btn-success mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
-                        //        asp-action="Send" asp-route-notificationСode="5" asp-route-orderId="@Model.Order.OrderId">
-                        //    Отправить код подтверждения тест
-                        //</button>
-
-                        <button onclick="SendNotification('/WorkerOrderPickupPoint/NotificationWorker/Send?notificationCode=5&orderId=@Model.Order.OrderId')"
-                                class="btn btn-success mt-2">
-                            Отправить код подтверждения
-                        </button>
-
-
-                        <button type="submit" class="btn btn-success mt-2" asp-area="WorkerOrderPickupPoint" asp-controller="NotificationWorker"
-                                asp-action="IssuePackage" asp-route-orderId="@Model.Order.OrderId">
-                            Ввести код подтверждения
-                        </button>
-                        break;
-                    default:
-                        break;
+                    @switch (Model.OperationName)
+                    {
+                        case SD.AcceptOrder:
+                            <div>
+                                <div>
+                                    <button onclick="SendNotification('/WorkerOrderPickupPoint/NotificationWorker/Send?notificationCode=5&orderId=@Model.Order.OrderId')"
+                                            class="btn btn-success mt-2">
+                                        Подтвердить прибытие заказа в пункт выдачи.*
+                                    </button>
+                                </div>
+                                <h8 class="opacity-50">*отправка уведомления клиенту о прибитые посылки</h8>
+                            </div>
+                            break;
+                        case SD.IssueOrder:
+                            <div>
+                                <div>
+                                    <button onclick="SendConfirmationCode('/WorkerOrderPickupPoint/OrderWorker/SendConfirmationCode?orderId=@Model.Order.OrderId')"
+                                            class="btn btn-success mt-2">
+                                        Отправить код подтверждения
+                                    </button>
+                                </div>
+                                <div>
+                                    <button onclick="EnterConfirmationCode('/WorkerOrderPickupPoint/OrderWorker/CheckVerificationCode?orderId=@Model.Order.OrderId')"
+                                            class="btn btn-success mt-2">
+                                        Ввести код подтверждения
+                                    </button>
+                                </div>
+                            </div>
+                            break;
+                        default:
+                            break;
+                    }
                 }
             </div>
         </div>
         <hr class="mt-5 mb-5" />
-
     </div>
 }
 
@@ -156,6 +195,7 @@
 
 @section Scripts{
     <script src="~/js/SendNotification.js"></script>
-}
+    <script src="~/js/SendСonfirmationСode.js"></script>
+    }
 
 

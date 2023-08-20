@@ -111,13 +111,13 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
 
 
         [HttpPost]
-        public IActionResult IssuePackage(int orderId)
+        public void SendConfirmationCode(int orderId)
         {
             var order = _db.Order.Find(orderId);
 
             if (order == null)
             {
-                return NotFound(SD.NotFoundOrder);
+               NotFound(SD.NotFoundOrder);
             }
 
             Random random = new();
@@ -133,14 +133,33 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
             };
 
             order.ConfirmationСode = confirmationСode;
-            
+
             _db.Order.Update(order);
             _db.Notifications.Add(notification);
             _db.SaveChanges();
-
-            return View();
         }
 
+        public bool CheckVerificationCode(int orderId, int confirmationCode)
+        {
+            var order = _db.Order.Find(orderId);
 
+            if (order == null)
+            {
+                return false;
+            }
+
+            if (order.ConfirmationСode == confirmationCode)
+            {
+                order.ConfirmationСode = 0;
+                order.OrderStatus = SD.StatusDelivered_4;
+                _db.Order.Update(order);
+                _db.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
