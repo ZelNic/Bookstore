@@ -357,6 +357,51 @@ namespace Bookstore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Bookstore.Models.Models.Stock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ResponsiblePerson")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShelfNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Stocks");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            City = "Москва",
+                            Count = 0,
+                            ProductId = 0,
+                            ResponsiblePerson = 12,
+                            ShelfNumber = 0,
+                            Street = "Советская"
+                        });
+                });
+
             modelBuilder.Entity("Bookstore.Models.Models.WishList", b =>
                 {
                     b.Property<int>("WishListId")

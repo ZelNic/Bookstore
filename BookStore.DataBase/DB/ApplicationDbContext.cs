@@ -25,6 +25,8 @@ namespace Bookstore.DataAccess
         public DbSet<Review> Reviews { get; set; }
         public DbSet<OrderPickupPoint> OrderPickupPoint { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Stock> Stocks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -133,6 +135,16 @@ namespace Bookstore.DataAccess
                     Text = "seed",
                     IsHidden = false,
                     SendingTime = new DateTime(),
+                }
+            );
+
+            modelBuilder.Entity<Stock>().HasData(
+                new Stock
+                {
+                    Id = 1,
+                    City = Cities.Moskow,
+                    Street = Streets.Soviet,
+                    ResponsiblePerson = 12
                 }
             );
 

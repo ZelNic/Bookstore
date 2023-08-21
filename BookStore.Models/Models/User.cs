@@ -7,9 +7,10 @@ namespace Bookstore.Models
         [Key]
         public int UserId { get; set; }
         [Required]
-        [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "Only latin characters")]
+        [RegularExpression("[a-zA-Zа-яА-Я]+", ErrorMessage = "Только буквенное обозначение")]
         public string? FirstName { get; set; }
         [Required]
+        [RegularExpression("[a-zA-Zа-яА-Я]+", ErrorMessage = "Только буквенное обозначение")]
         public string? LastName { get; set; }
         [DataType(DataType.Date)]
         [Required]

@@ -21,4 +21,11 @@
     <ProjectReference Include="..\Bookstore.Utility\Bookstore.Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Picker\Controllers\" />
+    <Folder Include="Areas\Picker\Data\" />
+    <Folder Include="Areas\Picker\Models\" />
+    <Folder Include="Areas\Picker\Views\" />
+  </ItemGroup>
+
 </Project>
