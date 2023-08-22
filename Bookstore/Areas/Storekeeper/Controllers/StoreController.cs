@@ -1,6 +1,8 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Bookstore.Areas.Storekeeper
 {
@@ -30,6 +32,14 @@ namespace Bookstore.Areas.Storekeeper
         {
             IQueryable stocks = _db.Stocks.Where(u => u.ResponsiblePerson == _storekeeper.UserId);
             return View(stocks);
+        }
+
+        public async Task<IEnumerable> GetProductAsync()
+        {
+            List<int> inter = new List<int>();
+            inter.Add(1);
+
+            return inter;
         }
     }
 }
