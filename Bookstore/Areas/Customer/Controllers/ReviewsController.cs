@@ -13,7 +13,7 @@ namespace Bookstore.Areas.Customer
             _db = db;            
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }

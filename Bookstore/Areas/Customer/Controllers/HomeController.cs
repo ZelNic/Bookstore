@@ -1,6 +1,7 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace Bookstore.Areas.Customer
@@ -19,10 +20,10 @@ namespace Bookstore.Areas.Customer
             _db = db;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            List<Book> booksList = _db.Books.ToList();
-            List<Category> categoriesList = _db.Categories.ToList();
+            List<Book> booksList = await _db.Books.ToListAsync();
+            List<Category> categoriesList = await _db.Categories.ToListAsync();
 
             BookVM bookVM = new()
             {
@@ -33,21 +34,21 @@ namespace Bookstore.Areas.Customer
             return View(bookVM);
         }
 
-        public IActionResult Details(int productId)
+        public async Task<IActionResult> Details(int productId)
         {
-            var product = _db.Books.Find(productId);
+            var product = await _db.Books.FindAsync(productId);
 
             return View(product);
         }
 
         [HttpPost]
-        public IActionResult Search(string? searchString)
+        public async Task<IActionResult> Search(string? searchString)
         {            
             if(searchString == null)
             {
                 return RedirectToAction("Index");
             }
-            IEnumerable<Book> books = _db.Books.Where(book => book.Title.Contains(searchString.ToLower()));
+            IEnumerable<Book> books = await _db.Books.Where(book => book.Title.Contains(searchString.ToLower())).ToListAsync();
 
             return View(books);
         }
@@ -55,13 +56,13 @@ namespace Bookstore.Areas.Customer
 
 
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> Privacy()
         {
             return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public async Task<IActionResult> Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }

@@ -144,12 +144,12 @@ namespace Bookstore.DataAccess
                     Id = 1,
                     City = Cities.Moskow,
                     Street = Streets.Soviet,
-                    ResponsiblePerson = 12
+                    ResponsiblePerson = 12,
+                    ProductId = 1,
+                    Count = 1,
+                    ShelfNumber = 1
                 }
             );
-
-
-
         }
     }
 }

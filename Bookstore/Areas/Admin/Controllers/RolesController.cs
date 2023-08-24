@@ -4,7 +4,7 @@ namespace Bookstore.Areas.Admin.Controllers
 {
     public class RolesController : Controller
     {
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }

@@ -1,6 +1,7 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Areas.Admin.Controllers
 {
@@ -14,24 +15,24 @@ namespace Bookstore.Areas.Admin.Controllers
             _db = db;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            List<Category> categoryList = _db.Categories.ToList();
+            List<Category> categoryList = await _db.Categories.ToListAsync();
             return View(categoryList);
         }
 
-        public IActionResult BookCategory(int categoryId)
+        public async Task<IActionResult> BookCategory(int categoryId)
         {
             CategoryVM categoryVM = new()
             {
-                BookList = _db.Books.Where(u => u.Category == categoryId).ToList(),
-                CategoryList = _db.Categories.ToList()
+                BookList = await _db.Books.Where(u => u.Category == categoryId).ToListAsync(),
+                CategoryList = await _db.Categories.ToListAsync()
             };
 
             return View(categoryVM);
         }
 
-        public IActionResult Upsert(int? categoryId)
+        public async Task<IActionResult> Upsert(int? categoryId)
         {
             if (categoryId == 0 || categoryId == null)
             {
@@ -40,13 +41,13 @@ namespace Bookstore.Areas.Admin.Controllers
                 return View(category);
             }
 
-            var book = _db.Categories.Find(categoryId);
+            var book = await _db.Categories.FindAsync(categoryId);
 
             return View(book);
         }
 
         [HttpPost]
-        public IActionResult Upsert(Category category)
+        public async Task<IActionResult> Upsert(Category category)
         {
             if (category.Id == 0)
             {
@@ -64,24 +65,24 @@ namespace Bookstore.Areas.Admin.Controllers
 
         [HttpGet]
         [ActionName("Delete")]
-        public IActionResult ConfirmDelete(int? categoryId)
+        public async Task<IActionResult> ConfirmDelete(int? categoryId)
         {
             if (categoryId != null)
             {
-                var categoryOnDelete = _db.Categories.Find(categoryId);
+                var categoryOnDelete = await _db.Categories.FindAsync(categoryId);
                 return View(categoryOnDelete);
             }
             else return NotFound();
         }
 
         [HttpPost]
-        public IActionResult Delete(int? categoryId)
+        public async Task<IActionResult> Delete(int? categoryId)
         {
-            var categoryOnDelete = _db.Categories.Find(categoryId);
+            var categoryOnDelete = await _db.Categories.FindAsync(categoryId);
             if (categoryOnDelete != null)
             {
                 _db.Categories.Remove(categoryOnDelete);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
                 return RedirectToAction("Index","Category");
             }
             else

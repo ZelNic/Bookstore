@@ -1,6 +1,7 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Areas.Admin.Controllers
 {
@@ -24,7 +25,7 @@ namespace Bookstore.Areas.Admin.Controllers
             }
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (_isAdmin == false)
                 return NotFound("Отказано в доступе");
@@ -34,8 +35,8 @@ namespace Bookstore.Areas.Admin.Controllers
                 int? userId = _contextAccessor.HttpContext.Session.GetInt32("Username");
                 if ((userId != null) && (_db.Employees.Find(userId) != null))
                 {
-                    List<Book> booksList = _db.Books.ToList();
-                    List<Category> categoriesList = _db.Categories.ToList();
+                    List<Book> booksList = await _db.Books.ToListAsync();
+                    List<Category> categoriesList = await _db.Categories.ToListAsync();
 
                     BookVM bookVM = new()
                     {
@@ -57,13 +58,13 @@ namespace Bookstore.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Upsert(int? bookId)
+        public async Task<IActionResult> Upsert(int? bookId)
         {
             var book = new Book();
 
             if (bookId != null)
             {
-                book = _db.Books.Find(bookId);
+                book = await _db.Books.FindAsync(bookId);
             }
 
             BookVM bookVM = new()
@@ -79,7 +80,7 @@ namespace Bookstore.Areas.Admin.Controllers
 
         [HttpPost]
         [ActionName("Upsert")]
-        public IActionResult UpsertPost(BookVM bookVM)
+        public async Task<IActionResult> UpsertPost(BookVM bookVM)
         {
             if (bookVM.Book.BookId == 0)
             {
@@ -87,7 +88,7 @@ namespace Bookstore.Areas.Admin.Controllers
             }
             else
             {
-                var oldVersionBook = _db.Books.Find(bookVM.Book.BookId);
+                var oldVersionBook = await _db.Books.FindAsync(bookVM.Book.BookId);
 
                 if (oldVersionBook != null)
                 {
@@ -102,7 +103,7 @@ namespace Bookstore.Areas.Admin.Controllers
                 }
             }
 
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return RedirectToAction("Index", "Book");
         }
 
@@ -110,24 +111,24 @@ namespace Bookstore.Areas.Admin.Controllers
 
         [HttpGet]
         [ActionName("Delete")]
-        public IActionResult ConfirmDelete(int? id)
+        public async Task<IActionResult> ConfirmDelete(int? id)
         {
             if (id != null)
             {
-                var bookOnDelete = _db.Books.Find(id);
+                var bookOnDelete = await _db.Books.FindAsync(id);
                 return View(bookOnDelete);
             }
             else return NotFound();
         }
 
         [HttpPost]
-        public IActionResult Delete(Book book)
+        public async Task<IActionResult> Delete(Book book)
         {
-            var bookOnDelete = _db.Books.Find(book.BookId);
+            var bookOnDelete = await _db.Books.FindAsync(book.BookId);
             if (bookOnDelete != null)
             {
                 _db.Books.Remove(bookOnDelete);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
                 return RedirectToAction("Index", "Book");
             }
             else

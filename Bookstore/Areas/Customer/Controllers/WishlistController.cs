@@ -2,6 +2,7 @@
 using Bookstore.Models;
 using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Areas.Customer
 {
@@ -27,7 +28,7 @@ namespace Bookstore.Areas.Customer
             }
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (_user != null)
             {
@@ -37,7 +38,7 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public IActionResult AddWishList(int productId)
+        public async Task<IActionResult> AddWishList(int productId)
         {
             if (_user == null)
             {
@@ -45,9 +46,9 @@ namespace Bookstore.Areas.Customer
             }
             else
             {
-                var wishList = _db.WishLists.Where(u => u.UserId == _user.UserId)
+                var wishList = await _db.WishLists.Where(u => u.UserId == _user.UserId)
                     .Where(u => u.ProductId == productId)
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
 
                 if (wishList != null)
                 {
@@ -63,21 +64,21 @@ namespace Bookstore.Areas.Customer
                         CountProduct = 1
                     };
 
-                    _db.WishLists.Add(newProductInWishList);
+                    await _db.WishLists.AddAsync(newProductInWishList);
                 }
 
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
 
                 return RedirectToAction("Index", "Home", new { area = "Customer" });
             }
         }
 
         [HttpPost]
-        public IActionResult RemoveFromWL(int productId)
+        public async Task<IActionResult> RemoveFromWL(int productId)
         {
-            var productOnRemove = _db.WishLists.Where(u => u.UserId == _user.UserId).Where(u=>u.ProductId == productId).FirstOrDefault();
+            var productOnRemove = await _db.WishLists.Where(u => u.UserId == _user.UserId).Where(u=>u.ProductId == productId).FirstOrDefaultAsync();
             _db.WishLists.Remove(productOnRemove);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return RedirectToAction("Index", "WishList", new { area = "Customer" });
         }
     }

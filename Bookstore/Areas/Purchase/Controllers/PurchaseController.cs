@@ -5,6 +5,7 @@ using Bookstore.Models.SD;
 using Bookstore.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Bookstore.Areas.Purchase
@@ -51,26 +52,25 @@ namespace Bookstore.Areas.Purchase
         [HttpPost]
         public IActionResult FillDeliveryDate(Order orderData)
         {
-            
+
 
             return View(orderData);
         }
 
-        //-----------------------------------------------------------------------Разбить на несколько методов.-------------------------------------------------------------------
 
         [HttpPost]
-        public IActionResult Payment(Order orderData)
+        public async Task<IActionResult> Payment(Order orderData)
         {
             if (_user.PersonalWallet >= orderData.PurchaseAmount)
             {
-                User? admin = _db.User.Find(1);
+                User? admin = await _db.User.FindAsync(1);
                 if (admin != null)
                 {
                     _user.PersonalWallet -= orderData.PurchaseAmount;
                     admin.PersonalWallet += orderData.PurchaseAmount;
 
                     _db.User.UpdateRange(_user, admin);
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
 
                     return View(orderData);
                 }
@@ -87,13 +87,13 @@ namespace Bookstore.Areas.Purchase
 
 
         [HttpPost]
-        public IActionResult FundsVerification(Order orderData)
+        public async Task<IActionResult> FundsVerification(Order orderData)
         {
 
-            var sb = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId);
+            var sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).ToListAsync();
 
 
-            IEnumerable<ProductData> productData = _db.ShoppingBasket
+            IEnumerable<ProductData> productData = await _db.ShoppingBasket
                 .Where(sb => sb.UserId == _user.UserId)
                 .Join(_db.Books, sb => sb.ProductId, b => b.BookId, (sb, b) => new { sb, b })
                 .Select(x => new ProductData
@@ -101,11 +101,10 @@ namespace Bookstore.Areas.Purchase
                     ProdId = x.sb.ProductId,
                     Price = x.b.Price,
                     Count = x.sb.CountProduct
-                }).ToList();
+                }).ToListAsync();
 
             string prodDataJson = JsonConvert.SerializeObject(productData);
 
-            //
             orderData.ProductData = prodDataJson;
             orderData.OrderStatus = SD.StatusPending_0;
             orderData.DeliveryAddress += orderData.City + ',' + orderData.Street + ' ' + orderData.HouseNumber;
@@ -113,9 +112,9 @@ namespace Bookstore.Areas.Purchase
 
             _db.ShoppingBasket.RemoveRange(sb);
 
-            _db.Order.Add(orderData);
+            await _db.Order.AddAsync(orderData);
 
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return RedirectToAction("Index", "Orders", new { area = "Customer" });
         }
     }

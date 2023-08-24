@@ -394,10 +394,10 @@ namespace Bookstore.Migrations
                         {
                             Id = 1,
                             City = "Москва",
-                            Count = 0,
-                            ProductId = 0,
+                            Count = 1,
+                            ProductId = 1,
                             ResponsiblePerson = 12,
-                            ShelfNumber = 0,
+                            ShelfNumber = 1,
                             Street = "Советская"
                         });
                 });

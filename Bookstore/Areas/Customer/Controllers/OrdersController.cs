@@ -2,6 +2,7 @@
 using Bookstore.Models;
 using Bookstore.Models.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Areas.Customer
 {
@@ -27,11 +28,11 @@ namespace Bookstore.Areas.Customer
             }
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             OrderVM orderVM = new()
             {
-                OrderData = _db.Order.Where(u => u.UserId == _user.UserId)
+                OrderData = await _db.Order.Where(u => u.UserId == _user.UserId).ToListAsync(),
             };
             return View(orderVM);
         }

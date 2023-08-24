@@ -4,6 +4,7 @@ using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Bookstore.Utility;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Areas.WorkerOrderPickupPoint
 {
@@ -29,18 +30,18 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
             }
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            IEnumerable<Notification> notifications = _db.Notifications.Where(u => u.RecipientId == _user.UserId).Where(s => s.IsHidden == false);
+            IEnumerable<Notification> notifications = await _db.Notifications.Where(u => u.RecipientId == _user.UserId).Where(s => s.IsHidden == false).ToListAsync();
 
             return View(notifications);
         }
 
         [HttpPost]
-        public void Send(int notificationCode, int orderId)
+        public async void Send(int notificationCode, int orderId)
         {
             string text = "";
-            Order? order = _db.Order.Find(orderId);
+            Order? order = await _db.Order.FindAsync(orderId);
 
             if (order != null)
             {
@@ -86,8 +87,8 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
                 };
 
 
-                _db.Notifications.Add(notification);
-                _db.SaveChanges();
+                await _db.Notifications.AddAsync(notification);
+                await _db.SaveChangesAsync();
             }
         }
     }

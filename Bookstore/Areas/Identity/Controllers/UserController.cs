@@ -1,6 +1,7 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Areas.Identity
 {
@@ -16,16 +17,16 @@ namespace Bookstore.Areas.Identity
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public IActionResult LogIn()
+        public async Task<IActionResult> LogIn()
         {
             User? user = null;
             return View(user);
         }
 
         [HttpPost]
-        public IActionResult LogIn(string email, string password)
+        public async Task<IActionResult> LogIn(string email, string password)
         {
-            User? user = _db.User.FirstOrDefault(u => u.Email == email);
+            User? user = await _db.User.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null)
             {
                 return NotFound("Пользователь не найден.");
@@ -42,14 +43,14 @@ namespace Bookstore.Areas.Identity
         }
 
         [HttpPost]
-        public IActionResult GoOut()
+        public async Task<IActionResult> GoOut()
         {
             _httpContextAccessor.HttpContext.Session.Remove("Username");
             return RedirectToAction("LogIn");
         }
 
         [HttpGet]
-        public IActionResult Registration()
+        public async Task<IActionResult> Registration()
         {
             User? user = null;
 
@@ -57,10 +58,10 @@ namespace Bookstore.Areas.Identity
         }
 
         [HttpPost]
-        public IActionResult Registration(User newUser)
+        public async Task<IActionResult> Registration(User newUser)
         {
-            _db.User.Add(newUser);
-            _db.SaveChanges();
+            await _db.User.AddAsync(newUser);
+            await _db.SaveChangesAsync();
 
             _httpContextAccessor.HttpContext.Session.SetInt32("Username", newUser.UserId);
 
@@ -68,12 +69,12 @@ namespace Bookstore.Areas.Identity
         }
 
         [HttpGet]
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile()
         {
             int? id = _httpContextAccessor.HttpContext.Session.GetInt32("Username");
             if (id != null)
             {
-                User user = _db.User.FirstOrDefault(u => u.UserId == id);
+                User user = await _db.User.FirstOrDefaultAsync(u => u.UserId == id);
                 return View(user);
             }
             else
@@ -83,9 +84,9 @@ namespace Bookstore.Areas.Identity
         }
 
         [HttpPost]
-        public IActionResult Profile(User user)
+        public async Task<IActionResult> Profile(User user)
         {
-            User oldVerUser = _db.User.FirstOrDefault(u => u.UserId == user.UserId);
+            User oldVerUser = await _db.User.FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
             if (oldVerUser != null)
             {
@@ -96,7 +97,7 @@ namespace Bookstore.Areas.Identity
                 oldVerUser.DateofBirth = user.DateofBirth;
 
                 _db.User.Update(oldVerUser);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
             }
 
             return RedirectToAction("Profile");

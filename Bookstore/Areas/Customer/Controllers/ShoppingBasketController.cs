@@ -3,6 +3,7 @@ using Bookstore.Models;
 using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Areas.Customer
 {
@@ -28,7 +29,7 @@ namespace Bookstore.Areas.Customer
             }
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (_user != null)
             {
@@ -37,8 +38,9 @@ namespace Bookstore.Areas.Customer
             return NotFound();
         }
 
+        //add in the basket or in the wish list
         [HttpPost]
-        public IActionResult AddBasket(int productId, bool isWishList = false)
+        public async Task<IActionResult> AddBasket(int productId, bool isWishList = false)
         {
             if (_user == null)
             {
@@ -46,9 +48,9 @@ namespace Bookstore.Areas.Customer
             }
             else
             {
-                var basket = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId)
+                var basket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId)
                     .Where(u => u.ProductId == productId)
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
 
                 if (basket != null)
                 {
@@ -67,11 +69,10 @@ namespace Bookstore.Areas.Customer
                         CountProduct = 1
                     };
 
-                    _db.ShoppingBasket.Add(newProductInShopBasket);
+                    await _db.ShoppingBasket.AddAsync(newProductInShopBasket);
                 }
 
-
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
 
                 if (isWishList == true)
                 {
@@ -85,21 +86,21 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public IActionResult RemoveFromBasket(int productId)
+        public async Task<IActionResult> RemoveFromBasket(int productId)
         {
-            ShoppingBasket productInBasket = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefault();
+            ShoppingBasket productInBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefaultAsync();
             int countProductInBasket = productInBasket.CountProduct;
 
             _db.ShoppingBasket.Remove(productInBasket);
 
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public IActionResult ChangeCountProduct(int productId, bool minus = false, bool plus = false)
+        public async Task<IActionResult> ChangeCountProduct(int productId, bool minus = false, bool plus = false)
         {
-            ShoppingBasket productInBasket = _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefault();
+            ShoppingBasket productInBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefaultAsync();
             int countProductInBasket = productInBasket.CountProduct;
 
             if (countProductInBasket == 1 && minus == true)
@@ -121,7 +122,7 @@ namespace Bookstore.Areas.Customer
                 _db.ShoppingBasket.Update(productInBasket);
             }     
             
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
