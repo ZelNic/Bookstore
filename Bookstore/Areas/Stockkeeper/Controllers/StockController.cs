@@ -1,5 +1,6 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
+using Bookstore.Models.SD;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +23,14 @@ namespace Bookstore.Areas.Stockkeeper
                 int? userId = _contextAccessor.HttpContext.Session.GetInt32("Username");
                 if ((userId != null) && (_db.Employees.Where(u => u.UserId == userId) != null))
                 {
-                    _storekeeper = _db.User.Find(userId);
+                    if (_db.User.Find(userId) != null)
+                    {
+                        _storekeeper = _db.User.Find(userId);
+                    }
+                }
+                else
+                {
+                    NotFound(SD.AccessDenied);
                 }
             }
         }
@@ -37,20 +45,21 @@ namespace Bookstore.Areas.Stockkeeper
             return View(stockVM);
         }
 
-        [HttpPost]
-        public async Task<List<Book>> GetProductAsync(string? nameProduct = null, int? productId = null)
-        {
-            List<Book> books = new();
-            if (nameProduct != null)
-            {
-                books = await _db.Books.Where(book => book.Title.Contains(nameProduct.ToLower())).ToListAsync();
-            }
-            else if (productId != null)
-            {
-                books = await _db.Books.Where(u => u.BookId == productId).ToListAsync();
-            }
+        //[HttpPost]
+        //public async Task<List<Book>> GetProductAsync(string? nameProduct, int? productId)
+        //{
+        //    List<Book> books = new();
+        //    if (nameProduct != null)
+        //    {
+        //        books = await _db.Books.Where(book => book.Title.Contains(nameProduct.ToLower())).ToListAsync();
+        //    }
+        //    else if (productId != null)
+        //    {
+        //        books = await _db.Books.Where(u => u.BookId == productId).ToListAsync();
+        //    }
 
-            return books;
-        }
+        //    return books;
+        //}
+
     }
 }

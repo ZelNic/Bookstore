@@ -1,6 +1,5 @@
 ﻿@model StockVM
 
-
 <h2>Склад</h2>
 
 <div class="container">
@@ -10,23 +9,48 @@
 
 
     <div class="hidden">
-        <form id="myForm" class="d-flex" method="post" asp-area="Stockkeeper" asp-controller="Stock" asp-action="GetProductAsync">
-            <input id="searchTitle" class="form-control me-sm-1 bg-light" type="search" name="nameProduct" placeholder="Поиск по названию">
-            <input id="searchId" class="form-control me-sm-1 bg-light" type="search" name="productId" placeholder="Поиск по Id">
-            <button id="searchButton" class="btn btn-dark my-4 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
+        <form method="post" enctype="multipart/form-data">
+            <input class="form-control me-sm-1 bg-light" type="search" name="nameProduct" placeholder="Поиск по названию">
+            <input class="form-control me-sm-1 bg-light" type="search" name="productId" placeholder="Поиск по Id">
+            <button type="submit" class="btn btn-dark my-4 my-sm-0"><i class="bi bi-search"></i></button>
         </form>
+        
+        <div id="bdProduct" hidden>
+            @Model.Books
+        </div>
+
+        <div id="hide" class="mt-1">
+            <button class="btn btn-secondary">Скрыть</button>
+
+            <div class="visible">
+            </div>
+        </div>
     </div>
 
-    
+
     <div id="result">
         <div class="row border border-1 rounded rounded-1 mt-1">
-        @if (Model.Books != null)
-        {            
-            foreach (var book in Model.Books)
+            @if (Model.Stock != null)
             {
-                <p>@book.Title - @book.Author</p>
+                <table>
+                    <tr>
+                        <th>Id</th>
+                        <th>Название</th>
+                        <th>Количество</th>
+                        <th>Номер полки</th>
+                    </tr>
+                    @foreach (var book in Model.Stock)
+                    {
+                        <tr>
+                            <td>@book.ProductId</td>
+                            <td>@Model.Books.FirstOrDefault(u=>u.BookId==book.ProductId).Title</td>
+                            <td>@book.Count</td>
+                            <td>@book.ShelfNumber</td>
+                        </tr>
+                    }
+                </table>
+
             }
-        }
         </div>
     </div>
 
@@ -41,33 +65,15 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-@*<form class="d-flex" method="post" asp-area="Customer" asp-controller="Home" asp-action="Search">
-    <input class="form-control me-sm-1 bg-light" type="search" name="searchString" placeholder="Поиск по названию">
-    <input class="form-control me-sm-1 bg-light" type="search" name="searchString" placeholder="Поиск по Id">
-    <a asp-for="@Model" hidden></a>
-    <button class="btn btn-dark my-4 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
-</form>
-<div id="hide" class="mt-1">
-    <button class="btn btn-secondary">Скрыть</button>
-</div>*@
 @*
-<div class="visible">
-    @if (Model.Books.Any())
-    {
-        string isHidden = "visible";
-    }
-    else
-    {
-        string isHidden = "hidden";
-    }
-</div>*@
+<form id="myForm" class="d-flex" method="post" asp-area="Stockkeeper" asp-controller="Stock" asp-action="GetProductAsync">
+    <input id="searchTitle" class="form-control me-sm-1 bg-light" type="search" name="nameProduct" placeholder="Поиск по названию">
+    <input id="searchId" class="form-control me-sm-1 bg-light" type="search" name="productId" placeholder="Поиск по Id">
+    <button id="searchButton" class="btn btn-dark my-4 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
+</form>
+
+
+*@
+
+
+

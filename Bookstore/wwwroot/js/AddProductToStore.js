@@ -1,3 +1,5 @@
+const bdBook = document.
+
 
 const openSearch = document.getElementById('openSearch');
 const searchContainer = document.querySelector('.hidden');
@@ -16,39 +18,38 @@ hide.addEventListener('click', function () {
 });
 
 
-document.getElementById("myForm").addEventListener("submit", function (event) {
-    event.preventDefault(); // Предотвращение обычного поведения отправки формы
+//document.getElementById("myForm").addEventListener("submit", function (event) {
+//    event.preventDefault();
 
-    // Получение значений полей формы
-    var title = document.getElementById("searchTitle").value;
-    var id = document.getElementById("searchId").value;
-    var result = document.getElementById("result").value;
-    
-    // Вызов функции для отправки запроса на сервер и обработки результата
-    result = findProduct(title, id);
-});
+//    var title = document.getElementById("searchTitle").value;
+//    var id = document.getElementById("searchId").value;
+//    var result = document.getElementById("result").value;
 
-function findProduct(title, id) {
-    fetch(`/Stockkeeper/Stock/GetProductAsync?nameProduct=${title}&productId=${id}`)
-        .then(response => {
-            // Обработка ответа от сервера
-        })
-        .catch(error => {
-            // Обработка ошибки
-        });
-}
+//    result = findProduct(title, id);
+//});
 
-fetch('/your-server-url')
-    .then(response => response.json())
-    .then(results => {
-        // Ваш код для отображения результатов в HTML
-        const resultsContainer = document.getElementById('results');
-        results.forEach(result => {
-            const resultElement = document.createElement('p');
-            resultElement.textContent = result;
-            resultsContainer.appendChild(resultElement);
-        });
-    })
-    .catch(error => {
-        console.error('Ошибка:', error);
-    });
+//function findProduct(title, id) {
+//    fetch(`/Stockkeeper/Stock/GetProductAsync?nameProduct=${title}&productId=${id}`, { method: 'POST' })
+//        .then(response => {
+//        })
+//        .catch(error => {
+//        });
+//}
+
+
+
+
+//fetch('/your-server-url')
+//    .then(response => response.json())
+//    .then(results => {
+//        // Ваш код для отображения результатов в HTML
+//        const resultsContainer = document.getElementById('results');
+//        results.forEach(result => {
+//            const resultElement = document.createElement('p');
+//            resultElement.textContent = result;
+//            resultsContainer.appendChild(resultElement);
+//        });
+//    })
+//    .catch(error => {
+//        console.error('Ошибка:', error);
+//    });
