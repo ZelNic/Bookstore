@@ -12,7 +12,7 @@ namespace Bookstore.Areas.Stockkeeper
 
         private readonly ApplicationDbContext _db;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly User _storekeeper;
+        private readonly User _stockkeeper;
         public StockController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
         {
             _db = db;
@@ -25,7 +25,7 @@ namespace Bookstore.Areas.Stockkeeper
                 {
                     if (_db.User.Find(userId) != null)
                     {
-                        _storekeeper = _db.User.Find(userId);
+                        _stockkeeper = _db.User.Find(userId);
                     }
                 }
                 else
@@ -39,27 +39,18 @@ namespace Bookstore.Areas.Stockkeeper
         {
             StockVM stockVM = new()
             {
-                Stock = await _db.Stocks.Where(u => u.ResponsiblePerson == _storekeeper.UserId).ToListAsync(),
+                Stock = await _db.Stocks.Where(u => u.ResponsiblePerson == _stockkeeper.UserId).ToListAsync(),
                 Books = await _db.Books.ToListAsync()
             };
             return View(stockVM);
         }
 
-        //[HttpPost]
-        //public async Task<List<Book>> GetProductAsync(string? nameProduct, int? productId)
-        //{
-        //    List<Book> books = new();
-        //    if (nameProduct != null)
-        //    {
-        //        books = await _db.Books.Where(book => book.Title.Contains(nameProduct.ToLower())).ToListAsync();
-        //    }
-        //    else if (productId != null)
-        //    {
-        //        books = await _db.Books.Where(u => u.BookId == productId).ToListAsync();
-        //    }
+        [HttpPost]
+        public async Task<bool> AddProductInStock(int productId, int numberShelf, int productCount = 1)
+        {
 
-        //    return books;
-        //}
 
+            return true;
+        }
     }
 }

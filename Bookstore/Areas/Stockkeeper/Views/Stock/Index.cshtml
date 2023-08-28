@@ -4,54 +4,31 @@
 
 <div class="container">
     <div class="col-2 pb-5 mt-2 pt-3">
-        <button id="openSearch" class="btn btn-success btn-outline-warning border-0 form-control">Новое поступление</button>
+        <button id="openSearch" onclick="EnterIdProduct('/Stockkeeper/Stock/AddProductInStock?')" class="btn btn-success btn-outline-warning border-0 form-control">Новое поступление</button>
     </div>
 
-
-    <div class="hidden">
-        <form method="post" enctype="multipart/form-data">
-            <input class="form-control me-sm-1 bg-light" type="search" name="nameProduct" placeholder="Поиск по названию">
-            <input class="form-control me-sm-1 bg-light" type="search" name="productId" placeholder="Поиск по Id">
-            <button type="submit" class="btn btn-dark my-4 my-sm-0"><i class="bi bi-search"></i></button>
-        </form>
-        
-        <div id="bdProduct" hidden>
-            @Model.Books
-        </div>
-
-        <div id="hide" class="mt-1">
-            <button class="btn btn-secondary">Скрыть</button>
-
-            <div class="visible">
-            </div>
-        </div>
-    </div>
-
-
-    <div id="result">
-        <div class="row border border-1 rounded rounded-1 mt-1">
-            @if (Model.Stock != null)
-            {
-                <table>
+    <div class="row border border-1 rounded rounded-1 mt-1">
+        @if (Model.Stock != null)
+        {
+            <table>
+                <tr>
+                    <th>Id</th>
+                    <th>Название</th>
+                    <th>Количество</th>
+                    <th>Номер полки</th>
+                </tr>
+                @foreach (var book in Model.Stock)
+                {
                     <tr>
-                        <th>Id</th>
-                        <th>Название</th>
-                        <th>Количество</th>
-                        <th>Номер полки</th>
+                        <td>@book.ProductId</td>
+                        <td>@Model.Books.FirstOrDefault(u=>u.BookId==book.ProductId).Title</td>
+                        <td>@book.Count</td>
+                        <td>@book.ShelfNumber</td>
                     </tr>
-                    @foreach (var book in Model.Stock)
-                    {
-                        <tr>
-                            <td>@book.ProductId</td>
-                            <td>@Model.Books.FirstOrDefault(u=>u.BookId==book.ProductId).Title</td>
-                            <td>@book.Count</td>
-                            <td>@book.ShelfNumber</td>
-                        </tr>
-                    }
-                </table>
+                }
+            </table>
 
-            }
-        </div>
+        }
     </div>
 
 </div>
@@ -59,9 +36,6 @@
 @section Scripts{
     <script src="~/js/AddProductToStore.js"></script>
 }
-
-
-
 
 
 
