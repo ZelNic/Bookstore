@@ -1,4 +1,10 @@
 ﻿@model StockVM
+@inject ApplicationDbContext DB
+@{
+    var db = DB;
+}
+
+
 
 <h2>Склад</h2>
 
@@ -7,28 +13,21 @@
         <button id="openSearch" onclick="EnterIdProduct('/Stockkeeper/Stock/AddProductInStock?')" class="btn btn-success btn-outline-warning border-0 form-control">Новое поступление</button>
     </div>
 
+
+
     <div class="row border border-1 rounded rounded-1 mt-1">
-        @if (Model.Stock != null)
-        {
-            <table>
+
+        <table id="stock" class="table table-bordered table-striped pt-3 pb-3 my-1">
+            <thead class="pt-4 pb-4 table-gray">
                 <tr>
                     <th>Id</th>
                     <th>Название</th>
                     <th>Количество</th>
                     <th>Номер полки</th>
                 </tr>
-                @foreach (var book in Model.Stock)
-                {
-                    <tr>
-                        <td>@book.ProductId</td>
-                        <td>@Model.Books.FirstOrDefault(u=>u.BookId==book.ProductId).Title</td>
-                        <td>@book.Count</td>
-                        <td>@book.ShelfNumber</td>
-                    </tr>
-                }
-            </table>
+            </thead>
+        </table>
 
-        }
     </div>
 
 </div>

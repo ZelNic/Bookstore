@@ -1,3 +1,24 @@
+
+var dataTable;
+
+$(document).ready(function () {
+    loadDataTable();
+});
+
+function loadDataTable() {
+    dataTable = $('#stock').DataTable({
+        "ajax": { url: '/Stockkeeper/Stock/getStock' },
+        "columns": [
+            { data: 'productId', "width": "25%" },
+            { data: 'nameProduct', "width": "25%" },
+            { data: 'count', "width": "25%" },
+            { data: 'shelfNumber', "width": "25%" },
+            
+        ]
+    });
+}
+
+
 function EnterIdProduct(url) {
     Swal.fire({
         title: 'Добавить новый товар',
@@ -36,10 +57,16 @@ function EnterIdProduct(url) {
                 icon: 'success'
             });
         }
+        else {
+            Swal.fire({
+                title: 'Ошибка',
+                icon: 'error'
+            });
+        }
     }).catch((error) => {
         Swal.fire({
             title: 'Ошибка при выполнении запроса',
-            text: error.message,
+            text: 'a',
             icon: 'error'
         });
     });
@@ -48,7 +75,16 @@ function EnterIdProduct(url) {
 
 
 
-
+//{
+            //    data: 'id',
+            //    "render": function (data) {
+            //        return `<div class="w-100 btn-group" role="group">
+            //         <a href="/admin/product/upsert?id=${data}" class="btn btn-primary mx-1"> <i class="bi bi-pencil-square"></i> Edit</a>
+            //         <a onClick=Delete('/admin/product/delete/${data}') class="btn btn-danger mx-1"> <i class="bi bi-trash-fill"></i> Delete</a>
+            //        </div>`
+            //    },
+            //    "width": "20%"
+            //}
 
 
 

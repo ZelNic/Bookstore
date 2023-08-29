@@ -2,19 +2,15 @@
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver.Core.Servers;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Bookstore.DataAccess
 {
     public class ApplicationDbContext : DbContext
     {
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-
-        }
+        }        
         public DbSet<Book> Books { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> User { get; set; }
