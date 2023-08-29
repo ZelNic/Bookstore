@@ -1,7 +1,7 @@
 function EnterIdProduct(url) {
     Swal.fire({
         title: 'Добавить новый товар',
-        html: '<input type="number" id="productCode" placeholder="Код товара" class="swal2-input">' +
+        html: '<input type="number" id="productId" placeholder="Код товара" class="swal2-input">' +
             '<input type="number" id="productCount" placeholder="Количество" class="swal2-input">'+
             '<input type="number" id="shelfNumber" placeholder="Номер полки" class="swal2-input bg">',
         showCancelButton: true,
@@ -10,13 +10,13 @@ function EnterIdProduct(url) {
 
     }).then((result) => {
         if (result.isConfirmed) {
-            const productCode = document.getElementById('productCode').value;
+            const productId = document.getElementById('productId').value;
             const productCount = document.getElementById('productCount').value;
             const numberShelf = document.getElementById('shelfNumber').value;
 
             return new Promise((resolve, reject) => {
                 $.ajax({
-                    url: url + "&productId=" + productCode + "&numberShelf=" + numberShelf + "&productCount=" + productCount,
+                    url: url + "&productId=" + productId + "&numberShelf=" + numberShelf + "&productCount=" + productCount,
                     type: 'POST',
                     success: function (response) {
                         resolve(response);

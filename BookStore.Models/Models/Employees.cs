@@ -2,7 +2,7 @@
 
 namespace Bookstore.Models.Models
 {
-    public class Employees
+    public class Employees : User
     {
         [Key]
         public int EmployeeId { get; set; }
