@@ -1,19 +1,11 @@
-﻿@model StockVM
-@inject ApplicationDbContext DB
-@{
-    var db = DB;
-}
+﻿@model Stock
 
-
-
-<h2>Склад</h2>
+<h2>Склад @Model.City, @Model.Street</h2>
 
 <div class="container">
     <div class="col-2 pb-5 mt-2 pt-3">
-        <button id="openSearch" onclick="EnterIdProduct('/Stockkeeper/Stock/AddProductInStock?')" class="btn btn-success btn-outline-warning border-0 form-control">Новое поступление</button>
+        <button id="openSearch" onclick="enterIdProduct('/Stockkeeper/Stock/AddProductInStock?')" class="btn btn-success border-0 form-control">Новое поступление</button>
     </div>
-
-
 
     <div class="row border border-1 rounded rounded-1 mt-1">
 
@@ -24,29 +16,13 @@
                     <th>Название</th>
                     <th>Количество</th>
                     <th>Номер полки</th>
+                    <th></th>
                 </tr>
             </thead>
         </table>
-
     </div>
-
 </div>
 
 @section Scripts{
-    <script src="~/js/AddProductToStore.js"></script>
+    <script src="~/js/Store.js"></script>
 }
-
-
-
-@*
-<form id="myForm" class="d-flex" method="post" asp-area="Stockkeeper" asp-controller="Stock" asp-action="GetProductAsync">
-    <input id="searchTitle" class="form-control me-sm-1 bg-light" type="search" name="nameProduct" placeholder="Поиск по названию">
-    <input id="searchId" class="form-control me-sm-1 bg-light" type="search" name="productId" placeholder="Поиск по Id">
-    <button id="searchButton" class="btn btn-dark my-4 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
-</form>
-
-
-*@
-
-
-

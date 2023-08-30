@@ -39,12 +39,12 @@ namespace Bookstore.Areas.Stockkeeper
 
         public async Task<IActionResult> Index()
         {
-            StockVM stockVM = new()
+            Stock? stock = _db.Stocks.Where(u => u.ResponsiblePerson == _stockkeeper.UserId).FirstOrDefault();
+            if (stock == null)
             {
-                Stock = await _db.Stocks.Where(u => u.ResponsiblePerson == _stockkeeper.UserId).ToListAsync(),
-                Books = await _db.Books.ToListAsync()
-            };
-            return View(stockVM);
+                return NotFound();
+            }
+            return View(stock);
         }
 
         [HttpPost]
@@ -84,6 +84,13 @@ namespace Bookstore.Areas.Stockkeeper
             else { return false; }
         }
 
+        public async Task<IActionResult> ChangeShelfProduct(int id)
+        {
+
+
+            return Ok();
+        }
+
         public async Task<IActionResult> GetStock()
         {
             var stock = await _db.Stocks.Where(u => u.ResponsiblePerson == _stockkeeper.UserId)
@@ -96,7 +103,6 @@ namespace Bookstore.Areas.Stockkeeper
                 }).ToListAsync();
 
             return Json(new { data = stock });
-
         }
     }
 }
