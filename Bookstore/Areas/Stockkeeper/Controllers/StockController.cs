@@ -4,7 +4,8 @@ using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static System.Reflection.Metadata.BlobBuilder;
+using SharpCompress.Common;
+using Xceed.Words.NET;
 
 namespace Bookstore.Areas.Stockkeeper
 {
@@ -40,13 +41,9 @@ namespace Bookstore.Areas.Stockkeeper
         public async Task<IActionResult> Index()
         {
             Stock? stock = _db.Stocks.Where(u => u.ResponsiblePerson == _stockkeeper.UserId).FirstOrDefault();
-            if (stock == null)
-            {
-                return NotFound();
-            }
+           
             return View(stock);
         }
-
         [HttpPost]
         public async Task<bool> AddProductInStock(int productId, int numberShelf, int productCount)
         {
@@ -83,26 +80,87 @@ namespace Bookstore.Areas.Stockkeeper
             }
             else { return false; }
         }
-
-        public async Task<IActionResult> ChangeShelfProduct(int id)
+        [HttpPost]
+        public async Task<IActionResult> ChangeShelfProduct(int recordId, int productCount, int newShelfNumber)
         {
+            Stock? record = await _db.Stocks.Where(u => u.ResponsiblePerson == _stockkeeper.UserId).Where(i=>i.Id==recordId).FirstOrDefaultAsync();
+            if(record == null)
+            {
+                return NotFound();
+            }            
 
+            if(record.ShelfNumber ==  newShelfNumber)
+            {
+                return Ok();
+            }
+
+            Stock newRecord = new()
+            {
+                City = record.City,
+                Street = record.Street,
+                ResponsiblePerson = record.ResponsiblePerson,
+                ProductId = record.ProductId,
+
+                ShelfNumber = newShelfNumber,
+                Count = productCount
+            };
+
+            record.Count -= productCount;
+            if (record.Count <= 0)
+            {
+                _db.Stocks.Remove(record);
+            }
+            else
+            {
+                _db.Stocks.Update(record);
+            }
+
+            await _db.Stocks.AddAsync(newRecord);
+            await _db.SaveChangesAsync();
 
             return Ok();
         }
-
         public async Task<IActionResult> GetStock()
         {
             var stock = await _db.Stocks.Where(u => u.ResponsiblePerson == _stockkeeper.UserId)
                 .Join(_db.Books, s => s.ProductId, b => b.BookId, (s, b) => new
                 {
+                    id = s.Id,
                     productId = s.ProductId,
+                    nameProduct = b.Title,
                     count = s.Count,
-                    shelfNumber = s.ShelfNumber,
-                    nameProduct = b.Title
+                    shelfNumber = s.ShelfNumber
                 }).ToListAsync();
 
             return Json(new { data = stock });
         }
+
+        public async Task<IActionResult> OrderProducts(int productId)
+        {
+            //var product = await _db.Books.FindAsync(productId);
+
+            
+            // Заполните свойства модели данными из базы данных или других источников
+            //создать надо модель, в ней запольнить свойства
+
+            // Откройте шаблон документа Word
+            using (DocX document = DocX.Load("путь_к_шаблону.docx"))
+            {
+                // Заполните данные в шаблоне, используя модель представления
+                document.ReplaceText("{{OrderNumber}}", model.OrderNumber);
+                document.ReplaceText("{{CustomerName}}", model.CustomerName);
+                // Замените другие метки в шаблоне соответствующими данными из модели представления
+
+                // Сохраните заполненный документ в файл
+                string filePath = "путь_к_сохранению_заполненного_документа.docx";
+                document.SaveAs(filePath);
+            }
+
+            // Верните файл пользователю для скачивания
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "имя_файла.docx");
+        }
+
+
     }
 }

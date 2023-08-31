@@ -9,18 +9,19 @@ function loadDataTable() {
     dataTable = $('#stock').DataTable({
         "ajax": { url: '/Stockkeeper/Stock/getStock' },
         "columns": [
+            { data: 'id', "width": "5%" },
             { data: 'productId', "width": "5%" },
-            { data: 'nameProduct', "width": "35%" },
-            { data: 'count', "width": "20%" },
-            { data: 'shelfNumber', "width": "20%" },
+            { data: 'nameProduct', "width": "40%" },
+            { data: 'count', "width": "25%" },
+            { data: 'shelfNumber', "width": "15%" },
             {
                 data: null,
                 render: function (data) {
                     return `<div class="w-100 btn-group" role="group">
-                         <a onClick="editShelf('${data.productId}&${data.nameProduct}&${data.count}&${data.shelfNumber}')" class="btn btn-primary mx-1">Сменить полку<i class="bi bi-pencil-square"></i></a>
+                         <a onClick="editShelf('${data.id}&${data.productId}&${data.nameProduct}&${data.count}&${data.shelfNumber}')"class="btn btn-secondary mx-1"><i class="bi bi-pencil-square"></i></a>
                         </div>`;
                 },
-                "width": "20%"
+                "width": "10%"
             }
         ]
     });
@@ -30,10 +31,11 @@ function loadDataTable() {
 function editShelf(productData) {
     var response = productData;
     var values = response.split('&');
-    var productId = values[0];
-    var nameProduct = values[1];
-    var count = values[2];
-    var shelfNumber = values[3];
+    var recordId = values[0]
+    var productId = values[1];
+    var nameProduct = values[2];
+    var count = values[3];
+    var shelfNumber = values[4];
 
     Swal.fire({
         title: nameProduct,
@@ -44,17 +46,32 @@ function editShelf(productData) {
             max: count,
             step: 1
         },
-        inputValue: 1,       
+        inputValue: 1,
+        html: '<input type="number" id="shelfNumber" placeholder="Номер полки" class="swal2-input">',
         showCancelButton: true,
         confirmButtonText: 'Сменить',
         cancelButtonText: 'Отмена',
     }).then(function (result) {
         if (result.isConfirmed) {
-            var selectedValue = result.value;
-            console.log(selectedValue);
-            // Дальнейшая обработка выбранного значения
+            var productCount = result.value;
+            var newShelfNumber = document.getElementById('shelfNumber').value;
+
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: '/Stockkeeper/Stock/ChangeShelfProduct?recordId=' + recordId + "&productCount=" + productCount + "&newShelfNumber=" + newShelfNumber,
+                    type: 'POST',
+                    success: function (response) {
+                        refreshDataTable();
+                        resolve(response);
+                    },
+                    error: function (error) {
+                        reject(error);
+                    }
+                });
+            });
         }
     });
+
 }
 
 function refreshDataTable() {
