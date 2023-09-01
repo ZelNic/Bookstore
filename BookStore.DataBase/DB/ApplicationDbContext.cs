@@ -1,4 +1,5 @@
-﻿using Bookstore.Models;
+﻿using Azure;
+using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ namespace Bookstore.DataAccess
         public DbSet<OrderPickupPoint> OrderPickupPoint { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Stock> Stocks { get; set; }
+        public DbSet<RecordStock> StockJournal { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -137,15 +139,24 @@ namespace Bookstore.DataAccess
             modelBuilder.Entity<Stock>().HasData(
                 new Stock
                 {
-                    Id = 1,
+                    Id = 26,
                     City = Cities.Moskow,
-                    Street = Streets.Soviet,
-                    ResponsiblePerson = 12,
-                    ProductId = 1,
-                    Count = 1,
-                    ShelfNumber = 1
+                    Street = Streets.Central,
+                    ResponsiblePersonId = 12
                 }
             );
+            modelBuilder.Entity<RecordStock>().HasData(
+                new RecordStock
+                {
+                    Id = 1,
+                    StockId = 26,
+                    ResponsiblePersonId = 12,
+                    ProductId = 1,
+                    Count = 1,
+                    ShelfNumber = 1,
+                    Operation = OperationStock.ReceiptOfGoods
+                }
+            ); ;
         }
     }
 }

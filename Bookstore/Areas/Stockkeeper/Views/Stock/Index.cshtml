@@ -1,11 +1,11 @@
-﻿@model Stock
+﻿@model StockVM
 
 
 <h2>
     Склад
     @if (Model != null)
     {
-        <a>@Model.City,@Model.Street</a>
+        <a>@Model.Stock.City,@Model.Stock.Street</a>
     }
 </h2>
 

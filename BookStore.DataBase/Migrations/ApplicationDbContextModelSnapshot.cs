@@ -290,6 +290,50 @@ namespace Bookstore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Bookstore.Models.Models.RecordStock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Operation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ResponsiblePersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShelfNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StockJournal");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Count = 1,
+                            Operation = "Прием товара",
+                            ProductId = 1,
+                            ResponsiblePersonId = 12,
+                            ShelfNumber = 1,
+                            StockId = 26
+                        });
+                });
+
             modelBuilder.Entity("Bookstore.Models.Models.Review", b =>
                 {
                     b.Property<int>("ReviewsId")
@@ -369,16 +413,7 @@ namespace Bookstore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ResponsiblePerson")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShelfNumber")
+                    b.Property<int>("ResponsiblePersonId")
                         .HasColumnType("int");
 
                     b.Property<string>("Street")
@@ -392,13 +427,10 @@ namespace Bookstore.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = 26,
                             City = "Москва",
-                            Count = 1,
-                            ProductId = 1,
-                            ResponsiblePerson = 12,
-                            ShelfNumber = 1,
-                            Street = "Советская"
+                            ResponsiblePersonId = 12,
+                            Street = "Центральная"
                         });
                 });
 
