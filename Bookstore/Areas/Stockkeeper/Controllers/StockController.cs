@@ -2,6 +2,7 @@
 using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
+using Bookstore.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
@@ -52,11 +53,12 @@ namespace Bookstore.Areas.Stockkeeper
         }
 
         [HttpPost]
-        public async Task<bool> AddProductInStock(int productId, int numberShelf, int productCount)
+        public async Task<IActionResult> AddProductInStock(int productId, int numberShelf, int productCount)
         {
-            if (await _db.Books.FindAsync(productId) == null)
+            var book = await _db.Books.FindAsync(productId);
+            if (book == null)
             {
-                return false;
+                return BadRequest(new { error = "Такого товара нет в базе. Проверьте правильность введенных данных." }.ToString());
             }
 
             Stock? stock = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).FirstOrDefaultAsync();
@@ -87,52 +89,68 @@ namespace Bookstore.Areas.Stockkeeper
                     await _db.StockJournal.AddAsync(record);
                 }
                 await _db.SaveChangesAsync();
-                return true;
+                return Ok("Товар " + book.Title + " добавлен на полку " + numberShelf + " в количестве " + productCount + " шт.");
             }
-            else { return false; }
+            else
+            {
+                return BadRequest(new { error = "Склад не найден." }.ToString());
+            }
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> ChangeShelfProduct(int recordId, int productCount, int newShelfNumber)
-        //{
-        //    Stock? record = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).Where(i => i.Id == recordId).FirstOrDefaultAsync();
-        //    if (record == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPost]
+        public async Task<IActionResult> ChangeShelfProduct(int recordId, int productCount, int newShelfNumber)
+        {
+            RecordStock? selectedRecord = await _db.StockJournal.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).Where(i => i.Id == recordId).FirstOrDefaultAsync();
+            if (selectedRecord == null)
+            {
+                return NotFound();
+            }
 
-        //    if (record.ShelfNumber == newShelfNumber)
-        //    {
-        //        return Ok();
-        //    }
+            if (selectedRecord.ShelfNumber == newShelfNumber)
+            {
+                return Ok();
+            }
 
-        //    Stock newRecord = new()
-        //    {
-        //        City = record.City,
-        //        Street = record.Street,
-        //        ResponsiblePerson = record.ResponsiblePerson,
-        //        ProductId = record.ProductId,
+            RecordStock? productOnShelf = await _db.StockJournal.Where(u => u.ProductId == selectedRecord.ProductId).Where(s => s.ShelfNumber == newShelfNumber).FirstOrDefaultAsync();
 
-        //        ShelfNumber = newShelfNumber,
-        //        Count = productCount
-        //    };
+            selectedRecord.Count -= productCount;
+            if (selectedRecord.Count <= 0)
+            {
+                _db.StockJournal.Remove(selectedRecord);
+            }
+            else
+            {
+                _db.StockJournal.Update(selectedRecord);
+            }
 
-        //    record.Count -= productCount;
-        //    if (record.Count <= 0)
-        //    {
-        //        _db.Stocks.Remove(record);
-        //    }
-        //    else
-        //    {
-        //        _db.Stocks.Update(record);
-        //    }
 
-        //    await _db.Stocks.AddAsync(newRecord);
-        //    await _db.SaveChangesAsync();
+            if (productOnShelf != null)
+            {
+                productOnShelf.Count += productCount;
 
-        //    return Ok();
-        //}
+                _db.StockJournal.Update(productOnShelf);
+                await _db.SaveChangesAsync();
+                return Ok();
+            }
+            else
+            {
+                RecordStock newRecord = new()
+                {
+                    StockId = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).Select(u => u.Id).FirstOrDefaultAsync(),
+                    ResponsiblePersonId = _stockkeeper.UserId,
+                    ProductId = selectedRecord.ProductId,
+                    ShelfNumber = newShelfNumber,
+                    Count = productCount,
+                    Operation = OperationStock.MovementOfGoods
+                };
+
+                await _db.StockJournal.AddAsync(newRecord);
+                await _db.SaveChangesAsync();
+
+                return Ok();
+            }
+        }
 
         public async Task<IActionResult> GetStock()
         {
@@ -149,6 +167,19 @@ namespace Bookstore.Areas.Stockkeeper
             return Json(new { data = stock });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetPurchaseRequest()
+        {
+            PurchaseRequest request = new()
+            {
+                ApplicationTime = MoscowTime.GetTime(),
+                ResponsiblePersonId = _stockkeeper.UserId,
+                StockId = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).Select(u => u.Id).FirstOrDefaultAsync()
+            };
+
+            return View(request);
+        }
+
         //public async Task<IActionResult> OrderProducts(int productId)
         //{
         //    var product = await _db.Books.FindAsync(productId);
@@ -157,7 +188,7 @@ namespace Bookstore.Areas.Stockkeeper
         //    {
         //        ApplicationTime = MoscowTime.GetTime(),
         //        ResponsiblePersonId = _stockkeeper.UserId,
-        //        City = 
+        //        City =
         //    };
 
         //    // Откройте шаблон документа Word

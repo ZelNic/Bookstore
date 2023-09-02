@@ -11,20 +11,35 @@ function loadDataTable() {
         "columns": [
             { data: 'id', "width": "5%" },
             { data: 'productId', "width": "5%" },
-            { data: 'nameProduct', "width": "40%" },
-            { data: 'count', "width": "25%" },
+            { data: 'nameProduct', "width": "30%" },
+            { data: 'count', "width": "15%" },
             { data: 'shelfNumber', "width": "15%" },
             {
                 data: null,
                 render: function (data) {
-                    return `<div class="w-100 btn-group" role="group">
-                         <a onClick="editShelf('${data.id}&${data.productId}&${data.nameProduct}&${data.count}&${data.shelfNumber}')"class="btn btn-secondary mx-1"><i class="bi bi-pencil-square"></i></a>
-                        </div>`;
+                    return
+                    `<div class="w-100 btn-group" role="group">
+                        <a onClick="editShelf('${data.id}&${data.productId}&${data.nameProduct}&${data.count}&${data.shelfNumber}')" class="btn btn-secondary"><i class="bi bi-pencil-square"></i></a>
+                    </div>`;
                 },
-                "width": "10%"
+                "width": "15%"
+            },
+            {
+                data: null,
+                render: function (data) {
+                    return
+                    `<div class="w-100 btn-group" role="group">
+                        <a onClick="selectProduct('${data.id}')" class="btn btn-danger mx-1"><i class="bi bi-trash"></i></a>
+                    </div>`;
+                },
+                "width": "15%"
             }
         ]
     });
+
+}
+
+function selectProduct(productData) {
 
 }
 
@@ -111,17 +126,17 @@ function enterIdProduct(url) {
             return;
         }
     }).then((response) => {
-        if (response) {
-            Swal.fire({
-                title: 'Товар добавлен',
-                icon: 'success'
-            });
-            refreshDataTable();
-        }
+        Swal.fire({
+            title: 'Товар добавлен',
+            text: response,
+            icon: 'success'
+        });
+        refreshDataTable();
+
     }).catch((error) => {
         Swal.fire({
             title: 'Ошибка при выполнении запроса',
-            text: 'a',
+            text: error,
             icon: 'error'
         });
     });
