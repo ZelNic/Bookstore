@@ -65,17 +65,17 @@ namespace Bookstore.Areas.Stockkeeper
 
             if (stock != null)
             {
-                RecordStock? stockJournal = await _db.StockJournal.Where(u => u.ProductId == productId).Where(s => s.ShelfNumber == numberShelf).FirstOrDefaultAsync();
+                RecordStock? stockJouselectedRecordrnal = await _db.StockJournal.Where(u => u.ProductId == productId).Where(s => s.ShelfNumber == numberShelf).FirstOrDefaultAsync();
 
-                if (stockJournal != null)
+                if (stockJouselectedRecordrnal != null)
                 {
-                    if (stockJournal.ProductId == productId && stockJournal.ShelfNumber == numberShelf)
+                    if (stockJouselectedRecordrnal.ProductId == productId && stockJouselectedRecordrnal.ShelfNumber == numberShelf)
                     {
-                        stockJournal.Count += productCount;
-                        _db.StockJournal.Update(stockJournal);
+                        stockJouselectedRecordrnal.Count += productCount;
+                        _db.StockJournal.Update(stockJouselectedRecordrnal);
                     }
                 }
-                else if (stockJournal == null)
+                else if (stockJouselectedRecordrnal == null)
                 {
                     RecordStock record = new()
                     {
@@ -84,7 +84,8 @@ namespace Bookstore.Areas.Stockkeeper
                         ProductId = productId,
                         Count = productCount,
                         ShelfNumber = numberShelf,
-                        Operation = OperationStock.ReceiptOfGoods
+                        Operation = OperationStock.ReceiptOfGoods,
+                        IsOrder = await _db.StockJournal.Where(u => u.ProductId == productId).Select(u => u.IsOrder).FirstOrDefaultAsync(),
                     };
                     await _db.StockJournal.AddAsync(record);
                 }
@@ -142,7 +143,8 @@ namespace Bookstore.Areas.Stockkeeper
                     ProductId = selectedRecord.ProductId,
                     ShelfNumber = newShelfNumber,
                     Count = productCount,
-                    Operation = OperationStock.MovementOfGoods
+                    Operation = OperationStock.MovementOfGoods,
+                    IsOrder = await _db.StockJournal.Where(u => u.ProductId == selectedRecord.ProductId).Select(u=>u.IsOrder).FirstOrDefaultAsync(),
                 };
 
                 await _db.StockJournal.AddAsync(newRecord);
@@ -161,7 +163,8 @@ namespace Bookstore.Areas.Stockkeeper
                     productId = s.ProductId,
                     nameProduct = b.Title,
                     count = s.Count,
-                    shelfNumber = s.ShelfNumber
+                    shelfNumber = s.ShelfNumber,
+                    isOrder = s.IsOrder,
                 }).ToListAsync();
 
             return Json(new { data = stock });
@@ -179,6 +182,24 @@ namespace Bookstore.Areas.Stockkeeper
 
             return View(request);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SelectProductToPurchase(int productId, bool isOrder)
+        {
+            IEnumerable<RecordStock> allProduct = await _db.StockJournal.Where(i => i.ProductId == productId).ToListAsync();
+
+            foreach (var product in allProduct)
+            {      
+                product.IsOrder = product.IsOrder ? false : true;
+            }
+
+            _db.StockJournal.UpdateRange(allProduct);
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
 
         //public async Task<IActionResult> OrderProducts(int productId)
         //{

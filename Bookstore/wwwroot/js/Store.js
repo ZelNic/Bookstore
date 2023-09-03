@@ -11,42 +11,68 @@ function loadDataTable() {
         "columns": [
             { data: 'id', "width": "5%" },
             { data: 'productId', "width": "5%" },
-            { data: 'nameProduct', "width": "30%" },
-            { data: 'count', "width": "15%" },
-            { data: 'shelfNumber', "width": "15%" },
+            {
+                data: 'nameProduct',
+                render: function (data, type, row) {
+                    return '<a href="/Customer/Home/Details?productId=' + row.productId + '">' + data + '</a>';
+                },
+                "width": "40%"
+            },
+            { data: 'count', "width": "20%" },
+            { data: 'shelfNumber', "width": "20%" },
             {
                 data: null,
                 render: function (data) {
-                    return
-                    `<div class="w-100 btn-group" role="group">
-                        <a onClick="editShelf('${data.id}&${data.productId}&${data.nameProduct}&${data.count}&${data.shelfNumber}')" class="btn btn-secondary"><i class="bi bi-pencil-square"></i></a>
+                    return `<div class="w-100 btn-group" role="group">
+                    <a onClick="editShelf('${data.id}&${data.productId}&${data.nameProduct}&${data.count}&${data.shelfNumber}&${data.isOrder}')" class="btn bg-secondary"><i class="bi bi-pencil-square"></i></a>
                     </div>`;
-                },
-                "width": "15%"
+                }, "width": "5%"
             },
             {
                 data: null,
                 render: function (data) {
-                    return
-                    `<div class="w-100 btn-group" role="group">
-                        <a onClick="selectProduct('${data.id}')" class="btn btn-danger mx-1"><i class="bi bi-trash"></i></a>
+
+                    if (data.isOrder == true) {
+                        return `<div class="w-100 btn-group" role="group">
+                    <a onClick="selectProductToPurchase('${data.productId}&${data.isOrder}')" class="btn btn-warning"><i class="bi bi-check2-square"></i></a>
                     </div>`;
-                },
-                "width": "15%"
+                    }
+                    else {
+                        return `<div class="w-100 btn-group" role="group">
+                    <a onClick="selectProductToPurchase('${data.productId}&${data.isOrder}')" class="btn btn-dark"><i class="bi bi-dash-square"></i></a>
+                    </div>`;
+                    }
+
+                }, "width": "5%"
             }
         ]
     });
-
 }
 
-function selectProduct(productData) {
-
+function selectProductToPurchase(productData) {
+    var response = productData.split('&');
+    var id = response[0];
+    var isOrder = response[1];
+    $.ajax({
+        url: '/Stockkeeper/Stock/SelectProductToPurchase' + "?productId=" + id + "&isOrder" + isOrder,
+        type: 'POST',
+        data: productData,
+        success: function (response) {
+            refreshDataTable();
+            resolve(response);
+        },
+        error: function (error) {
+            reject(error);
+        }
+    });
 }
+
 
 function editShelf(productData) {
+    console.log(productData)
     var response = productData;
     var values = response.split('&');
-    var recordId = values[0]
+    var recordId = values[0];
     var productId = values[1];
     var nameProduct = values[2];
     var count = values[3];
@@ -144,48 +170,3 @@ function enterIdProduct(url) {
 
 
 
-
-//{
-
-
-
-
-
-
-//const searchContainer = document.querySelector('.hidden');
-//const hide = document.getElementById('hide');
-
-//openSearch.addEventListener('click', function () {
-//    searchContainer.classList.remove('hidden');
-//    searchContainer.classList.add('visible');
-//    hide.classList.add('visible');
-//});
-
-//hide.addEventListener('click', function () {
-//    searchContainer.classList.remove('visible');
-//    searchContainer.classList.add('hidden');
-//    hide.classList.remove('visible');
-//});
-
-
-
-
-
-
-
-
-//document.getElementById("myForm").addEventListener("submit", function (event) {
-//    event.preventDefault();
-
-//    var title = document.getElementById("searchTitle").value;
-//    var id = document.getElementById("searchId").value;
-//    var result = findProduct(title,id);
-//});
-
-//function findProduct(title, id) {
-//    fetch(`/Stockkeeper/Stock/GetProductAsync?nameProduct=${title}&productId=${id}`, { method: 'POST' })
-//        .then(response => {
-//        })
-//        .catch(error => {
-//        });
-//}

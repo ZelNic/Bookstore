@@ -154,7 +154,8 @@ namespace Bookstore.DataAccess
                     ProductId = 1,
                     Count = 1,
                     ShelfNumber = 1,
-                    Operation = OperationStock.ReceiptOfGoods
+                    Operation = OperationStock.ReceiptOfGoods,
+                    IsOrder = true,                    
                 }
             ); ;
         }

@@ -301,6 +301,9 @@ namespace Bookstore.Migrations
                     b.Property<int>("Count")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsOrder")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Operation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -326,6 +329,7 @@ namespace Bookstore.Migrations
                         {
                             Id = 1,
                             Count = 1,
+                            IsOrder = true,
                             Operation = "Прием товара",
                             ProductId = 1,
                             ResponsiblePersonId = 12,

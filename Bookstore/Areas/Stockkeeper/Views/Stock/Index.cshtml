@@ -3,7 +3,7 @@
 
 <h2>
     Склад
-    @if (Model != null)
+    @if (Model.Stock != null)
     {
         <a>@Model.Stock.City,@Model.Stock.Street</a>
     }
@@ -40,3 +40,4 @@
 @section Scripts{
     <script src="~/js/Store.js"></script>
 }
+

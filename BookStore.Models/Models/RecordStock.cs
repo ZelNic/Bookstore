@@ -12,5 +12,6 @@ namespace Bookstore.Models.Models
         [Required] public int Count { get; set; }
         [Required] public int ShelfNumber { get; set; }
         [Required] public string Operation { get; set; }
+        [Required] public bool IsOrder { get; set; }
     }
 }
