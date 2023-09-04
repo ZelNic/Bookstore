@@ -19,7 +19,7 @@ function loadDataTable() {
                 "width": "40%"
             },
             { data: 'count', "width": "20%" },
-            { data: 'shelfNumber', "width": "20%" },
+            { data: 'shelfNumber', "width": "15%" },
             {
                 data: null,
                 render: function (data) {
@@ -44,7 +44,8 @@ function loadDataTable() {
                     }
 
                 }, "width": "5%"
-            }
+            },
+            { data: 'totalProduct', "width": "5%" }
         ]
     });
 }
@@ -146,27 +147,43 @@ function enterIdProduct(url) {
                         reject(error);
                     }
                 });
+            }).then((response) => {
+                Swal.fire({
+                    title: 'Товар добавлен',
+                    text: response,
+                    icon: 'success'
+                });
+                refreshDataTable();
+            }).catch((message) => {
+                Swal.fire({
+                    title: 'Ошибка при выполнении запроса',
+                    text: message,
+                    icon: 'error'
+                });
+                console.log(error);
             });
-        }
-        else {
-            return;
-        }
-    }).then((response) => {
-        Swal.fire({
-            title: 'Товар добавлен',
-            text: response,
-            icon: 'success'
-        });
-        refreshDataTable();
 
-    }).catch((error) => {
-        Swal.fire({
-            title: 'Ошибка при выполнении запроса',
-            text: error,
-            icon: 'error'
-        });
+        } else {
+            let timerInterval
+            Swal.fire({
+                title: 'Отмена операции',
+                timer: 500,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading()
+                    const b = Swal.getHtmlContainer().querySelector('b')
+                    timerInterval = setInterval(() => {
+                        b.textContent = Swal.getTimerLeft()
+                    }, 100)
+                },
+                willClose: () => {
+                    clearInterval(timerInterval)
+                }
+            })
+        }
     });
 }
+
 
 
 

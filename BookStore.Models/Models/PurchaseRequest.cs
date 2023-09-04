@@ -9,7 +9,6 @@ namespace Bookstore.Models.Models
         public DateTime ApplicationTime { get; set; }
         public int ResponsiblePersonId { get; set; }
         public int StockId { get; set; }
-        public List<int> ProductsId { get; set; }
-        public List<int> CountProduct { get; set; }
+        public List<RecordStock>? ProductList { get; set; }
     }
 }

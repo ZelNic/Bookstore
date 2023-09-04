@@ -58,7 +58,7 @@ namespace Bookstore.Areas.Stockkeeper
             var book = await _db.Books.FindAsync(productId);
             if (book == null)
             {
-                return BadRequest(new { error = "Такого товара нет в базе. Проверьте правильность введенных данных." }.ToString());
+                return BadRequest(new{ message = "Такого товара нет в базе. Проверьте правильность введенных данных."});
             }
 
             Stock? stock = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).FirstOrDefaultAsync();
@@ -144,7 +144,7 @@ namespace Bookstore.Areas.Stockkeeper
                     ShelfNumber = newShelfNumber,
                     Count = productCount,
                     Operation = OperationStock.MovementOfGoods,
-                    IsOrder = await _db.StockJournal.Where(u => u.ProductId == selectedRecord.ProductId).Select(u=>u.IsOrder).FirstOrDefaultAsync(),
+                    IsOrder = await _db.StockJournal.Where(u => u.ProductId == selectedRecord.ProductId).Select(u => u.IsOrder).FirstOrDefaultAsync(),
                 };
 
                 await _db.StockJournal.AddAsync(newRecord);
@@ -163,6 +163,7 @@ namespace Bookstore.Areas.Stockkeeper
                     productId = s.ProductId,
                     nameProduct = b.Title,
                     count = s.Count,
+                    totalProduct = _db.StockJournal.Where(i => i.ProductId == s.ProductId).Sum(s => s.Count),
                     shelfNumber = s.ShelfNumber,
                     isOrder = s.IsOrder,
                 }).ToListAsync();
@@ -173,14 +174,16 @@ namespace Bookstore.Areas.Stockkeeper
         [HttpGet]
         public async Task<IActionResult> GetPurchaseRequest()
         {
-            PurchaseRequest request = new()
+            var request = await _db.StockJournal.Where(u => u.IsOrder == true).Join(_db.Books, s => s.ProductId, b => b.BookId, (s, b) => new
             {
-                ApplicationTime = MoscowTime.GetTime(),
+                ApplicationTime = MoscowTime.GetTime().ToString("dd/MM/yyyy"),
                 ResponsiblePersonId = _stockkeeper.UserId,
-                StockId = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).Select(u => u.Id).FirstOrDefaultAsync()
-            };
+                ProductId = s.ProductId,
+                TotalProduct = _db.StockJournal.Where(u => u.IsOrder == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
+                TitleProduct = b.Title,
+            }).Distinct().ToListAsync();
 
-            return View(request);
+            return Json(new { data = request });
         }
 
         [HttpPost]
@@ -189,7 +192,7 @@ namespace Bookstore.Areas.Stockkeeper
             IEnumerable<RecordStock> allProduct = await _db.StockJournal.Where(i => i.ProductId == productId).ToListAsync();
 
             foreach (var product in allProduct)
-            {      
+            {
                 product.IsOrder = product.IsOrder ? false : true;
             }
 
