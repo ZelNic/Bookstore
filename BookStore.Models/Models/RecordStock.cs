@@ -8,6 +8,7 @@ namespace Bookstore.Models.Models
         public int Id { get; set; }
         [Required] public int StockId { get; set; }
         [Required] public int ResponsiblePersonId { get; set; }
+        [Required] public DateTime Time { get; set; }
         [Required] public int ProductId { get; set; }
         [Required] public int Count { get; set; }
         [Required] public int ShelfNumber { get; set; }

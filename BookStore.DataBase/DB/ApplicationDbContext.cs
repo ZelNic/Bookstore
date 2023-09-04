@@ -1,8 +1,8 @@
-﻿using Azure;
-using Bookstore.Models;
+﻿using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Microsoft.EntityFrameworkCore;
+using Bookstore.Utility;
 
 namespace Bookstore.DataAccess
 {
@@ -11,7 +11,7 @@ namespace Bookstore.DataAccess
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-        }        
+        }
         public DbSet<Book> Books { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> User { get; set; }
@@ -151,11 +151,12 @@ namespace Bookstore.DataAccess
                     Id = 1,
                     StockId = 26,
                     ResponsiblePersonId = 12,
+                    Time = MoscowTime.GetTime(),
                     ProductId = 1,
                     Count = 1,
                     ShelfNumber = 1,
                     Operation = OperationStock.ReceiptOfGoods,
-                    IsOrder = true,                    
+                    IsOrder = true,
                 }
             ); ;
         }

@@ -58,7 +58,7 @@ namespace Bookstore.Areas.Stockkeeper
             var book = await _db.Books.FindAsync(productId);
             if (book == null)
             {
-                return BadRequest(new{ message = "Такого товара нет в базе. Проверьте правильность введенных данных."});
+                return BadRequest(new{ error = "Такого товара нет в базе. Проверьте правильность введенных данных."});
             }
 
             Stock? stock = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).FirstOrDefaultAsync();
@@ -81,6 +81,7 @@ namespace Bookstore.Areas.Stockkeeper
                     {
                         StockId = stock.Id,
                         ResponsiblePersonId = _stockkeeper.UserId,
+                        Time = MoscowTime.GetTime(),
                         ProductId = productId,
                         Count = productCount,
                         ShelfNumber = numberShelf,
@@ -97,7 +98,6 @@ namespace Bookstore.Areas.Stockkeeper
                 return BadRequest(new { error = "Склад не найден." }.ToString());
             }
         }
-
 
         [HttpPost]
         public async Task<IActionResult> ChangeShelfProduct(int recordId, int productCount, int newShelfNumber)
@@ -140,6 +140,7 @@ namespace Bookstore.Areas.Stockkeeper
                 {
                     StockId = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).Select(u => u.Id).FirstOrDefaultAsync(),
                     ResponsiblePersonId = _stockkeeper.UserId,
+                    Time = MoscowTime.GetTime(),
                     ProductId = selectedRecord.ProductId,
                     ShelfNumber = newShelfNumber,
                     Count = productCount,
@@ -161,6 +162,8 @@ namespace Bookstore.Areas.Stockkeeper
                 {
                     id = s.Id,
                     productId = s.ProductId,
+                    time = s.Time.ToString("dd/MM/yyyy hh:mm"),
+                    operation = s.Operation,
                     nameProduct = b.Title,
                     count = s.Count,
                     totalProduct = _db.StockJournal.Where(i => i.ProductId == s.ProductId).Sum(s => s.Count),
@@ -169,21 +172,6 @@ namespace Bookstore.Areas.Stockkeeper
                 }).ToListAsync();
 
             return Json(new { data = stock });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetPurchaseRequest()
-        {
-            var request = await _db.StockJournal.Where(u => u.IsOrder == true).Join(_db.Books, s => s.ProductId, b => b.BookId, (s, b) => new
-            {
-                ApplicationTime = MoscowTime.GetTime().ToString("dd/MM/yyyy"),
-                ResponsiblePersonId = _stockkeeper.UserId,
-                ProductId = s.ProductId,
-                TotalProduct = _db.StockJournal.Where(u => u.IsOrder == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
-                TitleProduct = b.Title,
-            }).Distinct().ToListAsync();
-
-            return Json(new { data = request });
         }
 
         [HttpPost]
@@ -200,6 +188,21 @@ namespace Bookstore.Areas.Stockkeeper
             await _db.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPurchaseRequest()
+        {
+            var request = await _db.StockJournal.Where(u => u.IsOrder == true).Join(_db.Books, s => s.ProductId, b => b.BookId, (s, b) => new
+            {
+                ApplicationTime = MoscowTime.GetTime().ToString("dd/MM/yyyy hh:mm"),
+                ResponsiblePersonId = _stockkeeper.UserId,
+                ProductId = s.ProductId,
+                TotalProduct = _db.StockJournal.Where(u => u.IsOrder == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
+                TitleProduct = b.Title,
+            }).Distinct().ToListAsync();
+
+            return Json(new { data = request });
         }
 
 

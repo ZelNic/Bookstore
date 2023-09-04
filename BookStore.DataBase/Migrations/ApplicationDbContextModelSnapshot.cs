@@ -320,6 +320,9 @@ namespace Bookstore.Migrations
                     b.Property<int>("StockId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.ToTable("StockJournal");
@@ -334,7 +337,8 @@ namespace Bookstore.Migrations
                             ProductId = 1,
                             ResponsiblePersonId = 12,
                             ShelfNumber = 1,
-                            StockId = 26
+                            StockId = 26,
+                            Time = new DateTime(2023, 9, 4, 18, 13, 13, 829, DateTimeKind.Unspecified).AddTicks(1705)
                         });
                 });
 
