@@ -1,0 +1,31 @@
+﻿
+<div class="container">
+    <div class="row">
+        <h1>Заявка на закупку</h1>
+        <div class="col-2 mb-3 mt-2 pt-3">
+            <a class="btn btn-secondary p-2 pt-2" asp-area="Stockkeeper" asp-controller="Stock" asp-action="Index">Назад на склад</a>
+        </div>
+        <div class="col-8"></div>
+        <div class="col-2 pb-4 mb-3 mt-2 pt-3 text-right">
+            <a asp-area="Stockkeeper" asp-controller="Stock" asp-action="PurchaseRequest" class="btn btn-success border-0 form-control">Оформить</a>
+        </div>
+        <div class="row border border-2 rounded rounded-2 mt-1 p-2">
+            <table id="purchaseRequest" class="table table-bordered table-striped pt-3 my-1">
+                <thead class="pt-4 table-dark">
+                    <tr>
+                        <th>Id Товара</th>
+                        <th>Название</th>
+                        <th>Всего на складе</th>
+                        <th>Требуемое количество</th>
+                        <th>Удалить из списка</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/Stock/PurchaseRequest.js"></script>
+}

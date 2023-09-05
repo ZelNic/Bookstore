@@ -175,7 +175,7 @@ namespace Bookstore.Areas.Stockkeeper
         }
 
         [HttpPost]
-        public async Task<IActionResult> SelectProductToPurchase(int productId, bool isOrder)
+        public async Task<IActionResult> SelectProductToPurchase(int productId)
         {
             IEnumerable<RecordStock> allProduct = await _db.StockJournal.Where(i => i.ProductId == productId).ToListAsync();
 
@@ -191,15 +191,19 @@ namespace Bookstore.Areas.Stockkeeper
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPurchaseRequest()
+        public IActionResult PurchaseRequest()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTablePurchaseRequest()
         {
             var request = await _db.StockJournal.Where(u => u.IsOrder == true).Join(_db.Books, s => s.ProductId, b => b.BookId, (s, b) => new
             {
-                ApplicationTime = MoscowTime.GetTime().ToString("dd/MM/yyyy hh:mm"),
-                ResponsiblePersonId = _stockkeeper.UserId,
                 ProductId = s.ProductId,
+                TitleProduct = _db.Books.Where(u=>u.BookId== s.ProductId).Select(u=>u.Title).FirstOrDefault(),
                 TotalProduct = _db.StockJournal.Where(u => u.IsOrder == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
-                TitleProduct = b.Title,
             }).Distinct().ToListAsync();
 
             return Json(new { data = request });

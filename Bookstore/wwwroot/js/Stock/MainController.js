@@ -1,7 +1,7 @@
 
 var dataTable;
 $(document).ready(function () {
-    loadDataTable();
+    loadDataTableStock();
 });
 
 function loadDataTableStock() {
@@ -39,12 +39,12 @@ function loadDataTableStock() {
 
                     if (data.isOrder == true) {
                         return `<div class="w-100 btn-group" role="group">
-                    <a onClick="selectProductToPurchase('${data.productId}&${data.isOrder}')" class="btn btn-warning"><i class="bi bi-check2-square"></i></a>
+                    <a onClick="selectProductToPurchase('${data.productId}')" class="btn btn-warning"><i class="bi bi-check2-square"></i></a>
                     </div>`;
                     }
                     else {
                         return `<div class="w-100 btn-group" role="group">
-                    <a onClick="selectProductToPurchase('${data.productId}&${data.isOrder}')" class="btn btn-dark"><i class="bi bi-dash-square"></i></a>
+                    <a onClick="selectProductToPurchase('${data.productId}')" class="btn btn-dark"><i class="bi bi-dash-square"></i></a>
                     </div>`;
                     }
 
@@ -54,14 +54,11 @@ function loadDataTableStock() {
         ]
     });
 }
-function selectProductToPurchase(productData) {
-    var response = productData.split('&');
-    var id = response[0];
-    var isOrder = response[1];
+function selectProductToPurchase(productId) {    
     $.ajax({
-        url: '/Stockkeeper/Stock/SelectProductToPurchase' + "?productId=" + id + "&isOrder" + isOrder,
+        url: '/Stockkeeper/Stock/SelectProductToPurchase' + "?productId=" + productId,
         type: 'POST',
-        data: productData,
+        data: productId,
         success: function (response) {
             refreshDataTable();
             resolve(response);
