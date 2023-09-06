@@ -9,10 +9,11 @@ namespace Bookstore.Models.Models
         [Required] public int StockId { get; set; }
         [Required] public int ResponsiblePersonId { get; set; }
         [Required] public DateTime Time { get; set; }
-        [Required] public int ProductId { get; set; }
-        [Required] public int Count { get; set; }
-        [Required] public int ShelfNumber { get; set; }
+        public int ProductId { get; set; }
+        public int Count { get; set; }
+        public int ShelfNumber { get; set; }
         [Required] public string Operation { get; set; }
-        [Required] public bool IsOrder { get; set; }
+        public bool IsOrder { get; set; }
+        public string? ProductDataOnPurchase { get; set; }
     }
 }

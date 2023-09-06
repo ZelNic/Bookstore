@@ -6,9 +6,8 @@ namespace Bookstore.Models.Models
     {
         [Key]
         public int Id { get; set; }
-        public DateTime ApplicationTime { get; set; }
-        public int ResponsiblePersonId { get; set; }
-        public int StockId { get; set; }
-        public List<RecordStock>? ProductList { get; set; }
+        [Required]public DateTime ApplicationTime { get; set; }
+        [Required] public int ResponsiblePersonId { get; set; }
+        [Required] public string? ProductData { get; set; }
     }
 }

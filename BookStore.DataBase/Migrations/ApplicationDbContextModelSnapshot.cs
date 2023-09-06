@@ -308,6 +308,9 @@ namespace Bookstore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ProductDataOnPurchase")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -338,7 +341,7 @@ namespace Bookstore.Migrations
                             ResponsiblePersonId = 12,
                             ShelfNumber = 1,
                             StockId = 26,
-                            Time = new DateTime(2023, 9, 4, 18, 13, 13, 829, DateTimeKind.Unspecified).AddTicks(1705)
+                            Time = new DateTime(2023, 9, 6, 10, 15, 44, 386, DateTimeKind.Unspecified).AddTicks(4095)
                         });
                 });
 

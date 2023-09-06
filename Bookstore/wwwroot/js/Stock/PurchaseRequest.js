@@ -22,8 +22,10 @@ function loadDataTablePurchaseRequest() {
                 data: null,
                 render: function (data) {
                     return `<div class="w-100 btn-group" role="group">
-                    <input type="number" required/>
-                    </div>`;
+                                <input type="number" name="count" value="${parseInt(data.totalProduct)}" required/>
+                                <input type="number" name="productId" value="${data.productId}" hidden/> 
+                                <input type="number" name="titleProduct" value="${data.titleProduct}" hidden/> 
+                            </div>`;
                 }, "width": "15%"
             },
             {
@@ -37,6 +39,21 @@ function loadDataTablePurchaseRequest() {
         ]
     });
 }
+
+// Добавление обработчика события нажатия кнопки
+document.getElementById("purchaseRequestSend").addEventListener("submit", function (event) {
+    event.preventDefault(); // Отмена отправки формы
+
+    // Получение данных таблицы и передача их в функцию sendTable
+    var tableData = refreshDataTable();
+    sendTable(tableData);
+});
+
+function sendTable(tableData) {
+    console.log(tableData);
+}
+
+
 
 function deleteFromPurchaseRequest(productId) {
     $.ajax({

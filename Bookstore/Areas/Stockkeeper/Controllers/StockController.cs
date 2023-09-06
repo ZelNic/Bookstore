@@ -6,6 +6,7 @@ using Bookstore.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Xceed.Words.NET;
 
 namespace Bookstore.Areas.Stockkeeper
 {
@@ -215,12 +216,9 @@ namespace Bookstore.Areas.Stockkeeper
         //{
         //    var product = await _db.Books.FindAsync(productId);
 
-        //    PurchaseRequest request = new()
-        //    {
-        //        ApplicationTime = MoscowTime.GetTime(),
-        //        ResponsiblePersonId = _stockkeeper.UserId,
-        //        City =
-        //    };
+        //    //Надо запольнить модель
+
+
 
         //    // Откройте шаблон документа Word
         //    using (DocX document = DocX.Load("путь_к_шаблону.docx"))
