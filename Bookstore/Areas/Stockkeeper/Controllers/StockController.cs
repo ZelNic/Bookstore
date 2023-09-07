@@ -5,6 +5,7 @@ using Bookstore.Models.SD;
 using Bookstore.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Xceed.Words.NET;
 
@@ -16,7 +17,8 @@ namespace Bookstore.Areas.Stockkeeper
 
         private readonly ApplicationDbContext _db;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly User _stockkeeper;
+        private readonly User? _stockkeeper;
+        private readonly int _stockId;
         public StockController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
         {
             _db = db;
@@ -30,6 +32,11 @@ namespace Bookstore.Areas.Stockkeeper
                     if (_db.User.Find(userId) != null)
                     {
                         _stockkeeper = _db.User.Find(userId);
+                        _stockId = _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).FirstOrDefault().Id;
+                        if (_stockId == 0 || _stockkeeper == null)
+                        {
+                            NotFound(SD.AccessDenied);
+                        }
                     }
                 }
                 else
@@ -59,45 +66,38 @@ namespace Bookstore.Areas.Stockkeeper
             var book = await _db.Books.FindAsync(productId);
             if (book == null)
             {
-                return BadRequest(new{ error = "Такого товара нет в базе. Проверьте правильность введенных данных."});
+                return BadRequest(new { error = "Такого товара нет в базе. Проверьте правильность введенных данных." });
             }
 
-            Stock? stock = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).FirstOrDefaultAsync();
 
-            if (stock != null)
+            RecordStock? stockJouselectedRecordrnal = await _db.StockJournal.Where(u => u.ProductId == productId).Where(s => s.ShelfNumber == numberShelf).FirstOrDefaultAsync();
+
+            if (stockJouselectedRecordrnal != null)
             {
-                RecordStock? stockJouselectedRecordrnal = await _db.StockJournal.Where(u => u.ProductId == productId).Where(s => s.ShelfNumber == numberShelf).FirstOrDefaultAsync();
-
-                if (stockJouselectedRecordrnal != null)
+                if (stockJouselectedRecordrnal.ProductId == productId && stockJouselectedRecordrnal.ShelfNumber == numberShelf)
                 {
-                    if (stockJouselectedRecordrnal.ProductId == productId && stockJouselectedRecordrnal.ShelfNumber == numberShelf)
-                    {
-                        stockJouselectedRecordrnal.Count += productCount;
-                        _db.StockJournal.Update(stockJouselectedRecordrnal);
-                    }
+                    stockJouselectedRecordrnal.Count += productCount;
+                    _db.StockJournal.Update(stockJouselectedRecordrnal);
                 }
-                else if (stockJouselectedRecordrnal == null)
-                {
-                    RecordStock record = new()
-                    {
-                        StockId = stock.Id,
-                        ResponsiblePersonId = _stockkeeper.UserId,
-                        Time = MoscowTime.GetTime(),
-                        ProductId = productId,
-                        Count = productCount,
-                        ShelfNumber = numberShelf,
-                        Operation = OperationStock.ReceiptOfGoods,
-                        IsOrder = await _db.StockJournal.Where(u => u.ProductId == productId).Select(u => u.IsOrder).FirstOrDefaultAsync(),
-                    };
-                    await _db.StockJournal.AddAsync(record);
-                }
-                await _db.SaveChangesAsync();
-                return Ok("Товар " + book.Title + " добавлен на полку " + numberShelf + " в количестве " + productCount + " шт.");
             }
-            else
+            else if (stockJouselectedRecordrnal == null)
             {
-                return BadRequest(new { error = "Склад не найден." }.ToString());
+                RecordStock record = new()
+                {
+                    StockId = _stockId,
+                    ResponsiblePersonId = _stockkeeper.UserId,
+                    Time = MoscowTime.GetTime(),
+                    ProductId = productId,
+                    Count = productCount,
+                    ShelfNumber = numberShelf,
+                    Operation = OperationStock.ReceiptOfGoods,
+                    IsOrder = await _db.StockJournal.Where(u => u.ProductId == productId).Select(u => u.IsOrder).FirstOrDefaultAsync(),
+                };
+                await _db.StockJournal.AddAsync(record);
             }
+            await _db.SaveChangesAsync();
+            return Ok("Товар " + book.Title + " добавлен на полку " + numberShelf + " в количестве " + productCount + " шт.");
+
         }
 
         [HttpPost]
@@ -139,7 +139,7 @@ namespace Bookstore.Areas.Stockkeeper
             {
                 RecordStock newRecord = new()
                 {
-                    StockId = await _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).Select(u => u.Id).FirstOrDefaultAsync(),
+                    StockId = _stockId,
                     ResponsiblePersonId = _stockkeeper.UserId,
                     Time = MoscowTime.GetTime(),
                     ProductId = selectedRecord.ProductId,
@@ -158,7 +158,7 @@ namespace Bookstore.Areas.Stockkeeper
 
         public async Task<IActionResult> GetStock()
         {
-            var stock = await _db.StockJournal.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId)
+            var stockJournal = await _db.StockJournal.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId)
                 .Join(_db.Books, s => s.ProductId, b => b.BookId, (s, b) => new
                 {
                     id = s.Id,
@@ -172,11 +172,11 @@ namespace Bookstore.Areas.Stockkeeper
                     isOrder = s.IsOrder,
                 }).ToListAsync();
 
-            return Json(new { data = stock });
+            return Json(new { data = stockJournal });
         }
 
         [HttpPost]
-        public async Task<IActionResult> SelectProductToPurchase(int productId)
+        public async Task<IActionResult> SelectProductToPurchase(int productId, params int[] products)
         {
             IEnumerable<RecordStock> allProduct = await _db.StockJournal.Where(i => i.ProductId == productId).ToListAsync();
 
@@ -203,7 +203,7 @@ namespace Bookstore.Areas.Stockkeeper
             var request = await _db.StockJournal.Where(u => u.IsOrder == true).Join(_db.Books, s => s.ProductId, b => b.BookId, (s, b) => new
             {
                 ProductId = s.ProductId,
-                TitleProduct = _db.Books.Where(u=>u.BookId== s.ProductId).Select(u=>u.Title).FirstOrDefault(),
+                TitleProduct = _db.Books.Where(u => u.BookId == s.ProductId).Select(u => u.Title).FirstOrDefault(),
                 TotalProduct = _db.StockJournal.Where(u => u.IsOrder == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
             }).Distinct().ToListAsync();
 
@@ -211,31 +211,61 @@ namespace Bookstore.Areas.Stockkeeper
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> OrderProducts([FromBody] RecordStock[] purchaseRequestData)
+        {
+            if (purchaseRequestData == null)
+            {
+                return BadRequest(new { error = "Нет товаров на закупку." });
+            }
 
-        //public async Task<IActionResult> OrderProducts(int productId)
-        //{
-        //    var product = await _db.Books.FindAsync(productId);
+            string productDataOnPurchase = "";
 
-        //    //Надо запольнить модель
+            foreach (var item in purchaseRequestData)
+            {
+                productDataOnPurchase += item.ProductId.ToString() + ":";
+                productDataOnPurchase += item.Count.ToString() + "/";
+            }
+
+            RecordStock recordStockPurchase = new()
+            {
+                StockId = _stockId,
+                ResponsiblePersonId = _stockkeeper.UserId,
+                Time = MoscowTime.GetTime(),
+                Operation = OperationStock.ApplicationForPurchaseOfGoods,
+                ProductDataOnPurchase = productDataOnPurchase
+            };
+
+            //await _db.StockJournal.AddAsync(recordStockPurchase);
+            //await _db.SaveChangesAsync();
+
+            string templatePath = "/Areas/Stockkeeper/Sample/Заявка на закупку товаров.docx";
+            string filledFilePath = "/Areas/Stockkeeper/PurchaseRequisitions/имя_файла.docx";
 
 
 
-        //    // Откройте шаблон документа Word
-        //    using (DocX document = DocX.Load("путь_к_шаблону.docx"))
-        //    {
-        //        // Заполните данные в шаблоне, используя модель представления
-        //        document.ReplaceText("{{OrderNumber}}", model.OrderNumber);
-        //        document.ReplaceText("{{CustomerName}}", model.CustomerName);
-        //        // Замените другие метки в шаблоне соответствующими данными из модели представления
+            using (DocX document = DocX.Create(templatePath))
+            {
+                //foreach (var product in purchaseRequestData)
+                //{
+                //    document.ReplaceText("{{City}}", product.Id.ToString());
+                //    document.ReplaceText("{{Street}}", product.ProductName);
+                //}
+                try
+                {
+                    document.ReplaceText("{{Street}}", purchaseRequestData[0].ProductName);
+                    document.ReplaceText("{{City}}", purchaseRequestData[0].Id.ToString());
+                }
+                catch 
+                {
+                    return Ok("error");
+                }
 
-        //        // Сохраните заполненный документ в файл
-        //        string filePath = "путь_к_сохранению_заполненного_документа.docx";
-        //        document.SaveAs(filePath);
-        //    }
+                document.SaveAs(filledFilePath);
+            }
 
-        //    // Верните файл пользователю для скачивания
-        //    byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
-        //    return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "имя_файла.docx");
-        //}
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
+            return File(fileBytes, "имя_файла.docx");
+        }
     }
 }

@@ -22,9 +22,9 @@ function loadDataTablePurchaseRequest() {
                 data: null,
                 render: function (data) {
                     return `<div class="w-100 btn-group" role="group">
-                                <input type="number" name="count" value="${parseInt(data.totalProduct)}" required/>
-                                <input type="number" name="productId" value="${data.productId}" hidden/> 
-                                <input type="number" name="titleProduct" value="${data.titleProduct}" hidden/> 
+                                <input type="number" name="Count" value="${parseInt(data.totalProduct)}" required/>
+                                <input type="number" name="ProductId" value="${data.productId}" hidden/> 
+                                <input name="ProductName" value="${data.titleProduct}" hidden/> 
                             </div>`;
                 }, "width": "15%"
             },
@@ -40,17 +40,59 @@ function loadDataTablePurchaseRequest() {
     });
 }
 
-// Добавление обработчика события нажатия кнопки
-document.getElementById("purchaseRequestSend").addEventListener("submit", function (event) {
-    event.preventDefault(); // Отмена отправки формы
+function sendTable() {
 
-    // Получение данных таблицы и передача их в функцию sendTable
-    var tableData = refreshDataTable();
-    sendTable(tableData);
-});
+    var models = [];
 
-function sendTable(tableData) {
-    console.log(tableData);
+    // Получить все элементы ввода моделей
+    var countInputs = document.querySelectorAll('input[name="Count"]');
+    var productIdInputs = document.querySelectorAll('input[name="ProductId"]');
+    var productNameInputs = document.querySelectorAll('input[name="ProductName"]');
+
+    // Пройти по каждому элементу ввода и создать модель
+    for (var i = 0; i < countInputs.length; i++) {
+        var count = parseInt(countInputs[i].value);
+        var productId = productIdInputs[i].value;
+        var productName = productNameInputs[i].value;
+
+        var model = {
+            Count: count,
+            ProductId: productId,
+            productName: productName
+        };
+
+        models.push(model);
+        console.log(model)
+    }
+
+
+    var jsonData = JSON.stringify(models)
+    
+    var url = "/Stockkeeper/Stock/OrderProducts";
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: jsonData
+    })
+        .then(function (response) {
+            if (response.ok) {
+                return response.text();
+            } else {
+                throw new Error("Ошибка при отправке данных на сервер");
+            }
+        })
+        .then(function (data) {
+            // Обработка успешного ответа от сервера
+            console.log(data);
+        })
+        .catch(function (error) {
+            // Обработка ошибки
+            console.log(error);
+        });
+
 }
 
 

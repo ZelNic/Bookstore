@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bookstore.Models.Models
 {
@@ -9,8 +10,9 @@ namespace Bookstore.Models.Models
         [Required] public int StockId { get; set; }
         [Required] public int ResponsiblePersonId { get; set; }
         [Required] public DateTime Time { get; set; }
-        public int ProductId { get; set; }
-        public int Count { get; set; }
+        [JsonProperty] public int ProductId { get; set; }
+        [JsonProperty] public string? ProductName { get; set; }
+        [JsonProperty] public int Count { get; set; }
         public int ShelfNumber { get; set; }
         [Required] public string Operation { get; set; }
         public bool IsOrder { get; set; }
