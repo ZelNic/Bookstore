@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
+using Xceed.Document.NET;
 using Xceed.Words.NET;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Bookstore.Areas.Stockkeeper
 {
@@ -239,33 +241,39 @@ namespace Bookstore.Areas.Stockkeeper
             //await _db.StockJournal.AddAsync(recordStockPurchase);
             //await _db.SaveChangesAsync();
 
-            string templatePath = "/Areas/Stockkeeper/Sample/Заявка на закупку товаров.docx";
-            string filledFilePath = "/Areas/Stockkeeper/PurchaseRequisitions/имя_файла.docx";
+           /// Areas / Stockkeeper / Sample / test.docx
+            string templatePath = "F:\\GitHub\\Bookstore\\Bookstore\\Areas\\Stockkeeper\\Sample\\test.docx";
+            string nameFile = "Заявка" + recordStockPurchase.Time.ToString("ddmmyyyy");
+            string filledFilePath = $"F:\\GitHub\\Bookstore\\Bookstore\\Areas\\Stockkeeper\\PurchaseRequisitions\\{nameFile}";
+        //foreach (var product in purchaseRequestData)
+        //{
+        //    document.ReplaceText("{{City}}", product.Id.ToString());
+        //    document.ReplaceText("{{Street}}", product.ProductName);
+        //}
+        
+            //Paragraph paragraph = document.InsertParagraph();
+            //paragraph.Append("Kyky");
 
 
-
-            using (DocX document = DocX.Create(templatePath))
+            /// Areas / Stockkeeper / PurchaseRequisitions /
+            try
             {
-                //foreach (var product in purchaseRequestData)
-                //{
-                //    document.ReplaceText("{{City}}", product.Id.ToString());
-                //    document.ReplaceText("{{Street}}", product.ProductName);
-                //}
-                try
+                using (DocX document = DocX.Create(templatePath))
                 {
-                    document.ReplaceText("{{Street}}", purchaseRequestData[0].ProductName);
+                    
+
+                    document.ReplaceText("{{Street}}", "FFFFFFFFFFFFFFFFFFFFF");
                     document.ReplaceText("{{City}}", purchaseRequestData[0].Id.ToString());
-                }
-                catch 
-                {
-                    return Ok("error");
-                }
 
-                document.SaveAs(filledFilePath);
+                    document.SaveAs(filledFilePath);
+                    byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
+                    return File(fileBytes, nameFile);
+                }
             }
-
-            byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
-            return File(fileBytes, "имя_файла.docx");
+            catch
+            {
+                return Ok("error");
+            }
         }
     }
 }
