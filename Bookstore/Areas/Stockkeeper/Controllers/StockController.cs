@@ -3,13 +3,12 @@ using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Bookstore.Utility;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
-using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
-using Xceed.Document.NET;
-using Xceed.Words.NET;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Bookstore.Areas.Stockkeeper
 {
@@ -20,7 +19,7 @@ namespace Bookstore.Areas.Stockkeeper
         private readonly ApplicationDbContext _db;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly User? _stockkeeper;
-        private readonly int _stockId;
+        private readonly Stock? _stock;
         public StockController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
         {
             _db = db;
@@ -34,8 +33,8 @@ namespace Bookstore.Areas.Stockkeeper
                     if (_db.User.Find(userId) != null)
                     {
                         _stockkeeper = _db.User.Find(userId);
-                        _stockId = _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).FirstOrDefault().Id;
-                        if (_stockId == 0 || _stockkeeper == null)
+                        _stock = _db.Stocks.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId).FirstOrDefault();
+                        if (_stock == null || _stockkeeper == null)
                         {
                             NotFound(SD.AccessDenied);
                         }
@@ -86,7 +85,7 @@ namespace Bookstore.Areas.Stockkeeper
             {
                 RecordStock record = new()
                 {
-                    StockId = _stockId,
+                    StockId = _stock.Id,
                     ResponsiblePersonId = _stockkeeper.UserId,
                     Time = MoscowTime.GetTime(),
                     ProductId = productId,
@@ -141,7 +140,7 @@ namespace Bookstore.Areas.Stockkeeper
             {
                 RecordStock newRecord = new()
                 {
-                    StockId = _stockId,
+                    StockId = _stock.Id,
                     ResponsiblePersonId = _stockkeeper.UserId,
                     Time = MoscowTime.GetTime(),
                     ProductId = selectedRecord.ProductId,
@@ -176,7 +175,6 @@ namespace Bookstore.Areas.Stockkeeper
 
             return Json(new { data = stockJournal });
         }
-
         [HttpPost]
         public async Task<IActionResult> SelectProductToPurchase(int productId, params int[] products)
         {
@@ -231,7 +229,7 @@ namespace Bookstore.Areas.Stockkeeper
 
             RecordStock recordStockPurchase = new()
             {
-                StockId = _stockId,
+                StockId = _stock.Id,
                 ResponsiblePersonId = _stockkeeper.UserId,
                 Time = MoscowTime.GetTime(),
                 Operation = OperationStock.ApplicationForPurchaseOfGoods,
@@ -241,38 +239,60 @@ namespace Bookstore.Areas.Stockkeeper
             //await _db.StockJournal.AddAsync(recordStockPurchase);
             //await _db.SaveChangesAsync();
 
-           /// Areas / Stockkeeper / Sample / test.docx
-            string templatePath = "F:\\GitHub\\Bookstore\\Bookstore\\Areas\\Stockkeeper\\Sample\\test.docx";
-            string nameFile = "Заявка" + recordStockPurchase.Time.ToString("ddmmyyyy");
-            string filledFilePath = $"F:\\GitHub\\Bookstore\\Bookstore\\Areas\\Stockkeeper\\PurchaseRequisitions\\{nameFile}";
-        //foreach (var product in purchaseRequestData)
-        //{
-        //    document.ReplaceText("{{City}}", product.Id.ToString());
-        //    document.ReplaceText("{{Street}}", product.ProductName);
-        //}
-        
-            //Paragraph paragraph = document.InsertParagraph();
-            //paragraph.Append("Kyky");
 
 
-            /// Areas / Stockkeeper / PurchaseRequisitions /
-            try
+
+            //-----------------------------------------------------------------------------------------------------------------------------
+
+
+            string templatePath = "F:\\GitHub\\Bookstore\\Bookstore\\Areas\\Stockkeeper\\Sample\\Заявка на закупку товаров.docx";
+            string nameFile = "Заявка" + recordStockPurchase.Time.ToString("_dd.MM.yyyy");
+            string filledFilePath = $"F:\\GitHub\\Bookstore\\Bookstore\\Areas\\Stockkeeper\\PurchaseRequisitions\\{nameFile}.docx";
+
+
+
+            System.IO.File.Copy(templatePath, filledFilePath, true);
+
+            using (WordprocessingDocument docx = WordprocessingDocument.Open(filledFilePath, true))
             {
-                using (DocX document = DocX.Create(templatePath))
+                // Получаем главный документ Word
+                MainDocumentPart mainPart = docx.MainDocumentPart;
+
+                if(mainPart == null)
                 {
-                    
-
-                    document.ReplaceText("{{Street}}", "FFFFFFFFFFFFFFFFFFFFF");
-                    document.ReplaceText("{{City}}", purchaseRequestData[0].Id.ToString());
-
-                    document.SaveAs(filledFilePath);
-                    byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
-                    return File(fileBytes, nameFile);
+                    return NotFound();
                 }
+
+                ReplaceText(mainPart.Document.Body, "{{City}}", _stock.City.ToString());
+                ReplaceText(mainPart.Document.Body, "{{Street}}", _stock.Street.ToString());
+                ReplaceText(mainPart.Document.Body, "{{ApplicationTime}}", recordStockPurchase.Time.ToString("dd.MM.yyyy"));
+                ReplaceText(mainPart.Document.Body, "{{FirstName}}", _stockkeeper.FirstName);
+                ReplaceText(mainPart.Document.Body, "{{SecondName}}", _stockkeeper.LastName);
+                ReplaceText(mainPart.Document.Body, "{{Phone}}", _stockkeeper.PhoneNumber);
+
+                //Table table = mainPart.Document.Body.Descendants<Table>().FirstOrDefault();
+                // if (table != null)
+                // {
+                //     TableRow newRow = new TableRow(
+                //         new TableCell(new Paragraph(new Run(new DocumentFormat.OpenXml.Drawing.Text("Новая ячейка 1")))),
+                //         new TableCell(new Paragraph(new Run(new DocumentFormat.OpenXml.Drawing.Text("Новая ячейка 2"))))
+                //     );
+                //     table.AppendChild(newRow);
+                // }
+
+                // Сохраняем изменения в документе
+                mainPart.Document.Save();
             }
-            catch
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
+            return File(fileBytes, nameFile);
+        }
+
+        private void ReplaceText(OpenXmlElement element, string searchValue, string replaceValue)
+        {
+            foreach (var text in element.Descendants<Text>().Where(t => t.Text.Contains(searchValue)))
             {
-                return Ok("error");
+                text.Text = text.Text.Replace(searchValue, replaceValue);
             }
         }
     }
