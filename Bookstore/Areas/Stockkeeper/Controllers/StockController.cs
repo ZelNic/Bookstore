@@ -9,6 +9,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace Bookstore.Areas.Stockkeeper
 {
@@ -239,9 +240,6 @@ namespace Bookstore.Areas.Stockkeeper
             //await _db.StockJournal.AddAsync(recordStockPurchase);
             //await _db.SaveChangesAsync();
 
-
-
-
             //-----------------------------------------------------------------------------------------------------------------------------
 
 
@@ -256,44 +254,70 @@ namespace Bookstore.Areas.Stockkeeper
             using (WordprocessingDocument docx = WordprocessingDocument.Open(filledFilePath, true))
             {
                 // Получаем главный документ Word
-                MainDocumentPart mainPart = docx.MainDocumentPart;
+                MainDocumentPart? mainPart = docx.MainDocumentPart;
 
-                if(mainPart == null)
+                if (mainPart == null)
                 {
                     return NotFound();
                 }
 
-                ReplaceText(mainPart.Document.Body, "{{City}}", _stock.City.ToString());
-                ReplaceText(mainPart.Document.Body, "{{Street}}", _stock.Street.ToString());
-                ReplaceText(mainPart.Document.Body, "{{ApplicationTime}}", recordStockPurchase.Time.ToString("dd.MM.yyyy"));
-                ReplaceText(mainPart.Document.Body, "{{FirstName}}", _stockkeeper.FirstName);
-                ReplaceText(mainPart.Document.Body, "{{SecondName}}", _stockkeeper.LastName);
-                ReplaceText(mainPart.Document.Body, "{{Phone}}", _stockkeeper.PhoneNumber);
+                string docText = null;
+                using (StreamReader sr = new StreamReader(docx.MainDocumentPart.GetStream()))
+                {
+                    docText = sr.ReadToEnd();
+                }
 
-                //Table table = mainPart.Document.Body.Descendants<Table>().FirstOrDefault();
-                // if (table != null)
-                // {
-                //     TableRow newRow = new TableRow(
-                //         new TableCell(new Paragraph(new Run(new DocumentFormat.OpenXml.Drawing.Text("Новая ячейка 1")))),
-                //         new TableCell(new Paragraph(new Run(new DocumentFormat.OpenXml.Drawing.Text("Новая ячейка 2"))))
-                //     );
-                //     table.AppendChild(newRow);
-                // }
 
-                // Сохраняем изменения в документе
-                mainPart.Document.Save();
+                Dictionary<string, string> replacements = new Dictionary<string, string>
+                {
+                    {"Number", recordStockPurchase.Id.ToString()},
+                    {"Street", _stock.Street.ToString()},
+                    {"City", _stock.City.ToString()},
+                    {"ApplicationTime", recordStockPurchase.Time.ToString("dd.MM.yyyy")},
+                    {"FirstName", _stockkeeper.FirstName.ToString()},
+                    {"SecondName", _stockkeeper.LastName.ToString()},
+                    {"Phone", _stockkeeper.PhoneNumber.ToString()}
+                };
+
+                Regex regexText = new Regex(string.Join("|", replacements.Keys));
+                docText = regexText.Replace(docText, match => replacements[match.Value]);
+
+                using (StreamWriter sw = new StreamWriter(docx.MainDocumentPart.GetStream(FileMode.Create)))
+                {
+                    sw.Write(docText);
+                }
+
+                //-----------------------------------------------------------------------------------------------------------------------
+                //-----------------------------------------------------------------------------------------------------------------------
+                //-----------------------------------------------------------------------------------------------------------------------
+                
+                Table table = mainPart.Document.Body.Elements<Table>().FirstOrDefault();
+
+                TableRowProperties propTable = table.Elements<TableRow>().FirstOrDefault()?.TableRowProperties;
+
+                foreach (var replacement in purchaseRequestData)
+                {
+                    TableRow newRow = new TableRow();
+
+                    
+
+                    TableCell cellId = new TableCell(new Paragraph(new Run(new Text("-"))));
+                    TableCell productNameCell = new TableCell(new Paragraph(new Run(new Text(replacement.ProductName + ", " + replacement.ProductId.ToString()))));
+                    TableCell countCell = new TableCell(new Paragraph(new Run(new Text(replacement.Count.ToString()))));
+
+                    newRow.AppendChild(cellId);
+                    newRow.AppendChild(productNameCell);
+                    newRow.AppendChild(countCell);
+
+                    newRow.TableRowProperties = propTable;
+
+                    table.AppendChild(newRow);
+                }
             }
 
             byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
             return File(fileBytes, nameFile);
         }
 
-        private void ReplaceText(OpenXmlElement element, string searchValue, string replaceValue)
-        {
-            foreach (var text in element.Descendants<Text>().Where(t => t.Text.Contains(searchValue)))
-            {
-                text.Text = text.Text.Replace(searchValue, replaceValue);
-            }
-        }
     }
 }
