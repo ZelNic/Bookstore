@@ -52,7 +52,6 @@ namespace Bookstore.Areas.Customer
 
                 if (wishList != null)
                 {
-                    var count = wishList.CountProduct;
                     _db.WishLists.Update(wishList);
                 }
                 else
@@ -61,7 +60,6 @@ namespace Bookstore.Areas.Customer
                     {
                         ProductId = productId,
                         UserId = _user.UserId,
-                        CountProduct = 1
                     };
 
                     await _db.WishLists.AddAsync(newProductInWishList);
@@ -69,7 +67,7 @@ namespace Bookstore.Areas.Customer
 
                 await _db.SaveChangesAsync();
 
-                return RedirectToAction("Index", "Home", new { area = "Customer" });
+                return Ok();
             }
         }
 

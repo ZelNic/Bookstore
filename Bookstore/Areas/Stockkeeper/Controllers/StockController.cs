@@ -3,7 +3,6 @@ using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Bookstore.Utility;
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
@@ -290,16 +289,13 @@ namespace Bookstore.Areas.Stockkeeper
                 //-----------------------------------------------------------------------------------------------------------------------
                 //-----------------------------------------------------------------------------------------------------------------------
                 //-----------------------------------------------------------------------------------------------------------------------
-                
-                Table table = mainPart.Document.Body.Elements<Table>().FirstOrDefault();
 
-                TableRowProperties propTable = table.Elements<TableRow>().FirstOrDefault()?.TableRowProperties;
+                Table table = mainPart.Document.Body.Elements<Table>().FirstOrDefault();
+                TableProperties tableProperties = table.GetFirstChild<TableProperties>();
 
                 foreach (var replacement in purchaseRequestData)
                 {
                     TableRow newRow = new TableRow();
-
-                    
 
                     TableCell cellId = new TableCell(new Paragraph(new Run(new Text("-"))));
                     TableCell productNameCell = new TableCell(new Paragraph(new Run(new Text(replacement.ProductName + ", " + replacement.ProductId.ToString()))));
@@ -309,15 +305,26 @@ namespace Bookstore.Areas.Stockkeeper
                     newRow.AppendChild(productNameCell);
                     newRow.AppendChild(countCell);
 
-                    newRow.TableRowProperties = propTable;
+                    // Clone the TableProperties and apply it to each new cell
+                    TableCellProperties cellProperties = new TableCellProperties();
+                    cellProperties.Append(tableProperties.CloneNode(true));
+
+                    cellId.AppendChild(cellProperties.CloneNode(true));
+                    productNameCell.AppendChild(cellProperties.CloneNode(true));
+                    countCell.AppendChild(cellProperties.CloneNode(true));
 
                     table.AppendChild(newRow);
                 }
             }
 
             byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
-            return File(fileBytes, nameFile);
-        }
+            string fileName = "example.docx";
 
+            // Устанавливаем заголовки ответа
+            Response.Headers.Add("Content-Disposition", "attachment; filename=" + fileName);
+            Response.Headers.Add("X-Content-Type-Options", "nosniff");
+
+            return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        }
     }
 }

@@ -40,16 +40,18 @@ function loadDataTablePurchaseRequest() {
     });
 }
 
-function sendTable() {
+document.getElementById('purchaseRequestSend').addEventListener('submit', function (event) {
+    event.preventDefault(); 
+    sendTable();
+});
 
+function sendTable() {
     var models = [];
 
-    // Получить все элементы ввода моделей
     var countInputs = document.querySelectorAll('input[name="Count"]');
     var productIdInputs = document.querySelectorAll('input[name="ProductId"]');
     var productNameInputs = document.querySelectorAll('input[name="ProductName"]');
 
-    // Пройти по каждому элементу ввода и создать модель
     for (var i = 0; i < countInputs.length; i++) {
         var count = parseInt(countInputs[i].value);
         var productId = productIdInputs[i].value;
@@ -58,16 +60,15 @@ function sendTable() {
         var model = {
             Count: count,
             ProductId: productId,
-            productName: productName
+            ProductName: productName
         };
 
         models.push(model);
-        console.log(model)
+        console.log(model);
     }
 
+    var jsonData = JSON.stringify(models);
 
-    var jsonData = JSON.stringify(models)
-    
     var url = "/Stockkeeper/Stock/OrderProducts";
 
     fetch(url, {
@@ -76,25 +77,26 @@ function sendTable() {
             "Content-Type": "application/json"
         },
         body: jsonData
+    }).then(function (response) {
+        if (response.ok) {
+            return response.blob();
+        } else {
+            throw new Error("Ошибка при отправке данных на сервер");
+        }
     })
-        .then(function (response) {
-            if (response.ok) {
-                return response.text();
-            } else {
-                throw new Error("Ошибка при отправке данных на сервер");
-            }
-        })
-        .then(function (data) {
-            // Обработка успешного ответа от сервера
-            console.log(data);
+        .then(function (blob) {
+            var fileUrl = URL.createObjectURL(blob);
+
+            var downloadLink = document.createElement("a");
+            downloadLink.href = fileUrl;
+            downloadLink.download = "Заявление.docx";
+
+            downloadLink.click();
         })
         .catch(function (error) {
-            // Обработка ошибки
             console.log(error);
         });
-
 }
-
 
 
 function deleteFromPurchaseRequest(productId) {

@@ -1,5 +1,6 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
+using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -12,23 +13,39 @@ namespace Bookstore.Areas.Customer
         private readonly ILogger<HomeController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ApplicationDbContext _db;
+        private readonly User? _user;
 
         public HomeController(ILogger<HomeController> logger, IHttpContextAccessor httpContextAccessor, ApplicationDbContext db)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _db = db;
+
+            if (_httpContextAccessor.HttpContext.Session.GetInt32("Username") != null)
+            {
+                int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("Username");
+                if ((userId != null) && (_db.User.Find(userId) != null))
+                {
+                    _user = _db.User.Find(userId);
+                }
+            }
         }
 
         public async Task<IActionResult> Index()
         {
-            List<Book> booksList = await _db.Books.ToListAsync();
-            List<Category> categoriesList = await _db.Categories.ToListAsync();
+            List<Book>? booksList = await _db.Books.ToListAsync();
+            List<Category>? categoriesList = await _db.Categories.ToListAsync();
+            List<WishList>? wishLists = new();
+            if (_user != null)
+            {
+                wishLists = await _db.WishLists.Where(u => u.UserId == _user.UserId).ToListAsync();
+            }
 
             BookVM bookVM = new()
             {
                 BooksList = booksList,
-                CategoriesList = categoriesList
+                CategoriesList = categoriesList,
+                WishList = wishLists
             };
 
             return View(bookVM);
@@ -43,8 +60,8 @@ namespace Bookstore.Areas.Customer
 
         [HttpPost]
         public async Task<IActionResult> Search(string? searchString)
-        {            
-            if(searchString == null)
+        {
+            if (searchString == null)
             {
                 return RedirectToAction("Index");
             }
@@ -52,9 +69,6 @@ namespace Bookstore.Areas.Customer
 
             return View(books);
         }
-
-
-
 
         public async Task<IActionResult> Privacy()
         {
