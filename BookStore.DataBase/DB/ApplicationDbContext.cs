@@ -107,7 +107,7 @@ namespace Bookstore.DataAccess
                 {
                     WishListId = 1,
                     UserId = 1,
-                    ProductId = 1,
+                    ProductId = "1",
                 }
             );
 

@@ -33,22 +33,30 @@ namespace Bookstore.Areas.Customer
 
         public async Task<IActionResult> Index()
         {
+            BookVM bookVm = await GetBookVM();
+            return View(bookVm);
+        }
+
+        public async Task<BookVM> GetBookVM()
+        {
             List<Book>? booksList = await _db.Books.ToListAsync();
             List<Category>? categoriesList = await _db.Categories.ToListAsync();
-            List<WishList>? wishLists = new();
+            WishList? wishLists = new();
+
             if (_user != null)
             {
-                wishLists = await _db.WishLists.Where(u => u.UserId == _user.UserId).ToListAsync();
+                wishLists = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
             }
 
             BookVM bookVM = new()
             {
                 BooksList = booksList,
                 CategoriesList = categoriesList,
-                WishList = wishLists
+                WishList = wishLists,
+                User = _user
             };
 
-            return View(bookVM);
+            return bookVM;
         }
 
         public async Task<IActionResult> Details(int productId)

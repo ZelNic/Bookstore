@@ -1,8 +1,11 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Bookstore.Models.Models;
+using Bookstore.Models.SD;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using System.Text.RegularExpressions;
 
 namespace Bookstore.Areas.Customer
 {
@@ -30,12 +33,26 @@ namespace Bookstore.Areas.Customer
 
         public async Task<IActionResult> Index()
         {
+            List<Book>? booksList = await _db.Books.ToListAsync();
+            List<Category>? categoriesList = await _db.Categories.ToListAsync();
+            WishList? wishLists = new();
+
             if (_user != null)
             {
-                return View(_user);
+                wishLists = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
             }
-            return NotFound();
+
+            BookVM bookVM = new()
+            {
+                BooksList = booksList,
+                CategoriesList = categoriesList,
+                WishList = wishLists,
+                User = _user
+            };
+
+            return View(bookVM);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> AddWishList(int productId)
@@ -44,40 +61,53 @@ namespace Bookstore.Areas.Customer
             {
                 return RedirectToAction("LogIn", "User", new { area = "Identity" });
             }
+
+
+            var wishList = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+
+            if (wishList != null)
+            {
+                string[] productIds = wishList.ProductId.Split('|');
+
+                foreach (string id in productIds)
+                {
+                    if (id == productId.ToString())    
+                        return Ok();                    
+                }
+
+                wishList.ProductId += "|" + productId.ToString();
+
+                _db.WishLists.Update(wishList);
+            }
             else
             {
-                var wishList = await _db.WishLists.Where(u => u.UserId == _user.UserId)
-                    .Where(u => u.ProductId == productId)
-                    .FirstOrDefaultAsync();
-
-                if (wishList != null)
+                WishList newProductInWishList = new()
                 {
-                    _db.WishLists.Update(wishList);
-                }
-                else
-                {
-                    WishList newProductInWishList = new()
-                    {
-                        ProductId = productId,
-                        UserId = _user.UserId,
-                    };
+                    ProductId = productId.ToString(),
+                    UserId = _user.UserId,
+                };
 
-                    await _db.WishLists.AddAsync(newProductInWishList);
-                }
-
-                await _db.SaveChangesAsync();
-
-                return Ok();
+                await _db.WishLists.AddAsync(newProductInWishList);
             }
+
+            await _db.SaveChangesAsync();
+
+            return Ok();
         }
 
         [HttpPost]
         public async Task<IActionResult> RemoveFromWL(int productId)
         {
-            var productOnRemove = await _db.WishLists.Where(u => u.UserId == _user.UserId).Where(u=>u.ProductId == productId).FirstOrDefaultAsync();
-            _db.WishLists.Remove(productOnRemove);
+            WishList? wishList = _db.WishLists.Where(i=>i.UserId == _user.UserId).FirstOrDefault();
+            if (wishList == null)            
+                return NotFound();
+
+            string result = wishList.ProductId.Replace("|" + productId.ToString(), "");
+
+             _db.WishLists.Update(wishList);
             await _db.SaveChangesAsync();
-            return RedirectToAction("Index", "WishList", new { area = "Customer" });
+
+            return Ok();
         }
     }
 }

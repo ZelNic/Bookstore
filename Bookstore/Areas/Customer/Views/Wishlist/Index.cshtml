@@ -1,59 +1,62 @@
-﻿@model User
+﻿@model BookVM
 
-@inject ApplicationDbContext DB
-@{
-    var db = DB;
-}
 
-@if (Model == null)
+@if (Model.User == null)
 {
     <h1>Please Log In</h1>
 }
 else
 {
-    var wishlist = db.WishLists.Where(u => u.UserId == Model.UserId);
-
-    @if (wishlist.Count() == 0)
+    @if (Model.WishList == null)
     {
         <h1>Нет отложенных товаров</h1>
     }
     else
     {
         <h1>Отложенные товары</h1>
-    }
 
-    <div class="row row-cols-2">
-        <div class="container col-10">
-            <div class="row row-cols-2 row-cols-md-6 mb-5">
-                @foreach (var product in wishlist)
-                {
-                    var pr = @db.Books.Find(product.ProductId);
-                    <div class="col-2 mb-3">
-                        <div class="card card-subtitle h-100 shadow pt-1 border-0">
-                            <img src="@pr.ImageURL" class="card-img-top mx-auto rounded-1" style="object-fit: cover; width: 50%; height: 150px;" />
-                            <div class="card-body mt-0 pb-0">
-                                @pr.Title
-                            </div>
-                            <div class="card-body mt-0 pb-0">
-                                @pr.Price p
-                            </div>
-                            <div class="card card-footer bg-transparent border-0">
-                                <form method="post">
-                                    <button asp-area="Customer" asp-controller="WishList" asp-action="RemoveFromWL" asp-route-productId="@pr.BookId"
-                                            type="submit" class="btn btn-danger">
-                                        <i class="bi bi-x-circle"></i>
-                                    </button>
-                                    <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
-                                            asp-route-productId="@pr.BookId" asp-route-isWishList="true" class="btn btn-success border-0">
-                                        <i class="bi bi-bag-plus"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                }
+        <div class="row row-cols-2">
+            <div class="container col-10">
+                <div class="row row-cols-2 row-cols-md-6 mb-5">
+
+                    @{
+
+                        List<int> productListID = Model.WishList.ProductId.Split('|').Select(int.Parse).ToList();
+
+                        foreach (int productId in productListID)
+                        {
+                            var pr = Model.BooksList.Where(u => u.BookId == productId).FirstOrDefault();
+                            if (pr != null)
+                            {
+                                <div class="col-2 mb-3">
+                                    <div class="card card-subtitle h-100 shadow pt-1 border-0">
+                                        <img src="@pr.ImageURL" class="card-img-top mx-auto rounded-1" style="object-fit: cover; width: 50%; height: 150px;" />
+                                        <div class="card-body mt-0 pb-0">
+                                            @pr.Title
+                                        </div>
+                                        <div class="card-body mt-0 pb-0">
+                                            @pr.Price p
+                                        </div>
+                                        <div class="card card-footer bg-transparent border-0">
+                                            <form method="post">
+                                                <button asp-area="Customer" asp-controller="WishList" asp-action="RemoveFromWL" asp-route-productId="@pr.BookId"
+                                                        type="submit" class="btn btn-danger">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                                <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
+                                                        asp-route-productId="@pr.BookId" asp-route-isWishList="true" class="btn btn-success border-0">
+                                                    <i class="bi bi-bag-plus"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
             </div>
         </div>
-    </div>
+    }
 }
 

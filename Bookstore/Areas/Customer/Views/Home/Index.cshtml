@@ -35,31 +35,40 @@
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <div class="row">
-                                        <form method="post">
-                                            <div class="col-0">
-                                                <a asp-controller="Home" asp-action="Details" asp-route-productId="@book.BookId"
-                                                   class="btn btn-primary border-0 ">
-                                                    <i class="bi bi-three-dots"></i>
-                                                </a>
-                                            </div>
-                                            @if (Model.WishList != null)
+                                        <div class="col-0">
+                                            <a asp-controller="Home" asp-action="Details" asp-route-productId="@book.BookId"
+                                               class="btn btn-primary border-0 ">
+                                                <i class="bi bi-three-dots"></i>
+                                            </a>
+                                        </div>
+                                        <form id="wishlist" method="post">
+                                            @if (Model.WishList != null && Model.WishList.ProductId != null)
                                             {
                                                 <div class="col-0">
                                                     <div>
-                                                        <button id="wishList" type="submit" onclick="addToWishlist(@book.BookId)" class="btn btn-warning border-0">
+                                                        <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn btn-warning border-0">
 
-                                                            @if (Model.WishList.Where(u => u.ProductId == book.BookId).FirstOrDefault() != null)
+                                                            @if (Model.WishList.ProductId.Any(id => id.ToString() == book.BookId.ToString()))
                                                             {
                                                                 <i class="bi bi-bookmark-dash-fill"></i>
                                                             }
                                                             else
                                                             {
-                                                                <i id="btnWishlist" class="bi bi-bookmark-check-fill"></i>
+                                                                <i class="bi bi-bookmark-check-fill"></i>
                                                             }
+
                                                         </button>
                                                     </div>
                                                 </div>
                                             }
+                                            else
+                                            {
+                                                <button id="wishList" type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn btn-warning border-0">
+                                                    <i class="bi bi-bookmark-check-fill"></i>
+                                                </button>
+                                            }
+                                        </form>
+                                        <form>
                                             <div class="col-0">
                                                 <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
                                                         asp-route-productId="@book.BookId" class="btn btn-success border-0">

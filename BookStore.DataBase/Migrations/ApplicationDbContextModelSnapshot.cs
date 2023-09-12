@@ -344,7 +344,7 @@ namespace Bookstore.Migrations
                             ResponsiblePersonId = 12,
                             ShelfNumber = 1,
                             StockId = 26,
-                            Time = new DateTime(2023, 9, 11, 16, 44, 16, 184, DateTimeKind.Unspecified).AddTicks(9233)
+                            Time = new DateTime(2023, 9, 12, 8, 9, 14, 746, DateTimeKind.Unspecified).AddTicks(9475)
                         });
                 });
 
@@ -456,8 +456,9 @@ namespace Bookstore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WishListId"));
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -470,7 +471,7 @@ namespace Bookstore.Migrations
                         new
                         {
                             WishListId = 1,
-                            ProductId = 1,
+                            ProductId = "1",
                             UserId = 1
                         });
                 });
