@@ -1,11 +1,9 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Bookstore.Models.Models;
-using Bookstore.Models.SD;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileSystemGlobbing.Internal;
-using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Bookstore.Areas.Customer
 {
@@ -33,25 +31,44 @@ namespace Bookstore.Areas.Customer
 
         public async Task<IActionResult> Index()
         {
-            List<Book>? booksList = await _db.Books.ToListAsync();
-            List<Category>? categoriesList = await _db.Categories.ToListAsync();
-            WishList? wishLists = new();
+            return View();
+        }
 
-            if (_user != null)
+        public async Task<IActionResult> GetWishList()
+        {
+            if(_user == null)
             {
-                wishLists = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+                return Json(new { data = "Log In" });
+            }
+            
+
+            WishList? wishList = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+
+            if(wishList == null)
+            {
+                return Json(new { data = "WishList not found." });
             }
 
-            BookVM bookVM = new()
-            {
-                BooksList = booksList,
-                CategoriesList = categoriesList,
-                WishList = wishLists,
-                User = _user
-            };
+            List<int>? listId = wishList.ProductId.Split('|').Select(int.Parse).ToList();
 
-            return View(bookVM);
+            var wishListJson = await _db.Books
+                .Where(u => listId.Contains(u.BookId))
+                .Join(_db.Categories, b => b.Category, c => c.Id, (b, c) => new
+                {
+                    productId = b.BookId,
+                    nameProduct = b.Title,
+                    category = c.Name,
+                    image = b.ImageURL,
+                    author = b.Author,
+                    price = b.Price
+                })
+                .ToListAsync();
+
+
+            return Json(new { data = wishListJson });
         }
+
+
 
 
         [HttpPost]
@@ -59,7 +76,7 @@ namespace Bookstore.Areas.Customer
         {
             if (_user == null)
             {
-                return RedirectToAction("LogIn", "User", new { area = "Identity" });
+                return BadRequest(new { error = "Пользователь не вошел в систему." });
             }
 
 
@@ -71,8 +88,8 @@ namespace Bookstore.Areas.Customer
 
                 foreach (string id in productIds)
                 {
-                    if (id == productId.ToString())    
-                        return Ok();                    
+                    if (id == productId.ToString())
+                        return Ok();
                 }
 
                 wishList.ProductId += "|" + productId.ToString();
@@ -96,15 +113,25 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveFromWL(int productId)
+        public async Task<IActionResult> RemoveFromWishList(int productId)
         {
-            WishList? wishList = _db.WishLists.Where(i=>i.UserId == _user.UserId).FirstOrDefault();
-            if (wishList == null)            
+            WishList? wishList = _db.WishLists.Where(i => i.UserId == _user.UserId).FirstOrDefault();
+            if (wishList == null)
                 return NotFound();
 
-            string result = wishList.ProductId.Replace("|" + productId.ToString(), "");
+            List<string> listId = wishList.ProductId.Split('|').ToList();
+            listId.Remove(productId.ToString());
+            wishList.ProductId = string.Join("|", listId);
 
-             _db.WishLists.Update(wishList);
+            if (string.IsNullOrWhiteSpace(wishList.ProductId))
+            {
+                _db.WishLists.Remove(wishList);
+            }
+            else
+            {
+                _db.WishLists.Update(wishList);
+            }
+
             await _db.SaveChangesAsync();
 
             return Ok();

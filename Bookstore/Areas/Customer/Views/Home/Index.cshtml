@@ -6,7 +6,7 @@
             @foreach (var book in Model.BooksList)
             {
                 <div class="col-lg-2 col-sm-2">
-                    <div class="row p-2 mt-1" style="height: 100%">
+                    <div class="row p-1 mt-1" style="height: 100%">
                         <div class="col-12">
                             <div class="card card-deck border-0 p-1 shadow mx-auto h-100">
                                 <img src="@book.ImageURL" class="card-img" />
@@ -35,49 +35,56 @@
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <div class="row">
-                                        <div class="col-0">
-                                            <a asp-controller="Home" asp-action="Details" asp-route-productId="@book.BookId"
-                                               class="btn btn-primary border-0 ">
+
+                                        <form method="post" style="display: flex; align-items: center;">
+                                            <a asp-controller="Home" asp-action="Details" asp-route-productId="@book.BookId" class="btn" style="width: 56px; height: 40px;">
                                                 <i class="bi bi-three-dots"></i>
                                             </a>
-                                        </div>
-                                        <form id="wishlist" method="post">
-                                            @if (Model.WishList != null && Model.WishList.ProductId != null)
+
+                                            @if (Model.User == null)
                                             {
-                                                <div class="col-0">
-                                                    <div>
-                                                        <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn btn-warning border-0">
-
-                                                            @if (Model.WishList.ProductId.Any(id => id.ToString() == book.BookId.ToString()))
-                                                            {
-                                                                <i class="bi bi-bookmark-dash-fill"></i>
-                                                            }
-                                                            else
-                                                            {
-                                                                <i class="bi bi-bookmark-check-fill"></i>
-                                                            }
-
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                <a type="submit" asp-area="Identity" asp-controller="User" asp-action="LogIn" class="btn" style="width: 56px; height: 40px;">
+                                                    <i class="bi bi-heart"></i>
+                                                </a>
                                             }
                                             else
                                             {
-                                                <button id="wishList" type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn btn-warning border-0">
-                                                    <i class="bi bi-bookmark-check-fill"></i>
-                                                </button>
+                                                if (Model.WishList != null && Model.WishList.ProductId != null)
+                                                {
+                                                    List<int> productListID = Model.WishList.ProductId.Split('|').Select(int.Parse).ToList();
+                                                    <div>
+                                                        <div id="btnWishList">
+                                                            @if (productListID.Contains(book.BookId))
+                                                            {
+                                                                <button type="submit" onclick="removeFromWishlist(event,@book.BookId)" class="btn" style="width: 56px; height: 40px;">
+                                                                    <i class="bi bi-heart-fill"></i>
+                                                                </button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn" style="width: 56px; height: 40px;">
+                                                                    <i class="bi bi-heart"></i>
+                                                                </button>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn" style="width: 56px; height: 40px;">
+                                                        <i class="bi bi-heart"></i>
+                                                    </button>
+                                                }
                                             }
+                                            <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
+                                                    asp-route-productId="@book.BookId" class="btn" style="width: 56px; height: 50px;">
+                                                <i class="bi bi-bag-plus"></i>
+                                            </button>
                                         </form>
-                                        <form>
-                                            <div class="col-0">
-                                                <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
-                                                        asp-route-productId="@book.BookId" class="btn btn-success border-0">
-                                                    <i class="bi bi-bag-plus"></i>
-                                                </button>
-                                            </div>
-                                        </form>
+
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -88,5 +95,5 @@
 
 
 @section Scripts{
-    <script src="~/js/Customer/Details.js"></script>
+    <script src="~/js/Customer/WishList.js"></script>
 }
