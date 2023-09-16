@@ -36,15 +36,15 @@ namespace Bookstore.Areas.Customer
 
         public async Task<IActionResult> GetWishList()
         {
-            if(_user == null)
+            if (_user == null)
             {
                 return Json(new { data = "Log In" });
             }
-            
+
 
             WishList? wishList = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
 
-            if(wishList == null)
+            if (wishList == null)
             {
                 return Json(new { data = "WishList not found." });
             }
@@ -61,9 +61,7 @@ namespace Bookstore.Areas.Customer
                     image = b.ImageURL,
                     author = b.Author,
                     price = b.Price
-                })
-                .ToListAsync();
-
+                }).ToListAsync();
 
             return Json(new { data = wishListJson });
         }

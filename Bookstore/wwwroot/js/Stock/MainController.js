@@ -54,7 +54,7 @@ function loadDataTableStock() {
         ]
     });
 }
-function selectProductToPurchase(productId) {    
+function selectProductToPurchase(productId) {
     $.ajax({
         url: '/Stockkeeper/Stock/SelectProductToPurchase' + "?productId=" + productId,
         type: 'POST',
