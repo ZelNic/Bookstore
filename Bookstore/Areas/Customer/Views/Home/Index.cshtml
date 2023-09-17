@@ -75,12 +75,11 @@
                                                 </div>
                                             }
 
-
-                                            <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
-                                                    asp-route-productId="@book.BookId" class="btn" style="width: 56px; height: 50px;">
-                                                <i class="bi bi-bag-plus"></i>
-                                            </button>
-
+                                            <div id="btnShoppingBasket_@book.BookId">
+                                                <button type="submit" onclick="addToShoppingBasket(event,@book.BookId)"
+                                                        class="btn bi-cart" style="width: 56px; height: 50px;">
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -96,4 +95,5 @@
 
 @section Scripts{
     <script src="~/js/Customer/WishList.js"></script>
+    <script src="~/js/Customer/ShoppingBasket.js"></script>
 }

@@ -88,8 +88,7 @@ namespace Bookstore.DataAccess
                 {
                     BasketId = 1,
                     UserId = 1,
-                    ProductId = 1,
-                    CountProduct = 1
+                    ProductIdAndCount = "1:1"
                 }
             );
 

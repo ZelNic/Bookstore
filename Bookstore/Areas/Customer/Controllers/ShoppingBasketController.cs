@@ -4,6 +4,7 @@ using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace Bookstore.Areas.Customer
 {
@@ -38,9 +39,47 @@ namespace Bookstore.Areas.Customer
             return NotFound();
         }
 
-        //add in the basket or in the wish list
+        public Dictionary<int, int> ParseProductData(ShoppingBasket shoppingBasket)
+        {
+            List<string> productData = new();
+
+            if (shoppingBasket.ProductIdAndCount.Contains('|') == true)
+            {
+                productData = shoppingBasket.ProductIdAndCount.Split('|').ToList();
+            }
+            else
+            {
+                productData.Add(shoppingBasket.ProductIdAndCount);
+            }
+
+            Dictionary<int, int> productIdAndCount = new Dictionary<int, int>();
+
+            foreach (string idAndCount in productData)
+            {
+                string[] parts = idAndCount.Split(':');
+                if (parts.Length == 2)
+                {
+                    int key = Convert.ToInt32(parts[0]);
+                    int value = Convert.ToInt32(parts[1]);
+                    productIdAndCount.Add(key, value);
+                }
+            }
+
+            return productIdAndCount;
+        }
+
+        public string SerializationProductData(Dictionary<int, int> productIdAndCount)
+        {
+            string result = string.Join("|", productIdAndCount.Select(kv => $"{kv.Key}:{kv.Value}"));
+            Console.WriteLine(result);
+
+            return result;
+        }
+
+
+
         [HttpPost]
-        public async Task<IActionResult> AddBasket(int productId, bool isWishList = false)
+        public async Task<IActionResult> AddBasket(int productId, bool isFromWishList = false)
         {
             if (_user == null)
             {
@@ -48,33 +87,39 @@ namespace Bookstore.Areas.Customer
             }
             else
             {
-                var basket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId)
-                    .Where(u => u.ProductId == productId)
-                    .FirstOrDefaultAsync();
+                ShoppingBasket basket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
 
                 if (basket != null)
                 {
-                    var count = basket.CountProduct;
-                    count++;
-                    basket.CountProduct = count;
+                    Dictionary<int, int> productIdAndCount = ParseProductData(basket);
+
+                    if (productIdAndCount.ContainsKey(productId))
+                    {
+                        int count;
+                        productIdAndCount.TryGetValue(productId, out count);
+                        productIdAndCount[productId] = count + 1;
+                    }
+                    else
+                    {
+                        productIdAndCount.Add(productId, 1);
+                        basket.ProductIdAndCount = SerializationProductData(productIdAndCount);                        
+                    }
                     _db.ShoppingBasket.Update(basket);
                 }
-
-                if (basket == null)
-                {
-                    ShoppingBasket newProductInShopBasket = new()
+                else
+                {                    
+                    ShoppingBasket newShoppingBasket = new()
                     {
-                        ProductId = productId,
                         UserId = _user.UserId,
-                        CountProduct = 1
+                        ProductIdAndCount = productId.ToString() + ":1"
                     };
 
-                    await _db.ShoppingBasket.AddAsync(newProductInShopBasket);
+                    await _db.ShoppingBasket.AddAsync(newShoppingBasket);
                 }
 
                 await _db.SaveChangesAsync();
 
-                if (isWishList == true)
+                if (isFromWishList == true)
                 {
                     return RedirectToAction("Index", "WishList", new { area = "Customer" });
                 }
@@ -85,46 +130,46 @@ namespace Bookstore.Areas.Customer
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RemoveFromBasket(int productId)
-        {
-            ShoppingBasket productInBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefaultAsync();
-            int countProductInBasket = productInBasket.CountProduct;
+        //    [HttpPost]
+        //    public async Task<IActionResult> RemoveFromBasket(int productId)
+        //    {
+        //        ShoppingBasket productInBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefaultAsync();
+        //        int countProductInBasket = productInBasket.CountProduct;
 
-            _db.ShoppingBasket.Remove(productInBasket);
+        //        _db.ShoppingBasket.Remove(productInBasket);
 
-            await _db.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
+        //        await _db.SaveChangesAsync();
+        //        return RedirectToAction("Index");
+        //    }
 
-        [HttpPost]
-        public async Task<IActionResult> ChangeCountProduct(int productId, bool minus = false, bool plus = false)
-        {
-            ShoppingBasket productInBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefaultAsync();
-            int countProductInBasket = productInBasket.CountProduct;
+        //    [HttpPost]
+        //    public async Task<IActionResult> ChangeCountProduct(int productId, bool minus = false, bool plus = false)
+        //    {
+        //        ShoppingBasket productInBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).Where(u => u.ProductId == productId).FirstOrDefaultAsync();
+        //        int countProductInBasket = productInBasket.CountProduct;
 
-            if (countProductInBasket == 1 && minus == true)
-            {
-                _db.ShoppingBasket.Remove(productInBasket);
-            }
-            else
-            {
-                if (minus == true)
-                {
-                    countProductInBasket--;
-                }
-                else if (plus == true)
-                {
-                    countProductInBasket++;
-                }
+        //        if (countProductInBasket == 1 && minus == true)
+        //        {
+        //            _db.ShoppingBasket.Remove(productInBasket);
+        //        }
+        //        else
+        //        {
+        //            if (minus == true)
+        //            {
+        //                countProductInBasket--;
+        //            }
+        //            else if (plus == true)
+        //            {
+        //                countProductInBasket++;
+        //            }
 
-                productInBasket.CountProduct = countProductInBasket;
-                _db.ShoppingBasket.Update(productInBasket);
-            }     
-            
-            await _db.SaveChangesAsync();
+        //            productInBasket.CountProduct = countProductInBasket;
+        //            _db.ShoppingBasket.Update(productInBasket);
+        //        }     
 
-            return RedirectToAction("Index");
-        }
+        //        await _db.SaveChangesAsync();
+
+        //        return RedirectToAction("Index");
+        //    }
     }
 }

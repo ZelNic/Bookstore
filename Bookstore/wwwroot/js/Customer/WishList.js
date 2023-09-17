@@ -90,7 +90,7 @@ function removeFromWishlist(event, id, isFromWishList = false) {
         success: function (response) {
             if (isFromWishList == false) {
                 var btnWishList = document.getElementById(`btnWishList_${id}`);
-                btnWishList.innerHTML = `<button type="submit" onclick="addToWishlist(event,${id})" class="btn bi-heart" style="width: 56px; height: 40px;"></button>`;
+                btnWishList.innerHTML = `<button type="submit" onclick="addToWishlist(event,${id})" class="btn bi-cart" style="width: 56px; height: 40px;"></button>`;
             }
             getWishList();
         },

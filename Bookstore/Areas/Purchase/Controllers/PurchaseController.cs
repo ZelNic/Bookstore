@@ -86,36 +86,36 @@ namespace Bookstore.Areas.Purchase
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> FundsVerification(Order orderData)
-        {
+        //[HttpPost]
+        //public async Task<IActionResult> FundsVerification(Order orderData)
+        //{
 
-            var sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).ToListAsync();
+        //    var sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).ToListAsync();
 
 
-            IEnumerable<ProductData> productData = await _db.ShoppingBasket
-                .Where(sb => sb.UserId == _user.UserId)
-                .Join(_db.Books, sb => sb.ProductId, b => b.BookId, (sb, b) => new { sb, b })
-                .Select(x => new ProductData
-                {
-                    ProdId = x.sb.ProductId,
-                    Price = x.b.Price,
-                    Count = x.sb.CountProduct
-                }).ToListAsync();
+        //    IEnumerable<ProductData> productData = await _db.ShoppingBasket
+        //        .Where(sb => sb.UserId == _user.UserId)
+        //        .Join(_db.Books, sb => sb.ProductId, b => b.BookId, (sb, b) => new { sb, b })
+        //        .Select(x => new ProductData
+        //        {
+        //            ProdId = x.sb.ProductId,
+        //            Price = x.b.Price,
+        //            Count = x.sb.CountProduct
+        //        }).ToListAsync();
 
-            string prodDataJson = JsonConvert.SerializeObject(productData);
+        //    string prodDataJson = JsonConvert.SerializeObject(productData);
 
-            orderData.ProductData = prodDataJson;
-            orderData.OrderStatus = SD.StatusPending_0;
-            orderData.DeliveryAddress += orderData.City + ',' + orderData.Street + ' ' + orderData.HouseNumber;
-            orderData.PurchaseDate = MoscowTime.GetTime();
+        //    orderData.ProductData = prodDataJson;
+        //    orderData.OrderStatus = SD.StatusPending_0;
+        //    orderData.DeliveryAddress += orderData.City + ',' + orderData.Street + ' ' + orderData.HouseNumber;
+        //    orderData.PurchaseDate = MoscowTime.GetTime();
 
-            _db.ShoppingBasket.RemoveRange(sb);
+        //    _db.ShoppingBasket.RemoveRange(sb);
 
-            await _db.Order.AddAsync(orderData);
+        //    await _db.Order.AddAsync(orderData);
 
-            await _db.SaveChangesAsync();
-            return RedirectToAction("Index", "Orders", new { area = "Customer" });
-        }
+        //    await _db.SaveChangesAsync();
+        //    return RedirectToAction("Index", "Orders", new { area = "Customer" });
+        //}
     }
 }
