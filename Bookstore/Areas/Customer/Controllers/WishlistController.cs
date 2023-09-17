@@ -38,7 +38,7 @@ namespace Bookstore.Areas.Customer
         {
             if (_user == null)
             {
-                return Json(new { data = "Log In" });
+                return BadRequest(new { error = "Необходимо войти в систему" });
             }
 
 
@@ -46,7 +46,7 @@ namespace Bookstore.Areas.Customer
 
             if (wishList == null)
             {
-                return Json(new { data = "WishList not found." });
+                return BadRequest(new { error = "Список желаний пуст" });
             }
 
             List<int>? listId = wishList.ProductId.Split('|').Select(int.Parse).ToList();
@@ -55,12 +55,12 @@ namespace Bookstore.Areas.Customer
                 .Where(u => listId.Contains(u.BookId))
                 .Join(_db.Categories, b => b.Category, c => c.Id, (b, c) => new
                 {
-                    productId = b.BookId,
-                    nameProduct = b.Title,
-                    category = c.Name,
                     image = b.ImageURL,
+                    nameProduct = b.Title,
                     author = b.Author,
-                    price = b.Price
+                    category = c.Name,
+                    price = b.Price,
+                    productId = b.BookId
                 }).ToListAsync();
 
             return Json(new { data = wishListJson });
@@ -74,7 +74,7 @@ namespace Bookstore.Areas.Customer
         {
             if (_user == null)
             {
-                return BadRequest(new { error = "Пользователь не вошел в систему." });
+                return BadRequest(new { error = "Пользователь не вошел в систему" });
             }
 
 

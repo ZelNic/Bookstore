@@ -35,8 +35,7 @@
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <div class="row">
-
-                                        <form method="post" style="display: flex; align-items: center;">
+                                        <div style="display: flex; align-items: center;">
                                             <a asp-controller="Home" asp-action="Details" asp-route-productId="@book.BookId" class="btn" style="width: 56px; height: 40px;">
                                                 <i class="bi bi-three-dots"></i>
                                             </a>
@@ -47,41 +46,42 @@
                                                     <i class="bi bi-heart"></i>
                                                 </a>
                                             }
+
+                                            else if (Model.WishList != null && Model.WishList.ProductId != null)
+                                            {
+                                                List<int> productListID = Model.WishList.ProductId.Split('|').Select(int.Parse).ToList();
+                                                <div>
+                                                    <div id="btnWishList_@book.BookId">
+                                                        @if (productListID.Contains(book.BookId))
+                                                        {
+                                                            <button type="submit" onclick="removeFromWishlist(event,@book.BookId)"
+                                                                    class="btn btn-outline-danger bi-heart-fill" style="width: 56px; height: 40px;">
+                                                            </button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button type="submit" onclick="addToWishlist(event,@book.BookId)"
+                                                                    class="btn bi-heart" style="width: 56px; height: 40px;">
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
                                             else
                                             {
-                                                if (Model.WishList != null && Model.WishList.ProductId != null)
-                                                {
-                                                    List<int> productListID = Model.WishList.ProductId.Split('|').Select(int.Parse).ToList();
-                                                    <div>
-                                                        <div id="btnWishList">
-                                                            @if (productListID.Contains(book.BookId))
-                                                            {
-                                                                <button type="submit" onclick="removeFromWishlist(event,@book.BookId)" class="btn" style="width: 56px; height: 40px;">
-                                                                    <i class="bi bi-heart-fill"></i>
-                                                                </button>
-                                                            }
-                                                            else
-                                                            {
-                                                                <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn" style="width: 56px; height: 40px;">
-                                                                    <i class="bi bi-heart"></i>
-                                                                </button>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn" style="width: 56px; height: 40px;">
-                                                        <i class="bi bi-heart"></i>
+                                                <div id="btnWishList_@book.BookId">
+                                                    <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn btn bi-heart" style="width: 56px; height: 40px;">
                                                     </button>
-                                                }
+                                                </div>
                                             }
+
+
                                             <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
                                                     asp-route-productId="@book.BookId" class="btn" style="width: 56px; height: 50px;">
                                                 <i class="bi bi-bag-plus"></i>
                                             </button>
-                                        </form>
 
+                                        </div>
                                     </div>
                                 </div>
 
