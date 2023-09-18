@@ -1,9 +1,29 @@
-﻿@*@model User
+﻿
+<div>
+    <div class="container col-10">
+    <div id="shoppingBasket">
+    </div>
+    </div>
+    <div class="container col-2">
+        <div class="col-12">            
+            <div id="orderingInformation">  
+            </div>
+            <form method="post">
+                <button 
+                        type="submit" class="btn btn-success">
+                    <i class="bi bi-bag-fill"></i> Оформить заказ
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
-@inject ApplicationDbContext DB
-@{
-    var db = DB;
+
+@section Scripts{
+    <script src="~/js/Customer/ShoppingBasket.js"></script>
 }
+
+@*
 
 @if (Model == null)
 {
@@ -74,38 +94,7 @@ else
             </div>
         </div>
 
-        <div class="container col-2">
-            <div class="col-12">
-                @foreach (var product in basket)
-                {
-                    var price = @db.Books.Find(product.ProductId).Price;
-                    countProduct = db.ShoppingBasket.Where(u => u.UserId == Model.UserId)
-                    .Where(c => c.ProductId == product.ProductId)
-                    .FirstOrDefault().CountProduct;
-                    sumCountProduct += countProduct;
-                    sumPurchase += Convert.ToInt32(price) * countProduct;
-                }
-                <div>
-                    @if (sumCountProduct == 1)
-                    {
-                        <div>В вашей корзине @sumCountProduct позиция</div>
-                        <h5>Total: @sumPurchase ₽</h5>
-                    }
-                    else
-                    {
-                        <div>Всего @sumCountProduct позиций в вашей корзине.</div>
-                        <h5>Итого: @sumPurchase ₽</h5>
-                    }
-                </div>
-                <form method="post">
-                    <button asp-area="Purchase" asp-controller="Purchase" asp-action="FillRecipientDate" asp-route-purchaseАmount="@sumPurchase"
-                            type="submit" class="btn btn-success">
-                        <i class="bi bi-bag-fill"></i> Оформить заказ
-                    </button>
-                </form>
-            </div>
-        </div>
+        
     </div>
 }
-
 *@

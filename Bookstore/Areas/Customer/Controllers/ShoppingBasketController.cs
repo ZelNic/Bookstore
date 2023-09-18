@@ -4,7 +4,6 @@ using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace Bookstore.Areas.Customer
 {
@@ -32,14 +31,37 @@ namespace Bookstore.Areas.Customer
 
         public async Task<IActionResult> Index()
         {
-            if (_user != null)
+            return View();
+        }
+        public async Task<IActionResult> GetShoppingBasket()
+        {
+            ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+
+            if (shoppingBasket == null)
             {
-                return View(_user);
+                return BadRequest();
             }
-            return NotFound();
+
+            Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket);
+
+
+            var sb = await _db.Books.Where(u => productIdAndCount.Keys.Contains(u.BookId))
+                .Join(_db.Categories, b => b.Category, c => c.Id, (b, c) => new
+                {
+                    image = b.ImageURL,
+                    nameProduct = b.Title,
+                    author = b.Author,
+                    category = c.Name,
+                    price = b.Price,
+                    productId = b.BookId,
+                    count = productIdAndCount[b.BookId]
+                }).ToListAsync();
+
+            return Json(new { data = sb });
         }
 
-        public Dictionary<int, int> ParseProductData(ShoppingBasket shoppingBasket)
+
+        public static Dictionary<int, int> ParseProductData(ShoppingBasket shoppingBasket)
         {
             List<string> productData = new();
 
@@ -76,8 +98,6 @@ namespace Bookstore.Areas.Customer
             return result;
         }
 
-
-
         [HttpPost]
         public async Task<IActionResult> AddBasket(int productId, bool isFromWishList = false)
         {
@@ -102,12 +122,12 @@ namespace Bookstore.Areas.Customer
                     else
                     {
                         productIdAndCount.Add(productId, 1);
-                        basket.ProductIdAndCount = SerializationProductData(productIdAndCount);                        
+                        basket.ProductIdAndCount = SerializationProductData(productIdAndCount);
                     }
                     _db.ShoppingBasket.Update(basket);
                 }
                 else
-                {                    
+                {
                     ShoppingBasket newShoppingBasket = new()
                     {
                         UserId = _user.UserId,

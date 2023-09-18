@@ -3,7 +3,6 @@ using Bookstore.Models;
 using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace Bookstore.Areas.Customer
 {

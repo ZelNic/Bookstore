@@ -47,18 +47,14 @@ function generateHTML(response) {
             '</div>' +
             '<div class="card-body mt-0 pb-0">' +
             response.data[key].price +
-            '</div>' +
-            '<div class="card card-footer bg-transparent border-0">' +
-            '<form method="post">' +
-            '<button onclick="removeFromWishlist(event,' + response.data[key].productId + ',true)" type="submit" class="btn btn-danger">' +
-            '<i class="bi bi-x-circle"></i>' +
-            '</button>' +
-            '<button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket" asp-route-productId="' + response.data[key].productId + '" asp-route-isWishList="true" class="btn btn-success border-0">' +
-            '<i class="bi bi-bag-plus"></i>' +
-            '</button>' +
-            '</form>' +
-            '</div>' +
-            '</div>' +
+                '</div>' +
+                    '<div class="card card-footer bg-transparent border-0">' +
+                       '<form method="post">' +
+                            '<button onclick="removeFromWishlist(event,' + response.data[key].productId + ',true)" type="submit" class="btn btn-danger bi bi-x-circle"></button>' +
+                            '<button onclick="addToShoppingBasket(event,' + response.data[key].productId + ',true)" type="submit" class="btn btn-success border-0 bi bi-bag-plus"></button>' +
+                       '</form>' +
+                    '</div>' +
+                '</div>' +
             '</div>';
     };
 
@@ -90,7 +86,7 @@ function removeFromWishlist(event, id, isFromWishList = false) {
         success: function (response) {
             if (isFromWishList == false) {
                 var btnWishList = document.getElementById(`btnWishList_${id}`);
-                btnWishList.innerHTML = `<button type="submit" onclick="addToWishlist(event,${id})" class="btn bi-cart" style="width: 56px; height: 40px;"></button>`;
+                btnWishList.innerHTML = `<button type="submit" onclick="addToWishlist(event,${id})" class="btn bi-heart" style="width: 56px; height: 40px;"></button>`;
             }
             getWishList();
         },

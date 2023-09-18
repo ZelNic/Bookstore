@@ -42,44 +42,73 @@
 
                                             @if (Model.User == null)
                                             {
-                                                <a type="submit" asp-area="Identity" asp-controller="User" asp-action="LogIn" class="btn" style="width: 56px; height: 40px;">
+                                                <a asp-area="Identity" asp-controller="User" asp-action="LogIn" class="btn" style="width: 56px; height: 40px;">
                                                     <i class="bi bi-heart"></i>
                                                 </a>
-                                            }
 
-                                            else if (Model.WishList != null && Model.WishList.ProductId != null)
-                                            {
-                                                List<int> productListID = Model.WishList.ProductId.Split('|').Select(int.Parse).ToList();
-                                                <div>
-                                                    <div id="btnWishList_@book.BookId">
-                                                        @if (productListID.Contains(book.BookId))
-                                                        {
-                                                            <button type="submit" onclick="removeFromWishlist(event,@book.BookId)"
-                                                                    class="btn btn-outline-danger bi-heart-fill" style="width: 56px; height: 40px;">
-                                                            </button>
-                                                        }
-                                                        else
-                                                        {
-                                                            <button type="submit" onclick="addToWishlist(event,@book.BookId)"
-                                                                    class="btn bi-heart" style="width: 56px; height: 40px;">
-                                                            </button>
-                                                        }
-                                                    </div>
-                                                </div>
+
+                                                <a asp-area="Identity" asp-controller="User" asp-action="LogIn" class="btn bi-cart" style="width: 56px; height: 40px;">
+                                                </a>
                                             }
                                             else
                                             {
-                                                <div id="btnWishList_@book.BookId">
-                                                    <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn btn bi-heart" style="width: 56px; height: 40px;">
-                                                    </button>
-                                                </div>
-                                            }
+                                                if (Model.WishList != null && Model.WishList.ProductId != null)
+                                                {
+                                                    List<int> productListID = Model.WishList.ProductId.Split('|').Select(int.Parse).ToList();
+                                                    <div>
+                                                        <div id="btnWishList_@book.BookId">
+                                                            @if (productListID.Contains(book.BookId))
+                                                            {
+                                                                <button type="submit" onclick="removeFromWishlist(event,@book.BookId)"
+                                                                        class="btn btn-outline-danger bi-heart-fill" style="width: 56px; height: 40px;">
+                                                                </button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <button type="submit" onclick="addToWishlist(event,@book.BookId)"
+                                                                        class="btn bi-heart" style="width: 56px; height: 40px;">
+                                                                </button>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div id="btnWishList_@book.BookId">
+                                                        <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn btn bi-heart" style="width: 56px; height: 40px;">
+                                                        </button>
+                                                    </div>
+                                                }
 
-                                            <div id="btnShoppingBasket_@book.BookId">
-                                                <button type="submit" onclick="addToShoppingBasket(event,@book.BookId)"
-                                                        class="btn bi-cart" style="width: 56px; height: 50px;">
-                                                </button>
-                                            </div>
+
+                                                if (Model.ShoppingBasket != null && Model.ShoppingBasket.ProductIdAndCount != null)
+                                                {                                                    
+                                                    <div>
+                                                        <div id="btnShoppingBasket_@book.BookId">
+                                                            @if (Model.ShoppingBasket.ProductIdAndCount.ContainsKey(book.BookId))
+                                                            {
+                                                                <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="Index"
+                                                                        class="btn btn-outline-success bi-cart-check" style="width: 56px; height: 40px;">
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <button type="submit" onclick="addToShoppingBasket(event,@book.BookId)"
+                                                                        class="btn bi bi-cart" style="width: 56px; height: 40px;">
+                                                                </button>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div id="btnShoppingBasket_@book.BookId">
+                                                        <button type="submit" onclick="addToShoppingBasket(event,@book.BookId)"
+                                                                class="btn bi bi-cart" style="width: 56px; height: 50px;">
+                                                        </button>
+                                                    </div>
+                                                }
+                                            }
                                         </div>
                                     </div>
                                 </div>

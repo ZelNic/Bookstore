@@ -41,19 +41,30 @@ namespace Bookstore.Areas.Customer
         {
             List<Book>? booksList = await _db.Books.ToListAsync();
             List<Category>? categoriesList = await _db.Categories.ToListAsync();
-            WishList? wishLists = new();
+            WishList? wishLists = null;
+            ShoppingBasketClient? shoppingBasketClient = null;
 
             if (_user != null)
             {
                 wishLists = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+                ShoppingBasket? sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+                if(sb != null)
+                {
+                    shoppingBasketClient = new()
+                    {
+                        Id = sb.UserId,
+                        ProductIdAndCount = ShoppingBasketController.ParseProductData(sb)
+                    };
+                }
             }
 
             BookVM bookVM = new()
             {
+                User = _user,
                 BooksList = booksList,
                 CategoriesList = categoriesList,
                 WishList = wishLists,
-                User = _user
+                ShoppingBasket = shoppingBasketClient
             };
 
             return bookVM;
