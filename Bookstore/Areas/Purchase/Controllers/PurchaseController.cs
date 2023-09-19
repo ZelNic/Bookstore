@@ -1,12 +1,7 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
 using Bookstore.Models.Models;
-using Bookstore.Models.SD;
-using Bookstore.Utility;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace Bookstore.Areas.Purchase
 {

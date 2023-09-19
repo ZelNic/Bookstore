@@ -37,7 +37,7 @@ namespace Bookstore.Areas.Customer
         {
             if (_user == null)
             {
-                return BadRequest(new { error = "Необходимо войти в систему" });
+                return BadRequest(new { error = "Необходимо пройти аутентификацию" });
             }
 
 
@@ -73,7 +73,7 @@ namespace Bookstore.Areas.Customer
         {
             if (_user == null)
             {
-                return BadRequest(new { error = "Пользователь не вошел в систему" });
+                return BadRequest(new { error = "Необходимо пройти аутентификацию" });
             }
 
 

@@ -1,19 +1,22 @@
 ﻿
 <div>
-    <div class="container col-10">
-    <div id="shoppingBasket">
-    </div>
-    </div>
-    <div class="container col-2">
-        <div class="col-12">            
-            <div id="orderingInformation">  
+    <div class="container">
+        <div class="row">
+            <div class="col-10">
+                <div id="shoppingBasket">
+                </div>
             </div>
-            <form method="post">
-                <button 
-                        type="submit" class="btn btn-success">
-                    <i class="bi bi-bag-fill"></i> Оформить заказ
-                </button>
-            </form>
+            <div class="col-2">
+                <div class="col-12">
+                    <div id="orderingInformation">
+                    </div>
+                    <form method="post">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-bag-fill"></i> Оформить заказ
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -23,78 +26,4 @@
     <script src="~/js/Customer/ShoppingBasket.js"></script>
 }
 
-@*
 
-@if (Model == null)
-{
-    <h1>Please Log In</h1>
-}
-else
-{
-    var basket = db.ShoppingBasket.Where(u => u.UserId == Model.UserId);
-    var sumPurchase = 0;
-    var countProduct = 0;
-    var sumCountProduct = 0;
-
-    @if (basket.Count() == 0)
-    {
-        <h1>Пустая корзина</h1>
-    }
-    else
-    {
-        <h1>Ваш заказ</h1>
-    }
-
-    <div class="row row-cols-2">
-        <div class="container col-10">
-            <div class="row row-cols-2 row-cols-md-6 mb-5">
-                @foreach (var product in basket)
-                {
-                    var pr = @db.Books.Find(product.ProductId);
-                    <div class="col-2 mb-3">
-                        <div class="card card-subtitle h-100 shadow pt-1 border-0">
-                            <img src="@pr.ImageURL" alt="Image" class="card-img-top mx-auto rounded-1" style="object-fit: cover; width: 50%; height: 150px;" />
-                            <div class="card-body mt-0 pb-0">
-                                @pr.Title
-                            </div>
-                            <div class="card-body mt-0 pb-0">
-                                @pr.Price p
-                            </div>
-                            <div class="card card-footer bg-transparent border-0">
-                                <form method="post">
-                                    <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="RemoveFromBasket" asp-route-productId="@pr.BookId" asp-route-delete="true"
-                                            type="submit" class="btn btn-danger">
-                                        <i class="bi bi-x-circle"></i>
-                                    </button>
-                                    <div class="row border border-1 rounded-1">
-                                        <div class="col-3">
-                                            <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="ChangeCountProduct" asp-route-productId="@pr.BookId" asp-route-minus="true"
-                                                    type="submit" class="btn">
-                                                <i class="bi bi-dash-circle"></i>
-                                            </button>
-                                        </div>
-                                        <div class="col-3">
-                                            @{
-                                                var count = db.ShoppingBasket.Where(u => u.UserId == Model.UserId).Where(c => c.ProductId == product.ProductId).FirstOrDefault().CountProduct;
-                                                @count
-                                            }
-                                        </div>
-                                        <div class="col-3">
-                                            <button asp-area="Customer" asp-controller="ShoppingBasket" asp-action="ChangeCountProduct" asp-route-productId="@pr.BookId" asp-route-plus="true"
-                                                    type="submit" class="btn">
-                                                <i class="bi bi-plus-circle"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-
-        
-    </div>
-}
-*@
