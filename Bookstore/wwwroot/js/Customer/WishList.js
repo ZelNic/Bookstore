@@ -71,7 +71,7 @@ function generateHTML(response) {
 
 
 
-function addToWishlist(event, id) {
+function addToWishlist(event, id, isFromBasket = false) {
     event.preventDefault();
     $.ajax({
         url: '/Customer/WishList/AddWishList' + "?productId=" + id,
@@ -79,14 +79,14 @@ function addToWishlist(event, id) {
         data: id,
         success: function (response) {
             var btnWishList = document.getElementById(`btnWishList_${id}`);
-            btnWishList.innerHTML = `<button type="submit" onclick="removeFromWishlist(event,${id})" class="btn btn-outline-danger border-0 bi-heart-fill" style="width: 56px; height: 40px;"></button>`;
+            btnWishList.innerHTML = `<button type="submit" onclick="removeFromWishlist(event,${id})" class="btn btn-outline-danger border-0 bi-heart-fill" style="width: 56px; height: 40px;"></button>`;            
         },
         error: function (error) {
         }
     });
 }
 
-function removeFromWishlist(event, id, isFromWishList = false) {
+function removeFromWishlist(event, id, isFromBasket = false) {
     event.preventDefault();
 
     $.ajax({
@@ -94,10 +94,9 @@ function removeFromWishlist(event, id, isFromWishList = false) {
         type: 'POST',
         data: id,
         success: function (response) {
-            if (isFromWishList == false) {
+            
                 var btnWishList = document.getElementById(`btnWishList_${id}`);
-                btnWishList.innerHTML = `<button type="submit" onclick="addToWishlist(event,${id})" class="btn border-0 bi-heart" style="width: 56px; height: 40px;"></button>`;
-            }
+            btnWishList.innerHTML = `<button type="submit" onclick="addToWishlist(event,${id})" class="btn border-0 bi-heart" style="width: 56px; height: 40px;"></button>`;            
             getWishList();
         },
         error: function (error) {

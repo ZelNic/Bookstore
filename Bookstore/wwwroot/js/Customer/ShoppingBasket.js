@@ -6,26 +6,29 @@ $(document).ready(function () {
 var dataShoppingBasket;
 var countProduct;
 var totalPrice;
+var countSelectedProduct;
 var orderingInformation = document.getElementById("orderingInformation");
 var shoppingBasket = document.getElementById("shoppingBasket");
-
 function getShoppingBasket() {
 
     countProduct = 0;
     totalPrice = 0;
+
 
     $.ajax({
         url: '/Customer/ShoppingBasket/GetShoppingBasket',
         type: 'GET',
         dataType: 'json',
         success: function (response) {
-            dataShoppingBasket = response;
+
+            dataShoppingBasket = response.data;
+
             shoppingBasket.innerHTML = `
                 <h1>Корзина</h1>
                 <div class="row row-cols-1">
                     <div class="container col-10">
                         <div class="row row-cols-2 row-cols-md-6 mb-5">
-                        ${generateHTML(response)}
+                        ${generateHTML()}
                         </div>
                     </div>
                 </div>
@@ -37,6 +40,8 @@ function getShoppingBasket() {
             else {
                 orderingInformation.innerHTML = `<div>Всего ${countProduct} позиций в вашей корзине.</div><h5>Итого: ${totalPrice} ₽</h5>`;
             }
+
+
         },
         error: function (error) {
             shoppingBasket.innerHTML = `
@@ -45,39 +50,39 @@ function getShoppingBasket() {
         }
     });
 }
-function generateHTML(response) {
+function generateHTML() {
 
     var html = "";
 
-    for (var key in response.data) {
+    for (var key in dataShoppingBasket) {
 
-        totalPrice += response.data[key].price * response.data[key].count;
-        countProduct += response.data[key].count;
+        totalPrice += dataShoppingBasket[key].price * dataShoppingBasket[key].count;
+        countProduct += dataShoppingBasket[key].count;
 
         html +=
             `<div class="mb-3 p-1">
                     <div class="card card-subtitle h-100 shadow pt-1 border-0 m-0 p-0">
-                        <img src="${response.data[key].image}" class="card-img-top mx-auto rounded-1" alt="Product Image" style="object-fit: cover; width: 70%;" />
+                        <img src="${dataShoppingBasket[key].image}" class="card-img-top mx-auto rounded-1" alt="Product Image" style="object-fit: cover; width: 70%;" />
                         <div class="card-body mt-0 pb-0">
                             <div class="fs-6">
-                                ${response.data[key].nameProduct}
+                                ${dataShoppingBasket[key].nameProduct}
                             </div>
                         </div>
                         <div class="card card-footer bg-transparent border-0">
                             <hr />
                             <div class="text-center">
-                                ${response.data[key].author}
+                                ${dataShoppingBasket[key].author}
                             </div>
                             <hr />
                             <div class="text-center fs-5">
-                                ${response.data[key].price} ₽
+                                ${dataShoppingBasket[key].price} ₽
                             </div>
                             <hr />
                             <div class="mx-auto pb-1">
-                                <button onclick="removeFromShoppingBasket(event, ${response.data[key].productId})" type="submit"
+                                <button onclick="removeFromShoppingBasket(event, ${dataShoppingBasket[key].productId})" type="submit"
                                         class="btn btn-outline-danger border-0 bi bi-x-circle"></button>
 
-                                <button id="selector_${response.data[key].productId}" onclick="selectProduct(event,${response.data[key].productId},true)" type="submit"
+                                <button id="selector_${dataShoppingBasket[key].productId}" onclick="selectProduct(${key},${dataShoppingBasket[key].productId},true)" type="submit"
                                         class="btn btn-outline-secondary border-0 bi bi-check-circle"></button>
                             </div>
                             <div class="card-group">
@@ -86,7 +91,7 @@ function generateHTML(response) {
                                         <div class="mx-auto">
                                             <button class="btn bi bi-dash-circle">                                                
                                             </button>                       
-                                                ${response.data[key].count}                        
+                                                ${dataShoppingBasket[key].count}                        
                                             <button  type="submit" class="btn bi bi-plus-circle opacity-75">                                               
                                             </button>
                                         </div>
@@ -96,30 +101,50 @@ function generateHTML(response) {
                         </div>
                     </div>
                 </div>
-                `
+                `;
     };
 
     return html;
 }
 
-function selectProduct(event, id, isSelect) {
-    var selectror = document.getElementById(`selector_${id}`);
+function selectProduct(key, id, isSelect) {
+    var selector = document.getElementById(`selector_${id}`);
+    var boxSelect = document.getElementById("boxSelect");
+    countSelectedProduct = 0;
 
     if (isSelect == true) {
-        selectror.innerHTML = `
-        <button id="selector_${id}" onclick="selectProduct(event, ${id},false)" type="submit"
-        class="btn btn-outline-secondary border-0 bi bi-check-circle-fill"></button>
-    `;
-    } else {
-        selectror.innerHTML = 
-        `
-            <button id="selector_${id}" onclick="selectProduct(event,${id},true)" type="submit"
+        selector.outerHTML =
+            `<button id="selector_${id}" onclick="selectProduct(${key}, ${id}, ${false})" type="submit"
+            class="btn btn-outline-success border-0 bi bi-check-circle-fill"></button>`;
+        dataShoppingBasket[key].isSelect = true;
+    }
+    else {
+        selector.outerHTML =
+            `<button id="selector_${id}" onclick="selectProduct(${key},${id}, ${true})" type="submit"
             class="btn btn-outline-secondary border-0 bi bi-check-circle"></button>`;
+        dataShoppingBasket[key].isSelect = false;
+    }
+
+    for (var key in dataShoppingBasket) {
+        if (dataShoppingBasket[key].isSelect == true) {
+            countSelectedProduct++;
+        }
+    }
+
+    if (countSelectedProduct > 0) {
+        boxSelect.innerHTML = `<div class="mt-5 pt-5">Выбрано ${countSelectedProduct} позиций в вашей корзине.</div>                
+                <div>
+                <button type="submit" onclick="removeFromShoppingBasket(event, ${dataShoppingBasket[key].productId})" class="btn btn-outline-warning border-2 bi bi-trash-fill"></button>
+                <button type="submit" onclick="addToWishlist(event,${dataShoppingBasket[key].productId}); removeFromShoppingBasket(event,${dataShoppingBasket[key].productId}) " class="btn btn-outline-danger border-2 bi bi-heart-fill" style="width: 56px; height: 40px;"></button>
+                <div>`;
+    }
+    else {
+        boxSelect.innerHTML = "";
     }
 
 
-    dataShoppingBasket.data[key].isSelect = true;
 }
+
 
 function addToShoppingBasket(event, id) {
     event.preventDefault();
