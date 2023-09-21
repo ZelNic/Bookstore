@@ -2,7 +2,9 @@
 using Bookstore.Models;
 using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Bookstore.Areas.Customer
 {
@@ -24,6 +26,10 @@ namespace Bookstore.Areas.Customer
                 if ((userId != null) && (_db.User.Find(userId) != null))
                 {
                     _user = _db.User.Find(userId);
+                }
+                else
+                {
+                    BadRequest(new { error = "Необходимо пройти аутентификацию" });
                 }
             }
         }
@@ -69,27 +75,27 @@ namespace Bookstore.Areas.Customer
 
 
         [HttpPost]
-        public async Task<IActionResult> AddWishList(int productId)
+        public async Task<IActionResult> AddWishList(string newProductId)
         {
-            if (_user == null)
-            {
-                return BadRequest(new { error = "Необходимо пройти аутентификацию" });
-            }
+            WishList? wishList = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
 
-
-            var wishList = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+            List<int> listNewIdProducts = newProductId.Split('|').Select(int.Parse).ToList();
 
             if (wishList != null)
             {
-                string[] productIds = wishList.ProductId.Split('|');
+                List<int> oldProductList = wishList.ProductId.Split('|').Select(int.Parse).ToList();
 
-                foreach (string id in productIds)
+                for (int i = 0; i < listNewIdProducts.Count; i++)
                 {
-                    if (id == productId.ToString())
-                        return Ok();
+                    if (oldProductList.Contains(listNewIdProducts[i]))
+                    {
+                        listNewIdProducts.Remove(oldProductList[i]);
+                    }
+                    else
+                    {
+                        wishList.ProductId += "|" + listNewIdProducts[i].ToString();
+                    }
                 }
-
-                wishList.ProductId += "|" + productId.ToString();
 
                 _db.WishLists.Update(wishList);
             }
@@ -97,7 +103,7 @@ namespace Bookstore.Areas.Customer
             {
                 WishList newProductInWishList = new()
                 {
-                    ProductId = productId.ToString(),
+                    ProductId = string.Join("|", listNewIdProducts),
                     UserId = _user.UserId,
                 };
 

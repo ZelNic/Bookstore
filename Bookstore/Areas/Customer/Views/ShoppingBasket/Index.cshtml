@@ -9,21 +9,23 @@
             <div class="col-2">
                 <div class="col-12">
                     <div id="orderingInformation">
+                    </div>          
+                    <div id="checkout">
                     </div>
-                    <form method="post">
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-bag-fill"></i> Оформить заказ
-                        </button>
-                    </form>
-                    <div id="boxSelect">
-                        
+                    <div id="boxSelect">                        
                     </div>
                 </div>
+                
             </div>
         </div>
     </div>
 </div>
-
+<style>
+    input[type='number'] {
+        -moz-appearance: textfield; /* Firefox */
+        appearance: textfield; /* Chrome, Safari, Opera */
+    }
+</style>
 
 @section Scripts{
     <script src="~/js/Customer/WishList.js"></script>

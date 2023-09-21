@@ -39,7 +39,7 @@ namespace Bookstore.Areas.Customer
 
             if (shoppingBasket == null)
             {
-                return BadRequest();
+                return BadRequest(new { error = "Пустая корзина" }); ;
             }
 
             Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket);
@@ -91,7 +91,7 @@ namespace Bookstore.Areas.Customer
             return productIdAndCount;
         }
 
-        public string SerializationProductData(Dictionary<int, int> productIdAndCount)
+        public static string SerializationProductData(Dictionary<int, int> productIdAndCount)
         {
             string result = string.Join("|", productIdAndCount.Select(kv => $"{kv.Key}:{kv.Value}"));
             Console.WriteLine(result);
@@ -152,55 +152,77 @@ namespace Bookstore.Areas.Customer
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveFromBasket(int productId)
+        public async Task<IActionResult> RemoveFromBasket(string productsId)
         {
             ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
             if (shoppingBasket == null) { return BadRequest(); }
+
+            List<int> ids = productsId.Split(',').Select(int.Parse).ToList();
+
             Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket);
 
-            if (productIdAndCount.ContainsKey(productId))
+            foreach (int product in ids)
             {
-                productIdAndCount.Remove(productId);
+                if (productIdAndCount.ContainsKey(product))
+                {
+                    productIdAndCount.Remove(product);
+                }
             }
 
-            shoppingBasket.ProductIdAndCount = SerializationProductData(productIdAndCount);
-
-            _db.ShoppingBasket.Update(shoppingBasket);
-            await _db.SaveChangesAsync();
-            return Ok();
+            if (productIdAndCount.Count == 0)
+            {
+                _db.ShoppingBasket.Remove(shoppingBasket);
+                await _db.SaveChangesAsync();
+                return BadRequest(new { error = "Пустая корзина" }); ;
+            }
+            else
+            {
+                shoppingBasket.ProductIdAndCount = SerializationProductData(productIdAndCount);
+                await _db.SaveChangesAsync();
+                _db.ShoppingBasket.Update(shoppingBasket);
+                return Ok();
+            }
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> ChangeCountProduct(int productId, bool minus = false, bool plus = false)
+        public async Task<IActionResult> ChangeCountProduct(int productId, bool isPlus)
         {
-            ShoppingBasket shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
-            
+            ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+
             if (shoppingBasket == null) { return BadRequest(); }
+
             Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket);
 
             if (productIdAndCount.ContainsKey(productId))
             {
-                if (productIdAndCount[productId] == 1 && minus == true)
+                if (productIdAndCount[productId] == 1 && isPlus == false)
                 {
                     productIdAndCount.Remove(productId);
                 }
                 else
                 {
-                    if (minus == true)
+                    if (isPlus == false)
                     {
                         productIdAndCount[productId]--;
                     }
-                    else if (plus == true)
+                    else if (isPlus == true)
                     {
                         productIdAndCount[productId]++;
-                    }
-
-                    shoppingBasket.ProductIdAndCount = SerializationProductData(productIdAndCount); 
-
-                    _db.ShoppingBasket.Update(shoppingBasket);
+                    }                    
                 }
-            }                     
+
+                shoppingBasket.ProductIdAndCount = SerializationProductData(productIdAndCount);
+
+                if (string.IsNullOrWhiteSpace(shoppingBasket.ProductIdAndCount))
+                {
+                    _db.ShoppingBasket.Remove(shoppingBasket);
+                }
+                else
+                {
+                    _db.ShoppingBasket.Update(shoppingBasket);
+                }                
+            }
 
             await _db.SaveChangesAsync();
 

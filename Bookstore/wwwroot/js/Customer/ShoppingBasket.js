@@ -8,12 +8,15 @@ var countProduct;
 var totalPrice;
 var countSelectedProduct;
 var orderingInformation = document.getElementById("orderingInformation");
-var shoppingBasket = document.getElementById("shoppingBasket");
+var boxSelect = document.getElementById("boxSelect");
+var productArray = [];
+
 function getShoppingBasket() {
 
     countProduct = 0;
+    countSelectedProduct = 0;
     totalPrice = 0;
-
+    productArray = [];
 
     $.ajax({
         url: '/Customer/ShoppingBasket/GetShoppingBasket',
@@ -21,6 +24,12 @@ function getShoppingBasket() {
         dataType: 'json',
         success: function (response) {
 
+            var shoppingBasket = document.getElementById("shoppingBasket");
+            if (shoppingBasket == null) {
+                return;
+            }
+
+            var checkout = document.getElementById("checkout");
             dataShoppingBasket = response.data;
 
             shoppingBasket.innerHTML = `
@@ -31,8 +40,15 @@ function getShoppingBasket() {
                         ${generateHTML()}
                         </div>
                     </div>
+                    
                 </div>
             `;
+
+            checkout.innerHTML = `<form method="post">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-bag-fill"></i> Оформить заказ
+                        </button>
+                    </form>`;
 
             if (countProduct == 1) {
                 orderingInformation.innerHTML = `<div>В вашей корзине ${countProduct} позиция</div><h5>Итого: ${totalPrice} ₽</h5>`;
@@ -41,12 +57,14 @@ function getShoppingBasket() {
                 orderingInformation.innerHTML = `<div>Всего ${countProduct} позиций в вашей корзине.</div><h5>Итого: ${totalPrice} ₽</h5>`;
             }
 
+            activeSelect();
 
         },
         error: function (error) {
-            shoppingBasket.innerHTML = `
-                <h1>${error.responseJSON.error}</h1>                
-            `;
+            shoppingBasket.innerHTML = `<h1>${error.responseJSON.error}</h1>`
+            orderingInformation.innerHTML = ``;
+            checkout.innerHTML = ``;
+            boxSelect.innerHTML = ``;
         }
     });
 }
@@ -89,11 +107,9 @@ function generateHTML() {
                                 <div class="card card-subtitle h-100 shadow pt-1 border-0 m-0 p-0">
                                     <div class="row border border-0">
                                         <div class="mx-auto">
-                                            <button class="btn bi bi-dash-circle">                                                
-                                            </button>                       
-                                                ${dataShoppingBasket[key].count}                        
-                                            <button  type="submit" class="btn bi bi-plus-circle opacity-75">                                               
-                                            </button>
+                                            <button onclick="changeCountProduct(event, ${dataShoppingBasket[key].productId}, false)" type="submit" class="btn bi bi-dash-circle opacity-100">  
+                                            <input type="number" min="1" max="50" size="1" name="count" value="${dataShoppingBasket[key].count}" required/>                       
+                                            <button onclick="changeCountProduct(event, ${dataShoppingBasket[key].productId}, true)" type="submit" class="btn bi bi-plus-circle opacity-100"></button>   
                                         </div>
                                     </div>
                                 </div>
@@ -107,10 +123,27 @@ function generateHTML() {
     return html;
 }
 
+
+function activeSelect(key = null) {
+    if (productArray.length > 0) {
+
+        boxSelect.innerHTML = `<div class="mt-5 pt-5">Выбрано ${productArray.length} позиций в вашей корзине.</div>                
+                <div>
+                <button type="submit" onclick="removeFromShoppingBasket(event, '${productArray}')" class="btn btn-outline-warning border-2 bi bi-trash-fill"></button>
+                <button type="submit" onclick="addToWishlist(event,'${productArray}'); removeFromShoppingBasket(event,'${productArray}') " class="btn btn-outline-danger border-2 bi bi-heart-fill" style="width: 56px; height: 40px;"></button>
+                <div>`;
+    }
+    else {
+        boxSelect.innerHTML = "";
+    }
+}
+
+
+
 function selectProduct(key, id, isSelect) {
+
     var selector = document.getElementById(`selector_${id}`);
-    var boxSelect = document.getElementById("boxSelect");
-    countSelectedProduct = 0;
+    productArray = [];
 
     if (isSelect == true) {
         selector.outerHTML =
@@ -127,22 +160,11 @@ function selectProduct(key, id, isSelect) {
 
     for (var key in dataShoppingBasket) {
         if (dataShoppingBasket[key].isSelect == true) {
-            countSelectedProduct++;
+            productArray.push(dataShoppingBasket[key].productId);
         }
     }
 
-    if (countSelectedProduct > 0) {
-        boxSelect.innerHTML = `<div class="mt-5 pt-5">Выбрано ${countSelectedProduct} позиций в вашей корзине.</div>                
-                <div>
-                <button type="submit" onclick="removeFromShoppingBasket(event, ${dataShoppingBasket[key].productId})" class="btn btn-outline-warning border-2 bi bi-trash-fill"></button>
-                <button type="submit" onclick="addToWishlist(event,${dataShoppingBasket[key].productId}); removeFromShoppingBasket(event,${dataShoppingBasket[key].productId}) " class="btn btn-outline-danger border-2 bi bi-heart-fill" style="width: 56px; height: 40px;"></button>
-                <div>`;
-    }
-    else {
-        boxSelect.innerHTML = "";
-    }
-
-
+    activeSelect(key);
 }
 
 
@@ -160,17 +182,35 @@ function addToShoppingBasket(event, id) {
         }
     });
 }
-function removeFromShoppingBasket(event, id) {
+function removeFromShoppingBasket(event, productId) {
     event.preventDefault();
 
     $.ajax({
-        url: '/Customer/ShoppingBasket/RemoveFromBasket' + "?productId=" + id,
+        url: '/Customer/ShoppingBasket/RemoveFromBasket?productsId=' + productId,
         type: 'POST',
-        data: id,
+        data: productId,
         success: function (response) {
             getShoppingBasket();
         },
         error: function (error) {
+            getShoppingBasket();
+            reject(error);
+        }
+    });
+}
+
+function changeCountProduct(event, productId, isPlus) {
+    event.preventDefault();
+
+    $.ajax({
+        url: '/Customer/ShoppingBasket/ChangeCountProduct?productId=' + productId + "&isPlus=" + isPlus,
+        type: 'POST',
+        data: productId, isPlus,
+        success: function (response) {
+            getShoppingBasket();
+        },
+        error: function (error) {
+            getShoppingBasket();
             reject(error);
         }
     });
