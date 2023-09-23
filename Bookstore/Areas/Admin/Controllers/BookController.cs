@@ -35,12 +35,12 @@ namespace Bookstore.Areas.Admin.Controllers
                 int? userId = _contextAccessor.HttpContext.Session.GetInt32("Username");
                 if ((userId != null) && (_db.Employees.Find(userId) != null))
                 {
-                    List<Book> booksList = await _db.Books.ToListAsync();
+                    List<Product> booksList = await _db.Products.ToListAsync();
                     List<Category> categoriesList = await _db.Categories.ToListAsync();
 
-                    BookVM bookVM = new()
+                    ProductVM bookVM = new()
                     {
-                        BooksList = booksList,
+                        ProductsList = booksList,
                         CategoriesList = categoriesList
                     };
 
@@ -60,16 +60,16 @@ namespace Bookstore.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Upsert(int? bookId)
         {
-            var book = new Book();
+            var book = new Product();
 
             if (bookId != null)
             {
-                book = await _db.Books.FindAsync(bookId);
+                book = await _db.Products.FindAsync(bookId);
             }
 
-            BookVM bookVM = new()
+            ProductVM bookVM = new()
             {
-                Book = book,
+                Product = book,
                 CategoriesList = _db.Categories.ToList()
             };
 
@@ -80,26 +80,26 @@ namespace Bookstore.Areas.Admin.Controllers
 
         [HttpPost]
         [ActionName("Upsert")]
-        public async Task<IActionResult> UpsertPost(BookVM bookVM)
+        public async Task<IActionResult> UpsertPost(ProductVM productVM)
         {
-            if (bookVM.Book.BookId == 0)
+            if (productVM.Product.ProductId == 0)
             {
-                _db.Books.Add(bookVM.Book);
+                _db.Products.Add(productVM.Product);
             }
             else
             {
-                var oldVersionBook = await _db.Books.FindAsync(bookVM.Book.BookId);
+                var oldVersionBook = await _db.Products.FindAsync(productVM.Product.ProductId);
 
                 if (oldVersionBook != null)
                 {
-                    oldVersionBook.Title = bookVM.Book.Title;
-                    oldVersionBook.Author = bookVM.Book.Author;
-                    oldVersionBook.ISBN = bookVM.Book.ISBN;
-                    oldVersionBook.Description = bookVM.Book.Description;
-                    oldVersionBook.Price = bookVM.Book.Price;
-                    oldVersionBook.Category = bookVM.Book.Category;
-                    oldVersionBook.ImageURL = bookVM.Book.ImageURL;
-                    _db.Books.Update(oldVersionBook);
+                    oldVersionBook.Title = productVM.Product.Title;
+                    oldVersionBook.Author = productVM.Product.Author;
+                    oldVersionBook.ISBN = productVM.Product.ISBN;
+                    oldVersionBook.Description = productVM.Product.Description;
+                    oldVersionBook.Price = productVM.Product.Price;
+                    oldVersionBook.Category = productVM.Product.Category;
+                    oldVersionBook.ImageURL = productVM.Product.ImageURL;
+                    _db.Products.Update(oldVersionBook);
                 }
             }
 
@@ -115,19 +115,19 @@ namespace Bookstore.Areas.Admin.Controllers
         {
             if (id != null)
             {
-                var bookOnDelete = await _db.Books.FindAsync(id);
+                var bookOnDelete = await _db.Products.FindAsync(id);
                 return View(bookOnDelete);
             }
             else return NotFound();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(Book book)
+        public async Task<IActionResult> Delete(Product product)
         {
-            var bookOnDelete = await _db.Books.FindAsync(book.BookId);
-            if (bookOnDelete != null)
+            var productOnDelete = await _db.Products.FindAsync(product.ProductId);
+            if (productOnDelete != null)
             {
-                _db.Books.Remove(bookOnDelete);
+                _db.Products.Remove(productOnDelete);
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Index", "Book");
             }

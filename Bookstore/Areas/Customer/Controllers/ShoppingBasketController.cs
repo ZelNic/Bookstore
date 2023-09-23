@@ -45,7 +45,7 @@ namespace Bookstore.Areas.Customer
             Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
 
 
-            var sb = await _db.Books.Where(u => productIdAndCount.Keys.Contains(u.BookId))
+            var sb = await _db.Products.Where(u => productIdAndCount.Keys.Contains(u.ProductId))
                 .Join(_db.Categories, b => b.Category, c => c.Id, (b, c) => new
                 {
                     image = b.ImageURL,
@@ -53,8 +53,8 @@ namespace Bookstore.Areas.Customer
                     author = b.Author,
                     category = c.Name,
                     price = b.Price,
-                    productId = b.BookId,
-                    count = productIdAndCount[b.BookId],
+                    productId = b.ProductId,
+                    count = productIdAndCount[b.ProductId],
                     isSelect = false
                 }).ToListAsync();
 

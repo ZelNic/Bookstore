@@ -25,7 +25,7 @@ namespace Bookstore.Areas.Admin.Controllers
         {
             CategoryVM categoryVM = new()
             {
-                BookList = await _db.Books.Where(u => u.Category == categoryId).ToListAsync(),
+                BookList = await _db.Products.Where(u => u.Category == categoryId).ToListAsync(),
                 CategoryList = await _db.Categories.ToListAsync()
             };
 

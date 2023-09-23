@@ -56,8 +56,8 @@ namespace Bookstore.Areas.Customer
 
             List<int>? listId = wishList.ProductId.Split('|').Select(int.Parse).ToList();
 
-            var wishListJson = await _db.Books
-                .Where(u => listId.Contains(u.BookId))
+            var wishListJson = await _db.Products
+                .Where(u => listId.Contains(u.ProductId))
                 .Join(_db.Categories, b => b.Category, c => c.Id, (b, c) => new
                 {
                     image = b.ImageURL,
@@ -65,7 +65,7 @@ namespace Bookstore.Areas.Customer
                     author = b.Author,
                     category = c.Name,
                     price = b.Price,
-                    productId = b.BookId
+                    productId = b.ProductId
                 }).ToListAsync();
 
             return Json(new { data = wishListJson });

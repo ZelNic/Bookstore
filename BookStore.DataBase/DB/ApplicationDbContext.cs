@@ -12,7 +12,7 @@ namespace Bookstore.DataAccess
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
-        public DbSet<Book> Books { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<ShoppingBasket> ShoppingBasket { get; set; }
@@ -29,10 +29,10 @@ namespace Bookstore.DataAccess
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Book>().HasData(
-                new Book
+            modelBuilder.Entity<Product>().HasData(
+                new Product
                 {
-                    BookId = 1,
+                    ProductId = 1,
                     Title = "И нас пожирает пламя",
                     Author = "Жауме Кабре",
                     ISBN = "978-5-389-22890-0",

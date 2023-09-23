@@ -1,4 +1,4 @@
-﻿@model Book
+﻿@model Product
 
 <div class="container">
     <div>
@@ -9,66 +9,69 @@
             <img src="@Model.ImageURL" alt="Image" class="rounded rounded-1 col-12" />
         </div>
         <div class="col-3 bg-body-tertiary rounded rounded-1">
-            <form method="post" enctype="multipart/form-data">
-
-                <div>
-                    Author:
-                    <a asp-area="" asp-controller="" asp-action="" asp-route-author=""> @Model.Author</a>
-                </div>
-                <div>
-                    Editor:
-                    <a asp-area="" asp-controller="" asp-action="" asp-route-author=""> Piter</a>
-                </div>
-                <div>
-                    ISBN: @Model.ISBN
-                </div>
-                <div>
-                    Id товара: @Model.BookId
-                </div>
-                <hr class="col-8 mb-1" />
-                <div class="mt-0 pt-0">
-                    <div class="fs-5 fw-bolder">@Model.Price ₽</div>
-                    <button type="submit" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="AddBasket"
-                            asp-route-productId="@Model.BookId" class="btn btn-warning border-0 col-3">Buy
+            <div>
+                Автор: @Model.Author
+            </div>
+            <div>
+                Издательство: Piter
+            </div>
+            <div>
+                ISBN: @Model.ISBN
+            </div>
+            <div>
+                Id товара: @Model.ProductId
+            </div>
+            <hr class="col-8 mt-1 mb-1" />
+            <div>
+                <div id="btnWishList_@Model.ProductId">
+                    <button type="submit" onclick="addToWishlist(event,@Model.ProductId)" class="btn btn-warning border-0 btn bi-heart mt-1 mb-2" style="width: 56px; height: 40px;">
                     </button>
                 </div>
-                <hr class="col-8" />
-                <div>
-                    <i class="bi bi-bookmark-plus-fill"></i>
-                    <button type="submit" asp-area="Customer" asp-controller="Wishlist" asp-action="AddWishList"
-                            asp-route-productId="@Model.BookId" class="btn">
-                        Add to WishList
+                <div id="btnShoppingBasket_@Model.ProductId">
+                    <button type="submit" onclick="addToShoppingBasket(event,@Model.ProductId)"
+                            class="btn btn-success border-0 bi bi-cart" style="width: 56px; height: 40px;">
                     </button>
                 </div>
-
-            </form>
+            </div>
         </div>
         <div class="col-5">
             <div>
-                Рейтинг: 9.6
-                <i class="bi bi-star-fill"></i>
+                Рейтинг: @Model.ProductRating из 10
             </div>
             <div>
-                Оценить:
                 @for (int i = 0; i < 10; i++)
                 {
-                    <i class="bi bi-star"></i>
+                    if (i < Model.ProductRating)
+                    {
+                        <i class="bi bi-star-fill"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-star"></i>
+                    }
                 }
             </div>
-            <div class="">
+            <div>
                 @Html.Raw(Model.Description)
             </div>
         </div>
     </div>
-    <hr />
-    <div class="text-dark ">
-        Oтзывы
-    </div>
-    <hr />
-    <div class="mb-5 pb-5">
-        <div>
-            
-        </div>
-        <hr />        
-    </div>
 </div>
+
+<hr />
+<div class="text-dark ">
+    Oтзывы
+</div>
+<hr />
+<div class="mb-5 pb-5">
+    <div>
+    </div>
+    <hr />
+</div>
+</div>
+
+@section Scripts{
+    <script src="~/js/Customer/ShoppingBasket.js"></script>
+    <script src="~/js/Customer/WishList.js"></script>
+    <script src="~/js/Customer/Details.js"></script>
+                    }

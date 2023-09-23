@@ -3,20 +3,20 @@
     var db = DB;
 }
 
-@model BookVM
+@model ProductVM
 
 <div class="col-2 pb-3 mt-2 pt-3 text-right">
     <a asp-action="Upsert" class="btn btn-warning border-0 form-control">Добавить книгу</a>
 </div>
 
 <div class="">
-    <h5>Всего книг: @db.Books.Count()</h5>
+    <h5>Всего книг: @db.Products.Count()</h5>
 </div>
 
 <div class="container-fluid">
     <div class="row pb-5 mb-5 mb-2">
-        @if (Model.BooksList != null)
-            @foreach (var book in Model.BooksList)
+        @if (Model.ProductsList != null)
+            @foreach (var book in Model.ProductsList)
             {
                 <div class="col-lg-2 col-sm-2">
                     <div class="row p-1 mt-2" style="height: 100%">
@@ -47,7 +47,7 @@
                                     </div>
                                 </div>
                                 <div class="card-footer bg-transparent">
-                                    <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.BookId" class="btn btn-success border-0 form-control">
+                                    <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.ProductId" class="btn btn-success border-0 form-control">
                                         Изменить
                                     </a>
                                 </div>

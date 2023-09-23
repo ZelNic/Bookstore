@@ -2,11 +2,11 @@
 
 namespace Bookstore.Models
 {
-    public class BookVM
+    public class ProductVM
     {
         public User? User { get; set; }
-        public Book? Book { get; set; }
-        public List<Book>? BooksList { get; set; }
+        public Product? Product { get; set; }
+        public List<Product>? ProductsList { get; set; }
         public List<Category>? CategoriesList { get; set; }
         public WishList? WishList { get; set; }
         public ShoppingBasketClient? ShoppingBasket { get; set; }

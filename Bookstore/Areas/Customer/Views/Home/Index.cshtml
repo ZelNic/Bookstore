@@ -1,26 +1,26 @@
-﻿@model BookVM
+﻿@model ProductVM
 
 <div class="container-fluid">
     <div class="row pb-5 mb-5 mb-2">
-        @if (Model.BooksList != null)
-            @foreach (var book in Model.BooksList)
+        @if (Model.ProductsList != null)
+            @foreach (var product in Model.ProductsList)
             {
                 <div class="col-lg-2 col-sm-2">
                     <div class="row p-1 mt-1" style="height: 100%">
                         <div class="col-12">
                             <div class="card card-deck border-0 p-1 shadow mx-auto h-100">
-                                <img src="@book.ImageURL" class="card-img" />
+                                <img src="@product.ImageURL" class="card-img" />
                                 <div class="card-body border-light ">
                                     <div class="card-body mt-auto mt-2">
                                         <div class="">
-                                            <p class="card-title text-black"><b>@book.Title</b></p>
+                                            <p class="card-title text-black"><b>@product.Title</b></p>
                                         </div>
                                         <div class="">
-                                            <p class="card-title text-dark opacity-75"><b>@book.Author</b></p>
+                                            <p class="card-title text-dark opacity-75"><b>@product.Author</b></p>
                                         </div>
                                         @if (Model.CategoriesList != null)
                                         {
-                                            var category = Model.CategoriesList.FirstOrDefault(c => c.Id == book.Category);
+                                            var category = Model.CategoriesList.FirstOrDefault(c => c.Id == product.Category);
                                             if (category != null)
                                             {
                                                 <div class="pl-1">
@@ -29,14 +29,14 @@
                                             }
                                         }
                                         <div class="">
-                                            <p class="text-dark h4 text-center mb-0">@book.Price ₽</p>
+                                            <p class="text-dark h4 text-center mb-0">@product.Price ₽</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <div class="row">
                                         <div style="display: flex; align-items: center;">
-                                            <a asp-controller="Home" asp-action="Details" asp-route-productId="@book.BookId" class="btn" style="width: 56px; height: 40px;">
+                                            <a asp-controller="Home" asp-action="Details" asp-route-productId="@product.ProductId" class="btn" style="width: 56px; height: 40px;">
                                                 <i class="bi bi-three-dots"></i>
                                             </a>
 
@@ -56,16 +56,16 @@
                                                 {
                                                     List<int> productListID = Model.WishList.ProductId.Split('|').Select(int.Parse).ToList();
                                                     <div>
-                                                        <div id="btnWishList_@book.BookId">
-                                                            @if (productListID.Contains(book.BookId))
+                                                        <div id="btnWishList_@product.ProductId">
+                                                            @if (productListID.Contains(product.ProductId))
                                                             {
-                                                                <button type="submit" onclick="removeFromWishlist(event,@book.BookId)"
+                                                                <button type="submit" onclick="removeFromWishlist(event,@product.ProductId)"
                                                                         class="btn btn-outline-danger border-0 bi-heart-fill" style="width: 56px; height: 40px;">
                                                                 </button>
                                                             }
                                                             else
                                                             {
-                                                                <button type="submit" onclick="addToWishlist(event,@book.BookId)"
+                                                                <button type="submit" onclick="addToWishlist(event,@product.ProductId)"
                                                                         class="btn border-0 bi-heart" style="width: 56px; height: 40px;">
                                                                 </button>
                                                             }
@@ -74,8 +74,8 @@
                                                 }
                                                 else
                                                 {
-                                                    <div id="btnWishList_@book.BookId">
-                                                        <button type="submit" onclick="addToWishlist(event,@book.BookId)" class="btn border-0 btn bi-heart" style="width: 56px; height: 40px;">
+                                                    <div id="btnWishList_@product.ProductId">
+                                                        <button type="submit" onclick="addToWishlist(event,@product.ProductId)" class="btn border-0 btn bi-heart" style="width: 56px; height: 40px;">
                                                         </button>
                                                     </div>
                                                 }
@@ -84,8 +84,8 @@
                                                 if (Model.ShoppingBasket != null && Model.ShoppingBasket.ProductIdAndCount != null)
                                                 {
                                                     <div>
-                                                        <div id="btnShoppingBasket_@book.BookId">
-                                                            @if (Model.ShoppingBasket.ProductIdAndCount.ContainsKey(book.BookId))
+                                                        <div id="btnShoppingBasket_@product.ProductId">
+                                                            @if (Model.ShoppingBasket.ProductIdAndCount.ContainsKey(product.ProductId))
                                                             {
                                                                 <a asp-area="Customer" asp-controller="ShoppingBasket" asp-action="Index"
                                                                    class="btn btn-outline-success border-0 bi-cart-check" style="width: 56px; height: 40px;">
@@ -93,7 +93,7 @@
                                                             }
                                                             else
                                                             {
-                                                                <button type="submit" onclick="addToShoppingBasket(event,@book.BookId)"
+                                                                <button type="submit" onclick="addToShoppingBasket(event,@product.ProductId)"
                                                                         class="btn border-0 bi bi-cart" style="width: 56px; height: 40px;">
                                                                 </button>
                                                             }
@@ -102,8 +102,8 @@
                                                 }
                                                 else
                                                 {
-                                                    <div id="btnShoppingBasket_@book.BookId">
-                                                        <button type="submit" onclick="addToShoppingBasket(event,@book.BookId)"
+                                                    <div id="btnShoppingBasket_@product.ProductId">
+                                                        <button type="submit" onclick="addToShoppingBasket(event,@product.ProductId)"
                                                                 class="btn border-0 bi bi-cart" style="width: 56px; height: 50px;">
                                                         </button>
                                                     </div>

@@ -4,6 +4,7 @@ using Bookstore.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bookstore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230923050406_changeDesingBooksTableOnProductTable")]
+    partial class changeDesingBooksTableOnProductTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -294,7 +297,7 @@ namespace Bookstore.Migrations
                             ResponsiblePersonId = 12,
                             ShelfNumber = 1,
                             StockId = 26,
-                            Time = new DateTime(2023, 9, 23, 15, 42, 11, 294, DateTimeKind.Unspecified).AddTicks(9112)
+                            Time = new DateTime(2023, 9, 23, 8, 4, 5, 859, DateTimeKind.Unspecified).AddTicks(6502)
                         });
                 });
 
@@ -440,9 +443,6 @@ namespace Bookstore.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EditorId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ISBN")
                         .HasColumnType("nvarchar(max)");
 
@@ -469,7 +469,6 @@ namespace Bookstore.Migrations
                             Author = "Жауме Кабре",
                             Category = 1,
                             Description = "Человек просыпается неизвестно где - возможно, в больничной палате, но это неточно - и не помнит о себе вообще ничего. \"Зовите меня Измаил\", - предлагает он врачам, которых, за неимением других версий, нарекает Юрием Живаго и мадам Бовари.",
-                            EditorId = 0,
                             ISBN = "978-5-389-22890-0",
                             Price = 417,
                             Title = "И нас пожирает пламя"

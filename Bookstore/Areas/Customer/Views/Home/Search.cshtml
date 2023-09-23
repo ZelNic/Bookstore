@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Book>
+﻿@model IEnumerable<Product>
 
 <div class="container">
     <div class="row">
@@ -31,7 +31,7 @@
                                 </div>
                             </div>
                             <div class="card-footer bg-transparent">
-                                <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.BookId" class="btn btn-success border-0 form-control">
+                                <a asp-controller="Book" asp-action="Upsert" asp-route-bookId="@book.ProductId" class="btn btn-success border-0 form-control">
                                     Details
                                 </a>
                             </div>

@@ -106,7 +106,7 @@
                             <td>@product.ProdId</td>
                             <td>
                                 <a class="" asp-area="Customer" asp-controller="Home" asp-action="Details" asp-route-productId="@product.ProdId">
-                                    @db.Books.Find(product.ProdId).Title
+                                    @db.Products.Find(product.ProdId).Title
                                 </a>
                             </td>
                             <td>@product.Price</td>

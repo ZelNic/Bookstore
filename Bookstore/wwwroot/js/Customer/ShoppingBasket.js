@@ -48,7 +48,7 @@ function getShoppingBasket() {
 
             showBtnSaveChange();
             showTotal();
-            activeSelect();
+            activeSelectBox();
         },
         error: function (error) {
             shoppingBasket.innerHTML = `<h1>${error.responseJSON.error}</h1>`
@@ -98,9 +98,8 @@ function generateCardProduct() {
                                     <div class="row border border-0">
                                         <div class="mx-auto">
                                             <button onclick="changeCountProduct(event, ${key}, 'minus')" type="submit" class="btn bi bi-dash-circle opacity-100"></button> 
-                                            <input onfocus="changeCountProduct(event, ${key}, 'input', document.getElementById('countProduct_${key}').value)" onblur="showTotal()"
-       id="countProduct_${key}"  type="number" min="1" max="50" name="count" value="${dataShoppingBasket[key].count}" required/>
-
+                                            <input onblur="changeCountProduct(event, ${key}, 'input', document.getElementById('countProduct_${key}').value)"
+                                                id="countProduct_${key}"  type="number" min="1" max="50" name="count" value="${dataShoppingBasket[key].count}" required/>
                                             <button onclick="changeCountProduct(event, ${key},'plus')" type="submit" class="btn bi bi-plus-circle opacity-100"></button>   
                                         </div>
                                     </div>
@@ -135,7 +134,7 @@ function showTotal() {
         orderingInformation.innerHTML = `<div>Всего ${countProduct} позиций в вашей корзине.</div><h5>Итого: ${totalPrice} ₽</h5>`;
     }
 }
-function activeSelect(key = null) {
+function activeSelectBox(key = null) {
     if (productArray.length > 0) {
 
         boxSelect.innerHTML = `<div class="mt-5 pt-5">Выбрано ${productArray.length} позиций в вашей корзине.</div>                
@@ -172,7 +171,7 @@ function selectProduct(key, id, isSelect) {
         }
     }
 
-    activeSelect(key);
+    activeSelectBox(key);
 }
 function addToShoppingBasket(event, id) {
     event.preventDefault();
@@ -249,12 +248,12 @@ function changeCountProduct(event, key, operation, count = 1) {
             break;
     }
 
-    indicateCountProduct.setAttribute("value", dataShoppingBasket[key].count);
-    showTotal();
-
     if (!productArray.includes(key)) {
         productArray.push(key);
     }
+
+    indicateCountProduct.setAttribute("value", dataShoppingBasket[key].count);
+    showTotal();
 }
 
 function confirmChangeCount(event) {

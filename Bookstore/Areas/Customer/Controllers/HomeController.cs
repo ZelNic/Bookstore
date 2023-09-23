@@ -33,13 +33,13 @@ namespace Bookstore.Areas.Customer
 
         public async Task<IActionResult> Index()
         {
-            BookVM bookVm = await GetBookVM();
-            return View(bookVm);
+            ProductVM productVM = await GetProductsVM();
+            return View(productVM);
         }
 
-        public async Task<BookVM> GetBookVM()
+        public async Task<ProductVM> GetProductsVM()
         {
-            List<Book>? booksList = await _db.Books.ToListAsync();
+            List<Product>? productsList = await _db.Products.ToListAsync();
             List<Category>? categoriesList = await _db.Categories.ToListAsync();
             WishList? wishLists = null;
             ShoppingBasketClient? shoppingBasketClient = null;
@@ -58,10 +58,10 @@ namespace Bookstore.Areas.Customer
                 }
             }
 
-            BookVM bookVM = new()
+            ProductVM bookVM = new()
             {
                 User = _user,
-                BooksList = booksList,
+                ProductsList = productsList,
                 CategoriesList = categoriesList,
                 WishList = wishLists,
                 ShoppingBasket = shoppingBasketClient
@@ -72,21 +72,21 @@ namespace Bookstore.Areas.Customer
 
         public async Task<IActionResult> Details(int productId)
         {
-            var product = await _db.Books.FindAsync(productId);
+            var product = await _db.Products.FindAsync(productId);
 
             return View(product);
         }
 
-        [HttpPost]
+        
         public async Task<IActionResult> Search(string? searchString)
         {
             if (searchString == null)
             {
                 return RedirectToAction("Index");
             }
-            IEnumerable<Book> books = await _db.Books.Where(book => book.Title.Contains(searchString.ToLower())).ToListAsync();
+            IEnumerable<Product> products = await _db.Products.Where(book => book.Title.Contains(searchString.ToLower())).ToListAsync();
 
-            return View(books);
+            return View(products);
         }
 
         public async Task<IActionResult> Privacy()

@@ -64,7 +64,7 @@ namespace Bookstore.Areas.Stockkeeper
         [HttpPost]
         public async Task<IActionResult> AddProductInStock(int productId, int numberShelf, int productCount)
         {
-            var book = await _db.Books.FindAsync(productId);
+            var book = await _db.Products.FindAsync(productId);
             if (book == null)
             {
                 return BadRequest(new { error = "Такого товара нет в базе. Проверьте правильность введенных данных." });
@@ -160,7 +160,7 @@ namespace Bookstore.Areas.Stockkeeper
         public async Task<IActionResult> GetStock()
         {
             var stockJournal = await _db.StockJournal.Where(u => u.ResponsiblePersonId == _stockkeeper.UserId)
-                .Join(_db.Books, s => s.ProductId, b => b.BookId, (s, b) => new
+                .Join(_db.Products, s => s.ProductId, b => b.ProductId, (s, b) => new
                 {
                     id = s.Id,
                     productId = s.ProductId,
@@ -200,10 +200,10 @@ namespace Bookstore.Areas.Stockkeeper
         [HttpGet]
         public async Task<IActionResult> GetTablePurchaseRequest()
         {
-            var request = await _db.StockJournal.Where(u => u.IsOrder == true).Join(_db.Books, s => s.ProductId, b => b.BookId, (s, b) => new
+            var request = await _db.StockJournal.Where(u => u.IsOrder == true).Join(_db.Products, s => s.ProductId, b => b.ProductId, (s, b) => new
             {
                 ProductId = s.ProductId,
-                TitleProduct = _db.Books.Where(u => u.BookId == s.ProductId).Select(u => u.Title).FirstOrDefault(),
+                TitleProduct = _db.Products.Where(u => u.ProductId == s.ProductId).Select(u => u.Title).FirstOrDefault(),
                 TotalProduct = _db.StockJournal.Where(u => u.IsOrder == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
             }).Distinct().ToListAsync();
 
