@@ -42,7 +42,7 @@ namespace Bookstore.Areas.Customer
                 return BadRequest(new { error = "Пустая корзина" }); ;
             }
 
-            Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket);
+            Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
 
 
             var sb = await _db.Books.Where(u => productIdAndCount.Keys.Contains(u.BookId))
@@ -62,17 +62,17 @@ namespace Bookstore.Areas.Customer
         }
 
 
-        public static Dictionary<int, int> ParseProductData(ShoppingBasket shoppingBasket)
+        public static Dictionary<int, int> ParseProductData(string shoppingBasket)
         {
             List<string> productData = new();
 
-            if (shoppingBasket.ProductIdAndCount.Contains('|') == true)
+            if (shoppingBasket.Contains('|') == true)
             {
-                productData = shoppingBasket.ProductIdAndCount.Split('|').ToList();
+                productData = shoppingBasket.Split('|').ToList();
             }
             else
             {
-                productData.Add(shoppingBasket.ProductIdAndCount);
+                productData.Add(shoppingBasket);
             }
 
             Dictionary<int, int> productIdAndCount = new Dictionary<int, int>();
@@ -112,7 +112,7 @@ namespace Bookstore.Areas.Customer
 
                 if (shoppingBasket != null)
                 {
-                    Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket);
+                    Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
 
                     if (productIdAndCount.ContainsKey(productId))
                     {
@@ -159,7 +159,7 @@ namespace Bookstore.Areas.Customer
 
             List<int> ids = productsId.Split(',').Select(int.Parse).ToList();
 
-            Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket);
+            Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
 
             foreach (int product in ids)
             {
@@ -186,44 +186,26 @@ namespace Bookstore.Areas.Customer
 
 
         [HttpPost]
-        public async Task<IActionResult> ChangeCountProduct(int productId, bool isPlus)
+        public async Task<IActionResult> ChangeCountProduct(string productData)
         {
             ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
 
             if (shoppingBasket == null) { return BadRequest(); }
 
-            Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket);
+            Dictionary<int, int> oldProductIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
 
-            if (productIdAndCount.ContainsKey(productId))
+            Dictionary<int, int> newProductIdAndCount = ParseProductData(productData);
+
+            foreach (var product in newProductIdAndCount)
             {
-                if (productIdAndCount[productId] == 1 && isPlus == false)
+                if (oldProductIdAndCount.ContainsKey(product.Key))
                 {
-                    productIdAndCount.Remove(productId);
+                    oldProductIdAndCount[product.Key] = newProductIdAndCount[product.Key];
                 }
-                else
-                {
-                    if (isPlus == false)
-                    {
-                        productIdAndCount[productId]--;
-                    }
-                    else if (isPlus == true)
-                    {
-                        productIdAndCount[productId]++;
-                    }                    
-                }
-
-                shoppingBasket.ProductIdAndCount = SerializationProductData(productIdAndCount);
-
-                if (string.IsNullOrWhiteSpace(shoppingBasket.ProductIdAndCount))
-                {
-                    _db.ShoppingBasket.Remove(shoppingBasket);
-                }
-                else
-                {
-                    _db.ShoppingBasket.Update(shoppingBasket);
-                }                
             }
 
+            shoppingBasket.ProductIdAndCount = SerializationProductData(oldProductIdAndCount);
+            _db.ShoppingBasket.Update(shoppingBasket);
             await _db.SaveChangesAsync();
 
             return Ok();

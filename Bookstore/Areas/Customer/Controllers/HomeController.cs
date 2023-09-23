@@ -53,7 +53,7 @@ namespace Bookstore.Areas.Customer
                     shoppingBasketClient = new()
                     {
                         Id = sb.UserId,
-                        ProductIdAndCount = ShoppingBasketController.ParseProductData(sb)
+                        ProductIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount)
                     };
                 }
             }
