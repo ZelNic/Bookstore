@@ -1,5 +1,6 @@
 using Bookstore.Areas.Admin;
 using Bookstore.DataAccess;
+using Cassandra;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +12,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -19,7 +19,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddScoped<CustomAuthorizationAttribute>();
+builder.Services.AddScoped<CustomAuthorizationAttribute>();//добавить кастомную
 
 var app = builder.Build();
 

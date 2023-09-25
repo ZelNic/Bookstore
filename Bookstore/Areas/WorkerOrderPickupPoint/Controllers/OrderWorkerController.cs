@@ -5,6 +5,7 @@ using Bookstore.Models.SD;
 using Bookstore.Models.ViewModel;
 using Bookstore.Utility;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Areas.WorkerOrderPickupPoint
 {
@@ -56,15 +57,15 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
         }
 
         [HttpPost]
-        public IActionResult Order(int searchOrderId, string operation)
+        public async Task<IActionResult> Order(int searchOrderId, string operation)
         {
             OrderVM orderVM = new()
             {
-                Order = _db.Order.Find(searchOrderId),
+                Order = await _db.Order.Where(u=>u.OrderId==searchOrderId).FirstOrDefaultAsync(),
                 OperationName = operation
             };
 
-            if (orderVM.Order == null)
+            if (orderVM.Orders == null)
             {
                 return NotFound(SD.NotFoundUser);
             }

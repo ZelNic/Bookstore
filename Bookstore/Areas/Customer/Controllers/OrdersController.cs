@@ -32,7 +32,7 @@ namespace Bookstore.Areas.Customer
         {
             OrderVM orderVM = new()
             {
-                OrderData = await _db.Order.Where(u => u.UserId == _user.UserId).ToListAsync(),
+                Orders = await _db.Order.Where(u => u.UserId == _user.UserId).ToListAsync(),
             };
             return View(orderVM);
         }

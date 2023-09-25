@@ -124,8 +124,7 @@ function showBtnSaveChange() {
     }
 }
 function showTotal() {
-
-    checkout.innerHTML = `<form method="post"><button type="submit" class="btn btn-success bi bi-bag-fill">Оформить заказ</button></form>`;
+    checkout.innerHTML = `<button type="submit" onclick="doCheckout()" class="btn btn-success bi bi-bag-fill">Оформить заказ</button>`;
 
     if (countProduct == 1) {
         orderingInformation.innerHTML = `<div>В вашей корзине ${countProduct} позиция</div><h5>Итого: ${totalPrice} ₽</h5>`;
@@ -134,6 +133,21 @@ function showTotal() {
         orderingInformation.innerHTML = `<div>Всего ${countProduct} позиций в вашей корзине.</div><h5>Итого: ${totalPrice} ₽</h5>`;
     }
 }
+
+function doCheckout() {
+    console.log("I am here")
+    $.ajax({
+        url: '/Purchase/Purchase/FillRecipientDate' + "?purchaseАmount=" + totalPrice,
+        type: 'POST',
+        data: totalPrice,
+        success: function (response) {
+
+        },
+        error: function (error) {
+        }
+    });
+}
+
 function activeSelectBox(key = null) {
     if (productArray.length > 0) {
 
@@ -259,8 +273,6 @@ function changeCountProduct(event, key, operation, count = 1) {
 function confirmChangeCount(event) {
     event.preventDefault();
 
-    console.log(dataShoppingBasket);
-
     var productData = "";
 
     for (var i = 0; i < productArray.length; i++) {
@@ -269,8 +281,6 @@ function confirmChangeCount(event) {
             productData += '|';
         }
     }
-
-    console.log(productData);
 
     $.ajax({
         url: '/Customer/ShoppingBasket/ChangeCountProduct?productData=' + `${productData}`,
