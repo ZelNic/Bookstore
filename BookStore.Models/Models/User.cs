@@ -24,7 +24,7 @@ namespace Bookstore.Models
         public string? Region { get; set; }
         public string? City { get; set; }
         public string? Street { get; set; }
-        public int HouseNumber { get; set; }
+        public string? HouseNumber { get; set; }
         [DataType(DataType.PhoneNumber)]
         [Required]
         public string? PhoneNumber { get; set; }

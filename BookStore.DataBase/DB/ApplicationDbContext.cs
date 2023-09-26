@@ -63,7 +63,7 @@ namespace Bookstore.DataAccess
                     Region = "KMAO",
                     City = "Surgut",
                     Street = "Lenina",
-                    HouseNumber = 30,
+                    HouseNumber = "30",
                     PhoneNumber = "89226578108"
                 }
             );

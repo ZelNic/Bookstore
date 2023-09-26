@@ -129,7 +129,7 @@ namespace Bookstore.Migrations
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ConfirmationСode")
+                    b.Property<int>("ConfirmationCode")
                         .HasColumnType("int");
 
                     b.Property<string>("CurrentPosition")
@@ -156,10 +156,10 @@ namespace Bookstore.Migrations
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ReceiverName")
+                    b.Property<string>("ReceiverLastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RecipientsLastName")
+                    b.Property<string>("ReceiverName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Region")
@@ -185,7 +185,7 @@ namespace Bookstore.Migrations
                         new
                         {
                             OrderId = 1,
-                            ConfirmationСode = 0,
+                            ConfirmationCode = 0,
                             CurrentPosition = "Moskow",
                             OrderStatus = "Возмещено",
                             ProductData = "test",
@@ -294,7 +294,7 @@ namespace Bookstore.Migrations
                             ResponsiblePersonId = 12,
                             ShelfNumber = 1,
                             StockId = 26,
-                            Time = new DateTime(2023, 9, 23, 15, 42, 11, 294, DateTimeKind.Unspecified).AddTicks(9112)
+                            Time = new DateTime(2023, 9, 26, 12, 27, 34, 95, DateTimeKind.Unspecified).AddTicks(4057)
                         });
                 });
 
@@ -499,8 +499,8 @@ namespace Bookstore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("HouseNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("HouseNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -535,7 +535,7 @@ namespace Bookstore.Migrations
                             DateofBirth = "2018-10-25",
                             Email = "ninileo55555@gmail.com",
                             FirstName = "Nick",
-                            HouseNumber = 30,
+                            HouseNumber = "30",
                             LastName = "Zel",
                             Password = "admin",
                             PersonalWallet = 0,

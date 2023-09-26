@@ -9,7 +9,7 @@ namespace Bookstore.Models.Models
         [Required]
         public int UserId { get; set; }
         public string? ReceiverName { get; set; }
-        public string? RecipientsLastName { get; set; }
+        public string? ReceiverLastName { get; set; }
         public string? ProductData { get; set; }
         [DataType(DataType.DateTime)] public DateTime PurchaseDate { get; set; }
         public int PurchaseAmount { get; set; }
@@ -23,6 +23,6 @@ namespace Bookstore.Models.Models
         public string? Street { get; set; }
         public string? HouseNumber { get; set; }
         [DataType(DataType.PhoneNumber)] public string? PhoneNumber { get; set; }
-        public int ConfirmationСode { get; set; }
+        public int ConfirmationCode { get; set; }
     }
 }

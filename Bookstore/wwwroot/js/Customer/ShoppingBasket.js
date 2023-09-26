@@ -124,7 +124,7 @@ function showBtnSaveChange() {
     }
 }
 function showTotal() {
-    checkout.innerHTML = `<button type="submit" onclick="doCheckout()" class="btn btn-success bi bi-bag-fill">Оформить заказ</button>`;
+    checkout.innerHTML = `<button onclick="doCheckout()" class="btn btn-success bi bi-bag-fill" type="submit"> Оформить</button>`;
 
     if (countProduct == 1) {
         orderingInformation.innerHTML = `<div>В вашей корзине ${countProduct} позиция</div><h5>Итого: ${totalPrice} ₽</h5>`;
@@ -135,16 +135,15 @@ function showTotal() {
 }
 
 function doCheckout() {
-    console.log("I am here")
     $.ajax({
-        url: '/Purchase/Purchase/FillRecipientDate' + "?purchaseАmount=" + totalPrice,
-        type: 'POST',
-        data: totalPrice,
+        url: '/Purchase/Purchase/FillRecipientDate',
+        type: 'GET',
         success: function (response) {
-
+            window.location.href = '/Purchase/Purchase/FillRecipientDate';
         },
         error: function (error) {
-        }
+            console.log(error.responseJSON.error);
+        }    
     });
 }
 
@@ -217,8 +216,6 @@ function removeFromShoppingBasket(event, productId) {
         }
     });
 }
-
-
 
 function changeCountProduct(event, key, operation, count = 1) {
 

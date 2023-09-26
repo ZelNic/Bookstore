@@ -133,7 +133,7 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
                 Text = NotificationSD.IssueCode + ' ' + confirmationСode + ' ' + "Скажите его оператору для выдачи заказа."
             };
 
-            order.ConfirmationСode = confirmationСode;
+            order.ConfirmationCode = confirmationСode;
 
             _db.Order.Update(order);
             _db.Notifications.Add(notification);
@@ -149,9 +149,9 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
                 return false;
             }
 
-            if (order.ConfirmationСode == confirmationCode)
+            if (order.ConfirmationCode == confirmationCode)
             {
-                order.ConfirmationСode = 0;
+                order.ConfirmationCode = 0;
                 order.OrderStatus = SD.StatusDelivered_4;
                 _db.Order.Update(order);
                 _db.SaveChanges();

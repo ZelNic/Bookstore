@@ -1,7 +1,13 @@
-﻿using Bookstore.DataAccess;
+﻿using Bookstore.Areas.Customer;
+using Bookstore.DataAccess;
 using Bookstore.Models;
 using Bookstore.Models.Models;
+using Bookstore.Models.SD;
+using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Vml;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Areas.Purchase
 {
@@ -27,29 +33,68 @@ namespace Bookstore.Areas.Purchase
             }
         }
 
-        [HttpPost]
-        public IActionResult FillRecipientDate(int purchaseАmount)
+        [HttpGet]
+        public async Task<IActionResult> GetInfomationAboutBuyer()
         {
-            if (purchaseАmount == 0)
-            {
-                return RedirectToAction("Index", "ShoppingBasket", new { area = "Customer" });
-            }
-
             Order order = new()
             {
                 UserId = _user.UserId,
-                PurchaseAmount = purchaseАmount,
+                ReceiverName = _user.FirstName,
+                ReceiverLastName = _user.LastName,
+                OrderStatus = SD.StatusPending_0,
+                DeliveryAddress = $"{ _user.City}, {_user.Street} {_user.HouseNumber}",
+                Region = _user.Region,
+                City = _user.City,
+                Street = _user.Street,
+                HouseNumber = _user.HouseNumber,
+                PhoneNumber = _user.PhoneNumber,                
             };
 
-            return View(order);
+            return Json(new { data = order });
         }
 
-        [HttpPost]
-        public IActionResult FillDeliveryDate(Order orderData)
+        [HttpGet]
+        public async Task<IActionResult> GetInfomationDelivery()
         {
 
 
-            return View(orderData);
+            
+            return Json(new { data = "@"  });
+        }
+
+
+        public async Task<IActionResult> GetVerifiedProductData()
+        {
+            ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+            if (shoppingBasket == null) { return BadRequest(new { error = $"Корзина пользовтеля {_user.UserId} не найден." }); }
+
+            Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(shoppingBasket.ProductIdAndCount);
+
+            var purchaseData = await _db.Products.Where(u => productIdAndCount.Keys.Contains(u.ProductId))
+                .Join(_db.Products, b => b.ProductId, c => c.ProductId, (b, c) => new
+                {
+                    price = b.Price,
+                    productId = b.ProductId,
+                    count = productIdAndCount[b.ProductId]
+                }).ToArrayAsync();
+
+
+            int total = purchaseData.Sum(product => product.count * product.price);
+
+            return Json(new { purchaseData, total });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FillRecipientDate()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult FillDeliveryDate(string buyerData)
+        {
+
+            return View();
         }
 
 
