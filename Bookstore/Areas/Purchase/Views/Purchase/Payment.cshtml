@@ -1,21 +1,10 @@
-﻿@model Order
+﻿
 
 
 <div class="row justify-content-center">
     <div class="col-sm-8 col-md-6 col-lg-4">
         <h1 class="text-center">Payment</h1>
-        <form method="post" enctype="multipart/form-data asp-area="Purchase" asp-controller="Payment">
-            
-            <input asp-for="UserId" hidden />
-            <input asp-for="PurchaseAmount" hidden />
-            <input asp-for="ReceiverName" hidden />
-            <input asp-for="ReceiverLastName" hidden />
-            <input asp-for="PhoneNumber" hidden />
-            <input asp-for="isCourierDelivery" hidden />
-            <input asp-for="City" hidden />
-            <input asp-for="Street" hidden />
-            <input asp-for="HouseNumber" hidden />
-
+        <form method="post" enctype="multipart/form-data asp-area="Purchase" asp-controller="Payment">           
             <div class="form-group">
                 <label for="cardNumber">Номер карты</label>
                 <input type="number" class="form-control" id="cardNumber" name="CardNumber" required>

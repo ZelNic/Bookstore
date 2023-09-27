@@ -76,7 +76,7 @@ namespace Bookstore.DataAccess
                     ProductData = "test",
                     PurchaseDate = new DateTime(),
                     PurchaseAmount = 1,
-                    isCourierDelivery = false,
+                    IsCourierDelivery = false,
                     OrderStatus = SD.StatusRefunded_6,
                     CurrentPosition = "Moskow",
                     TravelHistory = "SPB,Moskow"

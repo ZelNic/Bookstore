@@ -141,6 +141,12 @@ namespace Bookstore.Migrations
                     b.Property<string>("HouseNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsCourierDelivery")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OrderPickupPointId")
+                        .HasColumnType("int");
+
                     b.Property<string>("OrderStatus")
                         .HasColumnType("nvarchar(max)");
 
@@ -174,9 +180,6 @@ namespace Bookstore.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("isCourierDelivery")
-                        .HasColumnType("bit");
-
                     b.HasKey("OrderId");
 
                     b.ToTable("Order");
@@ -187,13 +190,14 @@ namespace Bookstore.Migrations
                             OrderId = 1,
                             ConfirmationCode = 0,
                             CurrentPosition = "Moskow",
+                            IsCourierDelivery = false,
+                            OrderPickupPointId = 0,
                             OrderStatus = "Возмещено",
                             ProductData = "test",
                             PurchaseAmount = 1,
                             PurchaseDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             TravelHistory = "SPB,Moskow",
-                            UserId = 1,
-                            isCourierDelivery = false
+                            UserId = 1
                         });
                 });
 
@@ -294,7 +298,7 @@ namespace Bookstore.Migrations
                             ResponsiblePersonId = 12,
                             ShelfNumber = 1,
                             StockId = 26,
-                            Time = new DateTime(2023, 9, 26, 12, 27, 34, 95, DateTimeKind.Unspecified).AddTicks(4057)
+                            Time = new DateTime(2023, 9, 27, 7, 58, 53, 553, DateTimeKind.Unspecified).AddTicks(2696)
                         });
                 });
 

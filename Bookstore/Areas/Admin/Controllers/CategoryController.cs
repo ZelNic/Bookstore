@@ -36,7 +36,7 @@ namespace Bookstore.Areas.Admin.Controllers
         {
             if (categoryId == 0 || categoryId == null)
             {
-                Category category = new Category();
+                Category category = new ();
 
                 return View(category);
             }
@@ -52,7 +52,6 @@ namespace Bookstore.Areas.Admin.Controllers
             if (category.Id == 0)
             {
                 _db.Add(category);
-
             }
             else
             {

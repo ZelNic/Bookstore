@@ -136,10 +136,10 @@ function showTotal() {
 
 function doCheckout() {
     $.ajax({
-        url: '/Purchase/Purchase/FillRecipientDate',
+        url: '/Purchase/Purchase/FillDeliveryDate',
         type: 'GET',
         success: function (response) {
-            window.location.href = '/Purchase/Purchase/FillRecipientDate';
+            window.location.href = '/Purchase/Purchase/FillDeliveryDate';
         },
         error: function (error) {
             console.log(error.responseJSON.error);

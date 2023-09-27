@@ -3,11 +3,12 @@ using Bookstore.DataAccess;
 using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
-using DocumentFormat.OpenXml.EMMA;
-using DocumentFormat.OpenXml.Spreadsheet;
+using Bookstore.Utility;
 using DocumentFormat.OpenXml.Vml;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
+using Newtonsoft.Json;
 
 namespace Bookstore.Areas.Purchase
 {
@@ -42,12 +43,12 @@ namespace Bookstore.Areas.Purchase
                 ReceiverName = _user.FirstName,
                 ReceiverLastName = _user.LastName,
                 OrderStatus = SD.StatusPending_0,
-                DeliveryAddress = $"{ _user.City}, {_user.Street} {_user.HouseNumber}",
+                DeliveryAddress = $"{_user.City}, {_user.Street} {_user.HouseNumber}",
                 Region = _user.Region,
                 City = _user.City,
                 Street = _user.Street,
                 HouseNumber = _user.HouseNumber,
-                PhoneNumber = _user.PhoneNumber,                
+                PhoneNumber = _user.PhoneNumber,
             };
 
             return Json(new { data = order });
@@ -57,62 +58,86 @@ namespace Bookstore.Areas.Purchase
         public async Task<IActionResult> GetInfomationDelivery()
         {
 
-
-            
-            return Json(new { data = "@"  });
+            return Json(new { data = "@" });
         }
 
 
-        public async Task<IActionResult> GetVerifiedProductData()
+        public async Task<List<PurchaseData>> GetVerifiedProductData()
         {
             ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
-            if (shoppingBasket == null) { return BadRequest(new { error = $"Корзина пользовтеля {_user.UserId} не найден." }); }
+            if (shoppingBasket == null) { return null; }
 
             Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(shoppingBasket.ProductIdAndCount);
 
-            var purchaseData = await _db.Products.Where(u => productIdAndCount.Keys.Contains(u.ProductId))
-                .Join(_db.Products, b => b.ProductId, c => c.ProductId, (b, c) => new
+            List<PurchaseData> purchaseData = await _db.Products
+                .Where(u => productIdAndCount.Keys.Contains(u.ProductId))
+                .Select(p => new PurchaseData
                 {
-                    price = b.Price,
-                    productId = b.ProductId,
-                    count = productIdAndCount[b.ProductId]
-                }).ToArrayAsync();
+                    Price = p.Price,
+                    ProductId = p.ProductId,
+                    Count = productIdAndCount[p.ProductId]
+                }).ToListAsync();
 
-
-            int total = purchaseData.Sum(product => product.count * product.price);
-
-            return Json(new { purchaseData, total });
+            return purchaseData;
         }
 
         [HttpGet]
-        public async Task<IActionResult> FillRecipientDate()
+        public async Task<IActionResult> FillDeliveryDate()
         {
             return View();
         }
 
-        [HttpPost]
-        public IActionResult FillDeliveryDate(string buyerData)
+        [HttpGet]
+        public async Task<IActionResult> GetPersonalWalletAndPurchaseAmount()
         {
-
-            return View();
+            int sumOnWallet = _user.PersonalWallet;
+            List<PurchaseData> purchaseData = await GetVerifiedProductData();
+            int purchaseAmount = purchaseData.Sum(product => product.Count * product.Price);
+            var data = new
+            {
+                sumOnWallet,
+                purchaseAmount
+            };
+            return Json(new { data });
         }
 
+        //***********************************************************************ONLY DURING DEVELOPMENT***********************************************************************
 
         [HttpPost]
-        public async Task<IActionResult> Payment(Order orderData)
+        public async Task<IActionResult> AddMoneyOnWallet(int sum)
         {
-            if (_user.PersonalWallet >= orderData.PurchaseAmount)
+            _user.PersonalWallet += sum;
+            _db.User.Update(_user);
+            await _db.SaveChangesAsync();
+            return Ok();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Payment(string dataDelivery)
+        {
+            Order? order = JsonConvert.DeserializeObject<Order>(dataDelivery);
+            if (order == null) { return BadRequest(new { error = "Ошибка в отправленных данных." }); }
+
+            List<PurchaseData> purchaseData = await GetVerifiedProductData();
+            int confirmedPrice = purchaseData.Sum(product => product.Count * product.Price);
+            if (confirmedPrice != order.PurchaseAmount)
+            {
+                return BadRequest(new { error = "Ошибочная стоимость заказа." });
+            }
+
+
+            if (_user.PersonalWallet >= order.PurchaseAmount)
             {
                 User? admin = await _db.User.FindAsync(1);
                 if (admin != null)
                 {
-                    _user.PersonalWallet -= orderData.PurchaseAmount;
-                    admin.PersonalWallet += orderData.PurchaseAmount;
+                    _user.PersonalWallet -= order.PurchaseAmount;
+                    admin.PersonalWallet += order.PurchaseAmount;
 
                     _db.User.UpdateRange(_user, admin);
+                    await _db.Order.AddAsync(order);
                     await _db.SaveChangesAsync();
-
-                    return View(orderData);
+                    FundsVerification(order);
+                    return Ok();
                 }
                 else
                 {
@@ -126,36 +151,39 @@ namespace Bookstore.Areas.Purchase
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> FundsVerification(Order orderData)
-        //{
+        [HttpPost]
+        public async Task<IActionResult> FundsVerification(Order orderData)
+        {
 
-        //    var sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).ToListAsync();
+            ShoppingBasket sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+
+            Dictionary<int, int> ProductIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount);
 
 
-        //    IEnumerable<ProductData> productData = await _db.ShoppingBasket
-        //        .Where(sb => sb.UserId == _user.UserId)
-        //        .Join(_db.Books, sb => sb.ProductId, b => b.BookId, (sb, b) => new { sb, b })
-        //        .Select(x => new ProductData
-        //        {
-        //            ProdId = x.sb.ProductId,
-        //            Price = x.b.Price,
-        //            Count = x.sb.CountProduct
-        //        }).ToListAsync();
 
-        //    string prodDataJson = JsonConvert.SerializeObject(productData);
+            var productData = await _db.ShoppingBa
+                           .Where(sb => sb.UserId == _user.UserId)
+                           .Join(_db.Products, sb => sb.ProductIdAndCount, b => b.ProductId, (sb, b) => new { sb, b })
+                           .Select(x => new ProductData
+                           {
+                               ProdId = x.sb.ProductId,
+                               Price = x.b.Price,
+                               Count = x.sb.CountProduct
+                           }).ToListAsync();
 
-        //    orderData.ProductData = prodDataJson;
-        //    orderData.OrderStatus = SD.StatusPending_0;
-        //    orderData.DeliveryAddress += orderData.City + ',' + orderData.Street + ' ' + orderData.HouseNumber;
-        //    orderData.PurchaseDate = MoscowTime.GetTime();
+            string prodDataJson = JsonConvert.SerializeObject(productData);
 
-        //    _db.ShoppingBasket.RemoveRange(sb);
+            orderData.ProductData = prodDataJson;
+            orderData.OrderStatus = SD.StatusPending_0;
+            orderData.DeliveryAddress += orderData.City + ',' + orderData.Street + ' ' + orderData.HouseNumber;
+            orderData.PurchaseDate = MoscowTime.GetTime();
 
-        //    await _db.Order.AddAsync(orderData);
+            _db.ShoppingBasket.RemoveRange(sb);
 
-        //    await _db.SaveChangesAsync();
-        //    return RedirectToAction("Index", "Orders", new { area = "Customer" });
-        //}
+            await _db.Order.AddAsync(orderData);
+
+            await _db.SaveChangesAsync();
+            return RedirectToAction("Index", "Orders", new { area = "Customer" });
+        }
     }
 }
