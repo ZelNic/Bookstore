@@ -112,16 +112,36 @@ function makePayment() {
             if (result.isConfirmed) {
                 orderData.purchaseAmount = personalWalletAndPurchaseAmount.purchaseAmount;
                 var orderD = JSON.stringify(orderData);
-                
+
                 $.ajax({
                     url: '/Purchase/Purchase/Payment?dataDelivery=' + orderD,
                     type: 'POST',
-                    dataType: 'json',
                     success: function (response) {
-                        Swal.fire('Оплата прошла успешно');
+
+                        let timerInterval
+                        Swal.fire({
+                            title: 'Оплата прошла успешно',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            didOpen: () => {
+                                Swal.showLoading()
+                                const b = Swal.getHtmlContainer().querySelector('b')
+                                timerInterval = setInterval(() => {
+                                    b.textContent = Swal.getTimerLeft()
+                                }, 100)
+                            },
+                            willClose: () => {
+                                clearInterval(timerInterval)
+                            }
+                        }).then((result) => {
+
+                            if (result.dismiss === Swal.DismissReason.timer) {
+                                window.location.href = '/Customer/Orders/Index';
+                            }
+                        })
                     },
                     error: function (error) {
-                        Swal.fire('Оплата не прошла');
+                        Swal.fire(error.responseJSON.error);
                     }
                 });
             } else if (result.isDenied) {
@@ -136,7 +156,6 @@ function makePayment() {
                     }
                 });
             } else {
-                // Логика для кнопки "Отмена операции"
                 console.log('Отмена операции');
             }
         });

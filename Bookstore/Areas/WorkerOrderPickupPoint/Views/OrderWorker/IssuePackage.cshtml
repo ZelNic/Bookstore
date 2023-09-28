@@ -31,8 +31,8 @@
             </div>
 
             @{
-                IEnumerable<ProductData>
-                productsData = JsonConvert.DeserializeObject<IEnumerable<ProductData>>(@Model.Order.ProductData);
+                IEnumerable<OrderProductData>
+                productsData = JsonConvert.DeserializeObject<IEnumerable<OrderProductData>>(@Model.Order.ProductData);
             }
             @{
                 int countProduct = 0;
@@ -48,14 +48,14 @@
                         <th scope="col">Количество</th>
                     </tr>
                 </thead>
-                @foreach (ProductData product in productsData)
+                @foreach (OrderProductData product in productsData)
                 {
                     <tbody class="table-group-divider">
                         <tr>
-                            <td>@product.ProdId</td>
+                            <td>@product.Id</td>
                             <td>
-                                <a class="" asp-area="Customer" asp-controller="Home" asp-action="Details" asp-route-productId="@product.ProdId">
-                                    @db.Products.Find(product.ProdId).Title
+                                <a class="" asp-area="Customer" asp-controller="Home" asp-action="Details" asp-route-productId="@product.Id">
+                                    @db.Products.Find(product.Id).Title
                                 </a>
                             </td>
                             <td>@product.Price</td>
@@ -83,7 +83,7 @@
                     <label> Курьером</label>
                     <div class="form-group">
                         Адрес доставки:
-                        @Model.Order.DeliveryAddress
+                        @Model.Order.City @Model.Order.Street @Model.Order.HouseNumber
                     </div>
                 }
                 else

@@ -15,7 +15,6 @@ namespace Bookstore.Models.Models
         public int PurchaseAmount { get; set; }
         public string? OrderStatus { get; set; }
         public string? CurrentPosition { get; set; }
-        public string? DeliveryAddress { get; set; } 
         public string? TravelHistory { get; set; } 
         public bool IsCourierDelivery { get; set; }
         public int OrderPickupPointId { get; set; }

@@ -1,8 +1,9 @@
 ﻿using Bookstore.DataAccess;
 using Bookstore.Models;
-using Bookstore.Models.ViewModel;
+using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Bookstore.Areas.Customer
 {
@@ -28,13 +29,36 @@ namespace Bookstore.Areas.Customer
             }
         }
 
+
         public async Task<IActionResult> Index()
         {
-            OrderVM orderVM = new()
+            Order [] orders = await _db.Order.Where(u => u.UserId == _user.UserId).ToArrayAsync();
+            
+
+            var formatedOrders = orders.Select(o => new {
+                o.OrderId,
+                o.UserId,
+                o.ReceiverName,
+                o.ReceiverLastName,
+                ProductData = JsonConvert.DeserializeObject<IEnumerable<OrderProductData>>(o.ProductData),
+                o.PurchaseDate,
+                o.PurchaseAmount,
+            }).ToArray();
+
+
+
+            foreach (var order in formatedOrders)
             {
-                Orders = await _db.Order.Where(u => u.UserId == _user.UserId).ToListAsync(),
-            };
-            return View(orderVM);
+                IEnumerable<OrderProductData> orderProductData = order.ProductData;
+                foreach (var productData in orderProductData)
+                {
+                    
+                }
+            }
+
+
+
+            return Json(formatedOrders);
         }
     }
 }

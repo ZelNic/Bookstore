@@ -42,12 +42,12 @@ function EnterConfirmationCode(url) {
                         resolve(response);
                     },
                     error: function (error) {
-                        reject(error); // Промис завершился с ошибкой
+                        reject(error); 
                     }
                 });
             });
         } else {
-            return; // Вернуть пустое значение, если кнопка отмены была нажата
+            return; 
         }
     }).then((response) => {
         if (response) {

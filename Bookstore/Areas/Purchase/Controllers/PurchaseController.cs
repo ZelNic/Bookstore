@@ -4,10 +4,8 @@ using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Bookstore.Utility;
-using DocumentFormat.OpenXml.Vml;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
 using Newtonsoft.Json;
 
 namespace Bookstore.Areas.Purchase
@@ -43,7 +41,6 @@ namespace Bookstore.Areas.Purchase
                 ReceiverName = _user.FirstName,
                 ReceiverLastName = _user.LastName,
                 OrderStatus = SD.StatusPending_0,
-                DeliveryAddress = $"{_user.City}, {_user.Street} {_user.HouseNumber}",
                 Region = _user.Region,
                 City = _user.City,
                 Street = _user.Street,
@@ -54,27 +51,20 @@ namespace Bookstore.Areas.Purchase
             return Json(new { data = order });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetInfomationDelivery()
-        {
 
-            return Json(new { data = "@" });
-        }
-
-
-        public async Task<List<PurchaseData>> GetVerifiedProductData()
+        public async Task<List<OrderProductData>> GetVerifiedProductData()
         {
             ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
             if (shoppingBasket == null) { return null; }
 
             Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(shoppingBasket.ProductIdAndCount);
 
-            List<PurchaseData> purchaseData = await _db.Products
+            List<OrderProductData> purchaseData = await _db.Products
                 .Where(u => productIdAndCount.Keys.Contains(u.ProductId))
-                .Select(p => new PurchaseData
+                .Select(p => new OrderProductData
                 {
+                    Id = p.ProductId,
                     Price = p.Price,
-                    ProductId = p.ProductId,
                     Count = productIdAndCount[p.ProductId]
                 }).ToListAsync();
 
@@ -91,7 +81,7 @@ namespace Bookstore.Areas.Purchase
         public async Task<IActionResult> GetPersonalWalletAndPurchaseAmount()
         {
             int sumOnWallet = _user.PersonalWallet;
-            List<PurchaseData> purchaseData = await GetVerifiedProductData();
+            List<OrderProductData> purchaseData = await GetVerifiedProductData();
             int purchaseAmount = purchaseData.Sum(product => product.Count * product.Price);
             var data = new
             {
@@ -111,18 +101,27 @@ namespace Bookstore.Areas.Purchase
             await _db.SaveChangesAsync();
             return Ok();
         }
+
+
         [HttpPost]
         public async Task<IActionResult> Payment(string dataDelivery)
         {
             Order? order = JsonConvert.DeserializeObject<Order>(dataDelivery);
             if (order == null) { return BadRequest(new { error = "Ошибка в отправленных данных." }); }
 
-            List<PurchaseData> purchaseData = await GetVerifiedProductData();
+            List<OrderProductData> purchaseData = await GetVerifiedProductData();
             int confirmedPrice = purchaseData.Sum(product => product.Count * product.Price);
-            if (confirmedPrice != order.PurchaseAmount)
-            {
-                return BadRequest(new { error = "Ошибочная стоимость заказа." });
-            }
+            if (confirmedPrice != order.PurchaseAmount) { return BadRequest(new { error = "Ошибочная стоимость заказа." }); }
+
+            ShoppingBasket? sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
+
+            if (sb == null) { return BadRequest(new { error = "Запись о списке покупок не найдена." }); }
+
+            Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount);
+
+
+            List<OrderProductData> productData = await GetVerifiedProductData();
+            string prodDataJson = JsonConvert.SerializeObject(productData);
 
 
             if (_user.PersonalWallet >= order.PurchaseAmount)
@@ -130,60 +129,30 @@ namespace Bookstore.Areas.Purchase
                 User? admin = await _db.User.FindAsync(1);
                 if (admin != null)
                 {
+                    order.ProductData = prodDataJson;
+                    order.OrderStatus = SD.StatusApproved_1;
+                    order.PurchaseDate = MoscowTime.GetTime();
+
+
                     _user.PersonalWallet -= order.PurchaseAmount;
                     admin.PersonalWallet += order.PurchaseAmount;
 
+                    _db.ShoppingBasket.Remove(sb);
                     _db.User.UpdateRange(_user, admin);
                     await _db.Order.AddAsync(order);
                     await _db.SaveChangesAsync();
-                    FundsVerification(order);
+
                     return Ok();
                 }
                 else
                 {
-                    return NotFound("Технические проблемы.");
+                    return BadRequest(new { error = "Технические проблемы со стороны магазина." });
                 }
             }
             else
             {
-                return NotFound("Не хватает средств.");
+                return BadRequest(new { error = "Не хватает средств." });
             }
-        }
-
-
-        [HttpPost]
-        public async Task<IActionResult> FundsVerification(Order orderData)
-        {
-
-            ShoppingBasket sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
-
-            Dictionary<int, int> ProductIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount);
-
-
-
-            var productData = await _db.ShoppingBa
-                           .Where(sb => sb.UserId == _user.UserId)
-                           .Join(_db.Products, sb => sb.ProductIdAndCount, b => b.ProductId, (sb, b) => new { sb, b })
-                           .Select(x => new ProductData
-                           {
-                               ProdId = x.sb.ProductId,
-                               Price = x.b.Price,
-                               Count = x.sb.CountProduct
-                           }).ToListAsync();
-
-            string prodDataJson = JsonConvert.SerializeObject(productData);
-
-            orderData.ProductData = prodDataJson;
-            orderData.OrderStatus = SD.StatusPending_0;
-            orderData.DeliveryAddress += orderData.City + ',' + orderData.Street + ' ' + orderData.HouseNumber;
-            orderData.PurchaseDate = MoscowTime.GetTime();
-
-            _db.ShoppingBasket.RemoveRange(sb);
-
-            await _db.Order.AddAsync(orderData);
-
-            await _db.SaveChangesAsync();
-            return RedirectToAction("Index", "Orders", new { area = "Customer" });
         }
     }
 }

@@ -1,9 +1,4 @@
-﻿@model OrderVM
-@inject ApplicationDbContext DB
-@{
-    var db = DB;
-}
-
+﻿
 
 <h1>Заказы</h1>
 <div class="container">
@@ -28,8 +23,8 @@
                 </div>
 
                 @{
-                    IEnumerable<ProductData>
-                    productsData = JsonConvert.DeserializeObject<IEnumerable<ProductData>>(order.ProductData);
+                    IEnumerable<OrderProductData>
+                    productsData = JsonConvert.DeserializeObject<IEnumerable<OrderProductData>>(order.ProductData);
                 }
                 @{
                     int countProduct = 0;
@@ -45,15 +40,13 @@
                             <th scope="col">Количество</th>
                         </tr>
                     </thead>
-                    @foreach (ProductData product in productsData)
+                    @foreach (OrderProductData product in productsData)
                     {
                         <tbody class="table-group-divider">
                             <tr>
-                                <td>@product.ProdId</td>
+                                <td>@product.Id</td>
                                 <td>
-                                    <a class="" asp-area="Customer" asp-controller="Home" asp-action="Details" asp-route-productId="@product.ProdId">
-                                        @db.Products.Find(product.ProdId).Title
-                                    </a>
+                                    Название
                                 </td>
                                 <td>@product.Price</td>
                                 <td>@product.Count</td>
@@ -80,7 +73,7 @@
                         <label> Курьером</label>
                         <div class="form-group">
                             Адрес доставки:
-                            @order.DeliveryAddress
+                            @order.City, @order.Street @order.HouseNumber
                         </div>
                     }
                     else
