@@ -26,8 +26,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Picker\Controllers\" />
-    <Folder Include="Areas\Picker\Data\" />
-    <Folder Include="Areas\Picker\Models\" />
     <Folder Include="Areas\Picker\Views\" />
     <Folder Include="Areas\Stockkeeper\PurchaseRequisitions\" />
   </ItemGroup>

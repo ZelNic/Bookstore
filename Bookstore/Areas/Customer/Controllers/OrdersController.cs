@@ -29,36 +29,49 @@ namespace Bookstore.Areas.Customer
             }
         }
 
-
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            Order [] orders = await _db.Order.Where(u => u.UserId == _user.UserId).ToArrayAsync();
-            
+            return View();
+        }
 
-            var formatedOrders = orders.Select(o => new {
+
+        public async Task<IActionResult> GetOrders()
+        {
+            Order[] ordersDB = await _db.Order.Where(u => u.UserId == _user.UserId).OrderByDescending(u => u.OrderId).ToArrayAsync();
+            Product[] productsDB = await _db.Products.ToArrayAsync();
+
+            var formatedOrders = ordersDB.Select(o => new
+            {
                 o.OrderId,
                 o.UserId,
                 o.ReceiverName,
                 o.ReceiverLastName,
+                o.PhoneNumber,
                 ProductData = JsonConvert.DeserializeObject<IEnumerable<OrderProductData>>(o.ProductData),
-                o.PurchaseDate,
+                PurchaseDate = o.PurchaseDate.ToString("dd.MM.yyyy HH:mm"),
                 o.PurchaseAmount,
+                o.City,
+                o.Street,
+                o.HouseNumber,
+                o.CurrentPosition,
+                o.IsCourierDelivery,
+                o.OrderPickupPointId,
+                o.OrderStatus,
+                o.TravelHistory
             }).ToArray();
 
-
+            Dictionary<int, string> prodIdAndName = new();
 
             foreach (var order in formatedOrders)
             {
-                IEnumerable<OrderProductData> orderProductData = order.ProductData;
-                foreach (var productData in orderProductData)
+                IEnumerable<OrderProductData> opd = order.ProductData;
+                foreach (var productData in opd)
                 {
-                    
+                    prodIdAndName.TryAdd(productData.Id, productsDB.Where(u => u.ProductId == productData.Id).FirstOrDefault()?.Name);
                 }
             }
 
-
-
-            return Json(formatedOrders);
+            return Json(new { data = formatedOrders, prodIdAndName });
         }
     }
 }

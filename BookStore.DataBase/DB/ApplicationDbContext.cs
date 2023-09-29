@@ -33,7 +33,7 @@ namespace Bookstore.DataAccess
                 new Product
                 {
                     ProductId = 1,
-                    Title = "И нас пожирает пламя",
+                    Name = "И нас пожирает пламя",
                     Author = "Жауме Кабре",
                     ISBN = "978-5-389-22890-0",
                     Category = 1,

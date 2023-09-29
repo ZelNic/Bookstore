@@ -97,7 +97,7 @@ namespace Bookstore.Areas.Stockkeeper
                 await _db.StockJournal.AddAsync(record);
             }
             await _db.SaveChangesAsync();
-            return Ok("Товар " + book.Title + " добавлен на полку " + numberShelf + " в количестве " + productCount + " шт.");
+            return Ok("Товар " + book.Name + " добавлен на полку " + numberShelf + " в количестве " + productCount + " шт.");
 
         }
 
@@ -166,7 +166,7 @@ namespace Bookstore.Areas.Stockkeeper
                     productId = s.ProductId,
                     time = s.Time.ToString("dd/MM/yyyy hh:mm"),
                     operation = s.Operation,
-                    nameProduct = b.Title,
+                    nameProduct = b.Name,
                     count = s.Count,
                     totalProduct = _db.StockJournal.Where(i => i.ProductId == s.ProductId).Sum(s => s.Count),
                     shelfNumber = s.ShelfNumber,
@@ -175,6 +175,7 @@ namespace Bookstore.Areas.Stockkeeper
 
             return Json(new { data = stockJournal });
         }
+
         [HttpPost]
         public async Task<IActionResult> SelectProductToPurchase(int productId, params int[] products)
         {
@@ -203,7 +204,7 @@ namespace Bookstore.Areas.Stockkeeper
             var request = await _db.StockJournal.Where(u => u.IsOrder == true).Join(_db.Products, s => s.ProductId, b => b.ProductId, (s, b) => new
             {
                 ProductId = s.ProductId,
-                TitleProduct = _db.Products.Where(u => u.ProductId == s.ProductId).Select(u => u.Title).FirstOrDefault(),
+                TitleProduct = _db.Products.Where(u => u.ProductId == s.ProductId).Select(u => u.Name).FirstOrDefault(),
                 TotalProduct = _db.StockJournal.Where(u => u.IsOrder == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
             }).Distinct().ToListAsync();
 
@@ -236,8 +237,8 @@ namespace Bookstore.Areas.Stockkeeper
                 ProductDataOnPurchase = productDataOnPurchase
             };
 
-            //await _db.StockJournal.AddAsync(recordStockPurchase);
-            //await _db.SaveChangesAsync();
+            await _db.StockJournal.AddAsync(recordStockPurchase);
+            await _db.SaveChangesAsync();
 
             //-----------------------------------------------------------------------------------------------------------------------------
 

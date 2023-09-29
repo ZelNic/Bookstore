@@ -295,7 +295,7 @@ namespace Bookstore.Migrations
                             ResponsiblePersonId = 12,
                             ShelfNumber = 1,
                             StockId = 26,
-                            Time = new DateTime(2023, 9, 28, 11, 9, 20, 448, DateTimeKind.Unspecified).AddTicks(5694)
+                            Time = new DateTime(2023, 9, 29, 7, 37, 5, 364, DateTimeKind.Unspecified).AddTicks(9087)
                         });
                 });
 
@@ -450,14 +450,14 @@ namespace Bookstore.Migrations
                     b.Property<string>("ImageURL")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
                     b.Property<float?>("ProductRating")
                         .HasColumnType("real");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProductId");
 
@@ -472,8 +472,8 @@ namespace Bookstore.Migrations
                             Description = "Человек просыпается неизвестно где - возможно, в больничной палате, но это неточно - и не помнит о себе вообще ничего. \"Зовите меня Измаил\", - предлагает он врачам, которых, за неимением других версий, нарекает Юрием Живаго и мадам Бовари.",
                             EditorId = 0,
                             ISBN = "978-5-389-22890-0",
-                            Price = 417,
-                            Title = "И нас пожирает пламя"
+                            Name = "И нас пожирает пламя",
+                            Price = 417
                         });
                 });
 

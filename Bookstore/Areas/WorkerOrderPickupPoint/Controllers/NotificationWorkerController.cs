@@ -38,10 +38,10 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
         }
 
         [HttpPost]
-        public async void Send(int notificationCode, int orderId)
+        public async Task<IActionResult> Send(int notificationCode, int orderId)
         {
             string text = "";
-            Order? order = await _db.Order.FindAsync(orderId);
+            Order? order = await _db.Order.Where(u => u.OrderId == orderId).FirstOrDefaultAsync();
 
             if (order != null)
             {
@@ -76,6 +76,8 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
                         break;
                 }
 
+                order.OrderStatus = text;
+
                 Notification notification = new()
                 {
                     SenderId = _user.UserId,
@@ -86,9 +88,14 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
                     SendingTime = MoscowTime.GetTime(),
                 };
 
-
+                _db.Order.Update(order);
                 await _db.Notifications.AddAsync(notification);
                 await _db.SaveChangesAsync();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
             }
         }
     }

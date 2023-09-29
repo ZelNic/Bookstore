@@ -49,7 +49,7 @@ namespace Bookstore.Areas.Customer
                 .Join(_db.Categories, b => b.Category, c => c.Id, (b, c) => new
                 {
                     image = b.ImageURL,
-                    nameProduct = b.Title,
+                    nameProduct = b.Name,
                     author = b.Author,
                     category = c.Name,
                     price = b.Price,

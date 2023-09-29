@@ -84,7 +84,7 @@ namespace Bookstore.Areas.Customer
             {
                 return RedirectToAction("Index");
             }
-            IEnumerable<Product> products = await _db.Products.Where(book => book.Title.Contains(searchString.ToLower())).ToListAsync();
+            IEnumerable<Product> products = await _db.Products.Where(book => book.Name.Contains(searchString.ToLower())).ToListAsync();
 
             return View(products);
         }

@@ -92,7 +92,7 @@ namespace Bookstore.Areas.Admin.Controllers
 
                 if (oldVersionBook != null)
                 {
-                    oldVersionBook.Title = productVM.Product.Title;
+                    oldVersionBook.Name = productVM.Product.Name;
                     oldVersionBook.Author = productVM.Product.Author;
                     oldVersionBook.ISBN = productVM.Product.ISBN;
                     oldVersionBook.Description = productVM.Product.Description;

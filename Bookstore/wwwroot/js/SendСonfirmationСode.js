@@ -12,9 +12,12 @@ function SendConfirmationCode(url) {
         if (result.isConfirmed) {
             $.ajax({
                 url: url,
-                type: 'POST'
+                type: 'POST',
+
+                success: function (response) {
+                    EnterConfirmationCode(url);
+                },
             })
-            EnterConfirmationCode(url);
         }
     })
 }
@@ -30,7 +33,8 @@ function EnterConfirmationCode(url) {
             pattern: '[0-9]+'
         },
         showCancelButton: true,
-        confirmButtonText: 'Look up',
+        confirmButtonText: 'Отправить',
+        confirmButtonText: `Свернуть`
         showLoaderOnConfirm: true,
     }).then((result) => {
         if (result.isConfirmed) {
@@ -42,12 +46,12 @@ function EnterConfirmationCode(url) {
                         resolve(response);
                     },
                     error: function (error) {
-                        reject(error); 
+                        reject(error);
                     }
                 });
             });
         } else {
-            return; 
+            return;
         }
     }).then((response) => {
         if (response) {

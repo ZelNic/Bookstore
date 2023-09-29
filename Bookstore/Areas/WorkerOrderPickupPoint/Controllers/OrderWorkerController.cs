@@ -4,6 +4,7 @@ using Bookstore.Models.Models;
 using Bookstore.Models.SD;
 using Bookstore.Models.ViewModel;
 using Bookstore.Utility;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,7 +66,7 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
                 OperationName = operation
             };
 
-            if (orderVM.Orders == null)
+            if (orderVM.Order == null)
             {
                 return NotFound(SD.NotFoundUser);
             }
@@ -112,7 +113,7 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
 
 
         [HttpPost]
-        public void SendConfirmationCode(int orderId)
+        public async Task<IActionResult> SendConfirmationCode(int orderId)
         {
             var order = _db.Order.Find(orderId);
 
@@ -137,16 +138,17 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
 
             _db.Order.Update(order);
             _db.Notifications.Add(notification);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
+            return Ok();
         }
 
-        public bool CheckVerificationCode(int orderId, int confirmationCode)
+        public async Task<IActionResult> CheckVerificationCode(int orderId, int confirmationCode)
         {
             var order = _db.Order.Find(orderId);
 
             if (order == null)
             {
-                return false;
+                return BadRequest();
             }
 
             if (order.ConfirmationCode == confirmationCode)
@@ -155,11 +157,11 @@ namespace Bookstore.Areas.WorkerOrderPickupPoint
                 order.OrderStatus = SD.StatusDelivered_4;
                 _db.Order.Update(order);
                 _db.SaveChanges();
-                return true;
+                return Ok();
             }
             else
             {
-                return false;
+                return BadRequest();
             }
         }
     }
