@@ -1,18 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\Bookstore",
-    "\\Bookstore\\Areas",
-    "\\Bookstore\\Areas\\Admin",
-    "\\Bookstore\\Areas\\Admin\\Views",
-    "\\Bookstore\\Areas\\Admin\\Views\\Category",
-    "\\Bookstore\\Areas\\Customer",
-    "\\Bookstore\\Areas\\Customer\\Controllers",
-    "\\Bookstore\\Areas\\Identity",
-    "\\Bookstore\\Areas\\Identity\\Controllers",
-    "\\Bookstore\\Views",
-    "\\Bookstore\\Views\\Shared"
+    ""
   ],
-  "SelectedNode": "\\Bookstore.sln",
+  "SelectedNode": "\\Minotaur.sln",
   "PreviewInSolutionExplorer": false
 }
