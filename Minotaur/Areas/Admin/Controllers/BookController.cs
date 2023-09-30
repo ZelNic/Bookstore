@@ -1,20 +1,17 @@
-﻿using Minotaur.DataAccess;
-using Minotaur.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Minotaur.Areas.CustomAuthorization;
-using Minotaur.Models.SD;
+using Minotaur.DataAccess;
+using Minotaur.Models;
+using Minotaur.Models.Models;
 
 namespace Minotaur.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[CustomAuthorization(ApplicationDbContext, IHttpContextAccessor)]
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly User _admin;
-        private readonly bool _isAdmin;
+        private readonly Employees _admin;
 
         public BookController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
         {
@@ -23,44 +20,25 @@ namespace Minotaur.Areas.Admin.Controllers
 
             if (_contextAccessor.HttpContext.Session.GetInt32("UserId") != null)
             {
-                CustomAuthorizationAttribute checkUserIsAdmin = new();
-                
-                if(checkUserIsAdmin.AccessСheck(_db, _contextAccessor, SD.RoleAdmin) == false)
-                {
-                    BadRequest(SD.AccessDenied);
-                }
+                _admin = _db.Employees.Where(u => u.UserId == _contextAccessor.HttpContext.Session.GetInt32("UserId")).FirstOrDefault();
             }
         }
+
 
         public async Task<IActionResult> Index()
-        {          
+        {
+            List<Product> booksList = await _db.Products.ToListAsync();
+            List<Category> categoriesList = await _db.Categories.ToListAsync();
 
-            if (_contextAccessor.HttpContext.Session.GetInt32("UserId") != null)
+            ProductVM bookVM = new()
             {
-                int? userId = _contextAccessor.HttpContext.Session.GetInt32("UserId");
-                if ((userId != null) && (_db.Employees.Find(userId) != null))
-                {
-                    List<Product> booksList = await _db.Products.ToListAsync();
-                    List<Category> categoriesList = await _db.Categories.ToListAsync();
+                ProductsList = booksList,
+                CategoriesList = categoriesList
+            };
 
-                    ProductVM bookVM = new()
-                    {
-                        ProductsList = booksList,
-                        CategoriesList = categoriesList
-                    };
-
-                    return View(bookVM);
-                }
-                else
-                {
-                    return NotFound("Отказано в доступе.");
-                }
-            }
-            else
-            {
-                return NotFound("Отказано в доступе.");
-            }
+            return View(bookVM);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Upsert(int? bookId)

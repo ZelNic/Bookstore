@@ -2,6 +2,8 @@
 using Minotaur.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Minotaur.Areas.CustomAuthorization;
+using Minotaur.Models.SD;
 
 namespace Minotaur.Areas.Admin.Controllers
 {
@@ -9,10 +11,17 @@ namespace Minotaur.Areas.Admin.Controllers
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public CategoryController(ApplicationDbContext db)
+        public CategoryController(ApplicationDbContext db, IHttpContextAccessor contextAccessor, CustomAuthorizationAttribute checkUserIsAdmin)
         {
             _db = db;
+            _contextAccessor = contextAccessor;
+
+            if (_contextAccessor.HttpContext.Session.GetInt32("UserId") != null)
+            {
+
+            }
         }
 
         public async Task<IActionResult> Index()
@@ -36,7 +45,7 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             if (categoryId == 0 || categoryId == null)
             {
-                Category category = new ();
+                Category category = new();
 
                 return View(category);
             }
@@ -82,7 +91,7 @@ namespace Minotaur.Areas.Admin.Controllers
             {
                 _db.Categories.Remove(categoryOnDelete);
                 await _db.SaveChangesAsync();
-                return RedirectToAction("Index","Category");
+                return RedirectToAction("Index", "Category");
             }
             else
             {

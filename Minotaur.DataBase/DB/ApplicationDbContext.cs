@@ -3,12 +3,12 @@ using Minotaur.Models.Models;
 using Minotaur.Models.SD;
 using Microsoft.EntityFrameworkCore;
 using Minotaur.Utility;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Minotaur.DataAccess
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
-
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
