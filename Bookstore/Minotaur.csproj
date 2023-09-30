@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BookStore.DataBase\Bookstore.DataAccess.csproj" />
-    <ProjectReference Include="..\Bookstore.Utility\Bookstore.Utility.csproj" />
+    <ProjectReference Include="..\BookStore.DataBase\Minotaur.DataAccess.csproj" />
+    <ProjectReference Include="..\Bookstore.Utility\Minotaur.Utility.csproj" />
   </ItemGroup>
 
   <ItemGroup>

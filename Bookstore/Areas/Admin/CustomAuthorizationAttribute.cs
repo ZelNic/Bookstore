@@ -1,7 +1,7 @@
-﻿using Bookstore.DataAccess;
-using Bookstore.Models.SD;
+﻿using Minotaur.DataAccess;
+using Minotaur.Models.SD;
 
-namespace Bookstore.Areas.Admin
+namespace Minotaur.Areas.Admin
 {
     public class CustomAuthorizationAttribute : Attribute
     {

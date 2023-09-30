@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Bookstore.Models.Models
+namespace Minotaur.Models.Models
 {
     public class OrderPickupPoint
     {

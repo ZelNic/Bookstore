@@ -1,4 +1,4 @@
-﻿namespace Bookstore.Models
+﻿namespace Minotaur.Models
 {
     public class ShoppingBasketClient
     {

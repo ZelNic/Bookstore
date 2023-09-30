@@ -1,4 +1,4 @@
-﻿namespace Bookstore.Models.Models
+﻿namespace Minotaur.Models.Models
 {
     public class OrderProductData
     {

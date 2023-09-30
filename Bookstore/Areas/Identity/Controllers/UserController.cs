@@ -1,9 +1,9 @@
-﻿using Bookstore.DataAccess;
-using Bookstore.Models;
+﻿using Minotaur.DataAccess;
+using Minotaur.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bookstore.Areas.Identity
+namespace Minotaur.Areas.Identity
 {
     [Area("Identity")]
     public class UserController : Controller

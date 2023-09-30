@@ -4,7 +4,7 @@
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Bookstore.Migrations
+namespace Minotaur.Migrations
 {
     /// <inheritdoc />
     public partial class changenameTableAndHerColumn : Migration

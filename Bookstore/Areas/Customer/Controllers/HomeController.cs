@@ -1,11 +1,11 @@
-﻿using Bookstore.DataAccess;
-using Bookstore.Models;
-using Bookstore.Models.Models;
+﻿using Minotaur.DataAccess;
+using Minotaur.Models;
+using Minotaur.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
-namespace Bookstore.Areas.Customer
+namespace Minotaur.Areas.Customer
 {
     [Area("Customer")]
     public class HomeController : Controller

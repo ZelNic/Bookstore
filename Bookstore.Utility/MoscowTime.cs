@@ -1,4 +1,4 @@
-﻿namespace Bookstore.Utility
+﻿namespace Minotaur.Utility
 {
     public static class MoscowTime
     {

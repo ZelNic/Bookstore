@@ -1,8 +1,8 @@
-﻿using Bookstore.DataAccess;
+﻿using Minotaur.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bookstore.Areas.API
+namespace Minotaur.Areas.API
 {
     [Area("API")]
     public class APIController : Controller

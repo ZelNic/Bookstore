@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bookstore", "Bookstore\Bookstore.csproj", "{2466C122-CA76-48D3-BC89-DD452E17257A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minotaur", "Bookstore\Minotaur.csproj", "{2466C122-CA76-48D3-BC89-DD452E17257A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5D90F67F-D1CA-404A-8949-F64EA28CE48F} = {5D90F67F-D1CA-404A-8949-F64EA28CE48F}
 		{811EE1DE-5D48-4AE9-BBBF-9D2823249CC5} = {811EE1DE-5D48-4AE9-BBBF-9D2823249CC5}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bookstore.DataAccess", "BookStore.DataBase\Bookstore.DataAccess.csproj", "{811EE1DE-5D48-4AE9-BBBF-9D2823249CC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minotaur.DataAccess", "BookStore.DataBase\Minotaur.DataAccess.csproj", "{811EE1DE-5D48-4AE9-BBBF-9D2823249CC5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bookstore.Models", "BookStore.Models\Bookstore.Models.csproj", "{5D90F67F-D1CA-404A-8949-F64EA28CE48F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minotaur.Models", "BookStore.Models\Minotaur.Models.csproj", "{5D90F67F-D1CA-404A-8949-F64EA28CE48F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bookstore.Utility", "Bookstore.Utility\Bookstore.Utility.csproj", "{CE0250F8-78D4-4727-A651-C85DEE2E6304}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minotaur.Utility", "Bookstore.Utility\Minotaur.Utility.csproj", "{CE0250F8-78D4-4727-A651-C85DEE2E6304}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

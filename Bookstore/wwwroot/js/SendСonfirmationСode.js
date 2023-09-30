@@ -34,7 +34,7 @@ function EnterConfirmationCode(url) {
         },
         showCancelButton: true,
         confirmButtonText: 'Отправить',
-        confirmButtonText: `Свернуть`
+        confirmButtonText: `Свернуть`,
         showLoaderOnConfirm: true,
     }).then((result) => {
         if (result.isConfirmed) {

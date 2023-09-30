@@ -1,10 +1,10 @@
-﻿using Bookstore.Models;
-using Bookstore.Models.Models;
-using Bookstore.Models.SD;
+﻿using Minotaur.Models;
+using Minotaur.Models.Models;
+using Minotaur.Models.SD;
 using Microsoft.EntityFrameworkCore;
-using Bookstore.Utility;
+using Minotaur.Utility;
 
-namespace Bookstore.DataAccess
+namespace Minotaur.DataAccess
 {
     public class ApplicationDbContext : DbContext
     {

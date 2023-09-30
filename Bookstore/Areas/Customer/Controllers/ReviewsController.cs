@@ -1,8 +1,8 @@
-﻿using Bookstore.DataAccess;
-using Bookstore.Models;
+﻿using Minotaur.DataAccess;
+using Minotaur.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Bookstore.Areas.Customer
+namespace Minotaur.Areas.Customer
 {
     public class ReviewsController : Controller
     {

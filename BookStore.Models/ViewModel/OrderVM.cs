@@ -1,6 +1,6 @@
-﻿using Bookstore.Models.Models;
+﻿using Minotaur.Models.Models;
 
-namespace Bookstore.Models.ViewModel
+namespace Minotaur.Models.ViewModel
 {
     public class OrderVM
     {

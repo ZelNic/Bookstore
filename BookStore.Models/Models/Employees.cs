@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Bookstore.Models.Models
+namespace Minotaur.Models.Models
 {
     public class Employees
     {

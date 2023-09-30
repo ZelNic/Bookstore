@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BookStore.Models\Bookstore.Models.csproj" />
+    <ProjectReference Include="..\BookStore.Models\Minotaur.Models.csproj" />
   </ItemGroup>
 
 </Project>

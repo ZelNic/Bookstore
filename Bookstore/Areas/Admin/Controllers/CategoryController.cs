@@ -1,9 +1,9 @@
-﻿using Bookstore.DataAccess;
-using Bookstore.Models;
+﻿using Minotaur.DataAccess;
+using Minotaur.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bookstore.Areas.Admin.Controllers
+namespace Minotaur.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class CategoryController : Controller

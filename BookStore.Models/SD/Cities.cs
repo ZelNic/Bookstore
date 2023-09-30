@@ -1,4 +1,4 @@
-﻿namespace Bookstore.Models.SD
+﻿namespace Minotaur.Models.SD
 {
     public static class Cities
     {

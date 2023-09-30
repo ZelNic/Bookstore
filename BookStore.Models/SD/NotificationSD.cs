@@ -1,6 +1,6 @@
-﻿using Bookstore.Models.Models;
+﻿using Minotaur.Models.Models;
 
-namespace Bookstore.Models.SD
+namespace Minotaur.Models.SD
 {
     public static class NotificationSD
     {

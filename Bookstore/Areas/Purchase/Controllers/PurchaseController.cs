@@ -1,14 +1,14 @@
-﻿using Bookstore.Areas.Customer;
-using Bookstore.DataAccess;
-using Bookstore.Models;
-using Bookstore.Models.Models;
-using Bookstore.Models.SD;
-using Bookstore.Utility;
+﻿using Minotaur.Areas.Customer;
+using Minotaur.DataAccess;
+using Minotaur.Models;
+using Minotaur.Models.Models;
+using Minotaur.Models.SD;
+using Minotaur.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
-namespace Bookstore.Areas.Purchase
+namespace Minotaur.Areas.Purchase
 {
     [Area("Purchase")]
     public class PurchaseController : Controller

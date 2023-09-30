@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Bookstore.Migrations
+namespace Minotaur.Migrations
 {
     /// <inheritdoc />
     public partial class newTableOrder : Migration

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Bookstore.Models
+namespace Minotaur.Models
 {
     public class Category
     {

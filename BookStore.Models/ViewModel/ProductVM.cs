@@ -1,6 +1,6 @@
-﻿using Bookstore.Models.Models;
+﻿using Minotaur.Models.Models;
 
-namespace Bookstore.Models
+namespace Minotaur.Models
 {
     public class ProductVM
     {

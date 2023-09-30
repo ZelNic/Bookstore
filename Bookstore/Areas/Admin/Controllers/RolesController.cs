@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Bookstore.Areas.Admin.Controllers
+namespace Minotaur.Areas.Admin.Controllers
 {
     public class RolesController : Controller
     {

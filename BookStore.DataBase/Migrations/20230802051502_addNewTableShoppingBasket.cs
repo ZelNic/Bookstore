@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Bookstore.Migrations
+namespace Minotaur.Migrations
 {
     /// <inheritdoc />
     public partial class addNewTableShoppingBasket : Migration

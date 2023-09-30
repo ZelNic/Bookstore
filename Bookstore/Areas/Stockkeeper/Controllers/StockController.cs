@@ -1,8 +1,8 @@
-﻿using Bookstore.DataAccess;
-using Bookstore.Models;
-using Bookstore.Models.Models;
-using Bookstore.Models.SD;
-using Bookstore.Utility;
+﻿using Minotaur.DataAccess;
+using Minotaur.Models;
+using Minotaur.Models.Models;
+using Minotaur.Models.SD;
+using Minotaur.Utility;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
-namespace Bookstore.Areas.Stockkeeper
+namespace Minotaur.Areas.Stockkeeper
 {
     [Area("Stockkeeper")]
     public class StockController : Controller

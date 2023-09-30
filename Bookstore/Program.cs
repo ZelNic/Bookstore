@@ -1,5 +1,5 @@
-using Bookstore.Areas.Admin;
-using Bookstore.DataAccess;
+using Minotaur.Areas.Admin;
+using Minotaur.DataAccess;
 using Cassandra;
 using Microsoft.EntityFrameworkCore;
 

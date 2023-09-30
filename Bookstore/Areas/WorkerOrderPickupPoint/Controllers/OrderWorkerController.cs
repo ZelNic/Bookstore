@@ -1,14 +1,14 @@
-﻿using Bookstore.DataAccess;
-using Bookstore.Models;
-using Bookstore.Models.Models;
-using Bookstore.Models.SD;
-using Bookstore.Models.ViewModel;
-using Bookstore.Utility;
+﻿using Minotaur.DataAccess;
+using Minotaur.Models;
+using Minotaur.Models.Models;
+using Minotaur.Models.SD;
+using Minotaur.Models.ViewModel;
+using Minotaur.Utility;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bookstore.Areas.WorkerOrderPickupPoint
+namespace Minotaur.Areas.WorkerOrderPickupPoint
 {
     [Area("WorkerOrderPickupPoint")]
     public class OrderWorkerController : Controller
