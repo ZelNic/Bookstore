@@ -8,67 +8,59 @@ using System.Diagnostics;
 namespace Minotaur.Areas.Customer
 {
     [Area("Customer")]
+
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ApplicationDbContext _db;
-        private readonly User? _user;
 
         public HomeController(ILogger<HomeController> logger, IHttpContextAccessor httpContextAccessor, ApplicationDbContext db)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _db = db;
-
-            if (_httpContextAccessor.HttpContext.Session.GetInt32("UserId") != null)
-            {
-                int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserId");
-                if ((userId != null) && (_db.User.Find(userId) != null))
-                {
-                    _user = _db.User.Find(userId);
-                }
-            }
         }
 
         public async Task<IActionResult> Index()
         {
-            ProductVM productVM = await GetProductsVM();
-            return View(productVM);
+            //ProductVM productVM = await GetProductsVM();
+            //return View(productVM);
+            return View();
         }
 
-        public async Task<ProductVM> GetProductsVM()
-        {
-            List<Product>? productsList = await _db.Products.ToListAsync();
-            List<Category>? categoriesList = await _db.Categories.ToListAsync();
-            WishList? wishLists = null;
-            ShoppingBasketClient? shoppingBasketClient = null;
+        //public async Task<ProductVM> GetProductsVM()
+        //{
+        //    List<Product>? productsList = await _db.Products.ToListAsync();
+        //    List<Category>? categoriesList = await _db.Categories.ToListAsync();
+        //    WishList? wishLists = null;
+        //    ShoppingBasketClient? shoppingBasketClient = null;
 
-            if (_user != null)
-            {
-                wishLists = await _db.WishLists.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
-                ShoppingBasket? sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.UserId).FirstOrDefaultAsync();
-                if(sb != null)
-                {
-                    shoppingBasketClient = new()
-                    {
-                        Id = sb.UserId,
-                        ProductIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount)
-                    };
-                }
-            }
+        //    if (_user != null)
+        //    {
+        //        wishLists = await _db.WishLists.Where(u => u.UserId == _user.Id).FirstOrDefaultAsync();
+        //        ShoppingBasket? sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.Id).FirstOrDefaultAsync();
+        //        if (sb != null)
+        //        {
+        //            //shoppingBasketClient = new()
+        //            //{
+        //            //    Id = sb.UserId,
+        //            //    ProductIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount)
+        //            //};
+        //        }
+        //    }
 
-            ProductVM bookVM = new()
-            {
-                User = _user,
-                ProductsList = productsList,
-                CategoriesList = categoriesList,
-                WishList = wishLists,
-                ShoppingBasket = shoppingBasketClient
-            };
+        //    ProductVM bookVM = new()
+        //    {
+        //        User = _user,
+        //        ProductsList = productsList,
+        //        CategoriesList = categoriesList,
+        //        WishList = wishLists,
+        //        ShoppingBasket = shoppingBasketClient
+        //    };
 
-            return bookVM;
-        }
+        //    return bookVM;
+        //}
 
         public async Task<IActionResult> Details(int productId)
         {
@@ -77,7 +69,7 @@ namespace Minotaur.Areas.Customer
             return View(product);
         }
 
-        
+
         public async Task<IActionResult> Search(string? searchString)
         {
             if (searchString == null)

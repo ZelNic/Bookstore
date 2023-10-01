@@ -1,12 +1,4 @@
-﻿@inject IHttpContextAccessor HttpContextAccessor
-@{
-    var httpContext = HttpContextAccessor.HttpContext;
-}
-
-@inject ApplicationDbContext DB
-@{
-    var db = DB;
-}
+﻿
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,112 +31,17 @@
                 </div>
                 <div class="navbar-collapse collapse d-sm-inline-flex">
 
-                    @if (httpContext.Session.GetInt32("UserId") != null)
-                    {
-                        int? idUserFromHttpContext = httpContext.Session.GetInt32("UserId");
-
-                        User? user = db.User.FirstOrDefault(u => u.UserId == idUserFromHttpContext);
-
-                        if (user != null)
-                        {
-                            if (db.Employees.Where(u => u.UserId == user.UserId).FirstOrDefault() != null)
-                            {
-                                var employees = db.Employees.First(u => u.UserId == user.UserId);
-                                switch (employees.RoleName)
-                                {
-                                    case SD.RoleAdmin:
-                                        <ul class="navbar-nav flex-grow-1">
-                                            <li class="nav-item dropdown">
-                                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    Управление
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-dark">
-                                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Book" asp-action="Index">Книги</a></li>
-                                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">Категории</a></li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                        break;
-
-                                    case SD.RoleWorkerOrderPickupPoint:
-                                        <ul class="navbar-nav flex-grow-1">
-                                            <li class="nav-item dropdown">
-                                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    Управление заказами
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-dark">
-                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@SD.ViewOrderDetails">Проверить состояние</a></li>
-                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@SD.AcceptOrder">Прием</a></li>
-                                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@SD.IssueOrder">Выдача</a></li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                        break;
-
-                                    case SD.RoleOrderPicker:
-
-                                        <ul class="navbar-nav flex-grow-1">
-                                            <li>
-                                                <a class="nav-link text-light" asp-area="Identity" asp-controller="User" asp-action="Registration">Сборка заказа</a>
-                                            </li>
-                                        </ul>
-
-                                        break;
-
-                                    case SD.RoleStockkeeper:
-
-                                        <ul class="navbar-nav flex-grow-1">
-                                            <li>
-                                                <a class="nav-link text-light" asp-area="Stockkeeper" asp-controller="Stock" asp-action="Index">Склад</a>
-                                            </li>
-                                        </ul>
-
-                                        break;
-                                }
-                            }
-
-
-                            <ul class="navbar-nav flex-grow-1 justify-content-end">
-                                <li>
-                                    <a class="nav-link text-light" asp-area="Customer" asp-controller="Wishlist" asp-action="Index">
-                                        <i class="bi bi-bookmark-fill"></i>Отложено
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="nav-link text-light" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="Index">
-                                        <i class="bi bi-bag-check-fill"></i>Корзина
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="nav-link text-light" asp-area="Customer" asp-controller="Orders" asp-action="Index">
-                                        <i class="bi bi-box-seam"></i>Заказы
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="nav-link text-light" asp-area="Customer" asp-controller="NotificationCustomer" asp-action="Index">
-                                        <i class="bi bi-chat-dots-fill"></i> Сообщения
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="nav-link text-light" asp-area="Identity" asp-controller="User" asp-action="Profile">
-                                        <i class="bi bi-person-circle"></i> @user.FirstName
-                                    </a>
-                                </li>
-                            </ul>
-                        }
-                    }
-                    else
-                    {
+                  
                         <ul class="navbar-nav flex-grow-1 justify-content-end">
                             <li>
-                                <a class="nav-link text-light" asp-area="Identity" asp-controller="User" asp-action="Registration">Регистрация</a>
+                                <a class="nav-link text-light" asp-area="Identity" asp-controller="Account" asp-action="Logout">Регистрация</a>
                             </li>
                             <li>
-                                <a class="nav-link text-light" asp-area="Identity" asp-controller="User" asp-action="LogIn">Войти</a>
+                                <a class="nav-link text-light" asp-area="Identity" asp-controller="Account" asp-action="Login">Войти</a>
                             </li>
 
                         </ul>
-                    }
+                    
                 </div>
             </div>
         </nav>

@@ -2,7 +2,7 @@
 {
     public class ShoppingBasketClient
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public Dictionary<int, int>? ProductIdAndCount { get; set; }
     }
 }

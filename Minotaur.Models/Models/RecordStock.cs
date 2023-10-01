@@ -8,7 +8,7 @@ namespace Minotaur.Models.Models
         [Key]
         public int Id { get; set; }
         [Required] public int StockId { get; set; }
-        [Required] public int ResponsiblePersonId { get; set; }
+        [Required] public string ResponsiblePersonId { get; set; }
         [Required] public DateTime Time { get; set; }
         [JsonProperty] public int ProductId { get; set; }
         [JsonProperty] public string? ProductName { get; set; }

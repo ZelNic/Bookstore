@@ -7,7 +7,7 @@ namespace Minotaur.Models.Models
         [Key]
         public int OrderId { get; set; }
         [Required]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public string? ReceiverName { get; set; }
         public string? ReceiverLastName { get; set; }
         public string? ProductData { get; set; }

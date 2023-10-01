@@ -18,6 +18,10 @@ builder.Services.ConfigureApplicationCookie(option =>
     option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
 });
 
+
+builder.Services.AddRazorPages();
+builder.Services.AddSession();
+
 var app = builder.Build();
 
 
@@ -40,8 +44,5 @@ app.UseSession();
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
-
-app.UseExceptionHandler("/Home/Index");
-
-
+app.MapRazorPages();
 app.Run();

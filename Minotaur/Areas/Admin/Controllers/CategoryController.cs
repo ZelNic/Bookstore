@@ -1,24 +1,23 @@
-﻿using Minotaur.DataAccess;
-using Minotaur.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Minotaur.Areas.CustomAuthorization;
-using Minotaur.Models.SD;
+using Minotaur.DataAccess;
+using Minotaur.Models;
 
 namespace Minotaur.Areas.Admin.Controllers
 {
     [Area("Admin")]
+
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly IHttpContextAccessor _contextAccessor;
 
-        public CategoryController(ApplicationDbContext db, IHttpContextAccessor contextAccessor, CustomAuthorizationAttribute checkUserIsAdmin)
+        public CategoryController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
         {
             _db = db;
             _contextAccessor = contextAccessor;
 
-            if (_contextAccessor.HttpContext.Session.GetInt32("UserId") != null)
+            if (_contextAccessor.HttpContext.Session.GetInt32("Id") != null)
             {
 
             }

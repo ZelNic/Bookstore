@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Minotaur.Models
 {
-    public class User
+    public class User : IdentityUser
     {
-        [Key]
-        public int UserId { get; set; }
+        
         [Required]
         [RegularExpression("[a-zA-Zа-яА-Я]+", ErrorMessage = "Только буквенное обозначение")]
         public string? FirstName { get; set; }
@@ -28,6 +28,6 @@ namespace Minotaur.Models
         [DataType(DataType.PhoneNumber)]
         [Required]
         public string? PhoneNumber { get; set; }
-        public int PersonalWallet { get; set; } 
+        public int PersonalWallet { get; set; }
     }
 }

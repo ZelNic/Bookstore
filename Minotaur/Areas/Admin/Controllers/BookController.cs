@@ -18,9 +18,9 @@ namespace Minotaur.Areas.Admin.Controllers
             _db = db;
             _contextAccessor = contextAccessor;
 
-            if (_contextAccessor.HttpContext.Session.GetInt32("UserId") != null)
+            if (_contextAccessor.HttpContext.Session.GetInt32("Id") != null)
             {
-                _admin = _db.Employees.Where(u => u.UserId == _contextAccessor.HttpContext.Session.GetInt32("UserId")).FirstOrDefault();
+                _admin = _db.Employees.Where(u => u.Id == _contextAccessor.HttpContext.Session.GetString("Id")).FirstOrDefault();
             }
         }
 

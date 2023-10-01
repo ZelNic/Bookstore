@@ -7,6 +7,6 @@ namespace Minotaur.Models.Models
         [Key]
         public int EmployeeId { get; set; }
         public string RoleName { get; set; }
-        public int UserId { get; set; }
+        public string Id { get; set; }
     }
 }

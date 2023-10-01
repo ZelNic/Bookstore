@@ -1,8 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using Minotaur.Areas.Identity.Data
 
-@inject SignInManager<MinotaurUser> SignInManager
-@inject UserManager<MinotaurUser> UserManager
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
