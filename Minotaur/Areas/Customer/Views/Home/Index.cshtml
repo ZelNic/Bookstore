@@ -1,8 +1,9 @@
-﻿@model ProductVM
+﻿@using Minotaur.Models.SD;
+@model ProductVM
 
 <div class="">
     <div class="row pb-5 mb-5 mb-2">
-      @*  @if (Model.ProductsList != null)
+        @if (Model.ProductsList != null)
             @foreach (var product in Model.ProductsList)
             {
                 <div class="col-lg-2 col-sm-1">
@@ -117,12 +118,18 @@
                         </div>
                     </div>
                 </div>
-            }*@
+            }
     </div>
 </div>
 
 
-@section Scripts{
-    <script src="~/js/Customer/WishList.js"></script>
-    <script src="~/js/Customer/ShoppingBasket.js"></script>
+@if (User.Identity != null)
+{
+    <section Scripts>
+        {
+        <script src="~/js/Customer/WishList.js"></script>
+        <script src="~/js/Customer/ShoppingBasket.js"></script>
+        }
+    </section>
 }
+

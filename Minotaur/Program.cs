@@ -1,29 +1,37 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Minotaur.Areas.Identity.Pages.Account;
 using Minotaur.DataAccess;
+using Minotaur.Models;
+using Minotaur.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+builder.Services.AddScoped<UserManager<User>>();
+builder.Services.AddScoped<SignInManager<User>>();
+builder.Services.AddScoped<ILogger<LoginModel>, Logger<LoginModel>>();
+
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 builder.Services.ConfigureApplicationCookie(option =>
 {
-    option.LoginPath = $"/Identity/Account/Login";
-    option.LogoutPath = $"/Identity/Account/Logout";
-    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+    option.LoginPath = $"/Areas/Identity/Account/Logout";
+    option.LogoutPath = $"/Areas/Identity/Account/Login";
+    option.AccessDeniedPath = $"/Areas/Identity/Account/AccessDenied";
 });
 
 
-builder.Services.AddRazorPages();
-builder.Services.AddSession();
-
 var app = builder.Build();
-
 
 //Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -40,9 +48,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.UseSession();
+app.MapRazorPages();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages();
 app.Run();

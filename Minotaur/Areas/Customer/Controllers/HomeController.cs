@@ -24,43 +24,43 @@ namespace Minotaur.Areas.Customer
 
         public async Task<IActionResult> Index()
         {
-            //ProductVM productVM = await GetProductsVM();
-            //return View(productVM);
-            return View();
+            ProductVM productVM = await GetProductsVM();
+            return View(productVM);
         }
 
-        //public async Task<ProductVM> GetProductsVM()
-        //{
-        //    List<Product>? productsList = await _db.Products.ToListAsync();
-        //    List<Category>? categoriesList = await _db.Categories.ToListAsync();
-        //    WishList? wishLists = null;
-        //    ShoppingBasketClient? shoppingBasketClient = null;
+        public async Task<ProductVM> GetProductsVM()
+        {
+            List<Product>? productsList = await _db.Products.ToListAsync();
+            List<Category>? categoriesList = await _db.Categories.ToListAsync();
+            WishList? wishLists = null;
+            ShoppingBasketClient? shoppingBasketClient = null;
+            var user = User.Identity;
 
-        //    if (_user != null)
-        //    {
-        //        wishLists = await _db.WishLists.Where(u => u.UserId == _user.Id).FirstOrDefaultAsync();
-        //        ShoppingBasket? sb = await _db.ShoppingBasket.Where(u => u.UserId == _user.Id).FirstOrDefaultAsync();
-        //        if (sb != null)
-        //        {
-        //            //shoppingBasketClient = new()
-        //            //{
-        //            //    Id = sb.UserId,
-        //            //    ProductIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount)
-        //            //};
-        //        }
-        //    }
+            if (user != null)
+            {
+                wishLists = await _db.WishLists.Where(u => u.UserId == user.Name).FirstOrDefaultAsync();
+                ShoppingBasket? sb = await _db.ShoppingBasket.Where(u => u.UserId == user.Name).FirstOrDefaultAsync();
+                if (sb != null)
+                {
+                    shoppingBasketClient = new()
+                    {
+                        Id = sb.UserId,
+                        ProductIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount)
+                    };
+                }
+            }
 
-        //    ProductVM bookVM = new()
-        //    {
-        //        User = _user,
-        //        ProductsList = productsList,
-        //        CategoriesList = categoriesList,
-        //        WishList = wishLists,
-        //        ShoppingBasket = shoppingBasketClient
-        //    };
+            ProductVM bookVM = new()
+            {
+                User = user.Name,
+                ProductsList = productsList,
+                CategoriesList = categoriesList,
+                WishList = wishLists,
+                ShoppingBasket = shoppingBasketClient
+            };
 
-        //    return bookVM;
-        //}
+            return bookVM;
+        }
 
         public async Task<IActionResult> Details(int productId)
         {

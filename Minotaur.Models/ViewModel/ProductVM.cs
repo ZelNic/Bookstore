@@ -4,7 +4,7 @@ namespace Minotaur.Models
 {
     public class ProductVM
     {
-        public User? User { get; set; }
+        public string? User { get; set; }
         public Product? Product { get; set; }
         public List<Product>? ProductsList { get; set; }
         public List<Category>? CategoriesList { get; set; }

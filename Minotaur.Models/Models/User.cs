@@ -14,20 +14,11 @@ namespace Minotaur.Models
         public string? LastName { get; set; }
         [DataType(DataType.Date)]
         [Required]
-        public string? DateofBirth { get; set; }
-        [DataType(DataType.EmailAddress)]
-        [Required]
-        public string? Email { get; set; }
-        [DataType(DataType.Password)]
-        [Required]
-        public string? Password { get; set; }
+        public string? DateofBirth { get; set; } 
         public string? Region { get; set; }
         public string? City { get; set; }
         public string? Street { get; set; }
-        public string? HouseNumber { get; set; }
-        [DataType(DataType.PhoneNumber)]
-        [Required]
-        public string? PhoneNumber { get; set; }
+        public string? HouseNumber { get; set; }        
         public int PersonalWallet { get; set; }
     }
 }
