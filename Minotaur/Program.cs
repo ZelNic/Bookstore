@@ -9,20 +9,12 @@ using Minotaur.Utility;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-
-builder.Services.AddScoped<UserManager<User>>();
-builder.Services.AddScoped<SignInManager<User>>();
-builder.Services.AddScoped<ILogger<LoginModel>, Logger<LoginModel>>();
-
-builder.Services.AddScoped<IEmailSender, EmailSender>();
-
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 builder.Services.ConfigureApplicationCookie(option =>
 {
     option.LoginPath = $"/Areas/Identity/Account/Logout";
@@ -30,10 +22,15 @@ builder.Services.ConfigureApplicationCookie(option =>
     option.AccessDeniedPath = $"/Areas/Identity/Account/AccessDenied";
 });
 
+builder.Services.AddRazorPages();
+
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+
+
 
 var app = builder.Build();
 
-//Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -50,8 +47,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
 app.Run();
+
+
+
+
+//builder.Services.AddScoped<UserManager<IdentityUser>>();
+//builder.Services.AddScoped<SignInManager<User>>();
+//builder.Services.AddScoped<ILogger<LoginModel>, Logger<LoginModel>>();

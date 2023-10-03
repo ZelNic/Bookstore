@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Minotaur.Models
 {
-    public class User : IdentityUser
+    public class MinotaurUser : IdentityUser
     {
         
         [Required]

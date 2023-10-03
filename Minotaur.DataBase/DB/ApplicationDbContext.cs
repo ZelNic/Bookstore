@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Minotaur.DataAccess
 {
-    public class ApplicationDbContext : IdentityDbContext<User>
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<MinotaurUser> MinotaurUsers { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ShoppingBasket> ShoppingBasket { get; set; }
