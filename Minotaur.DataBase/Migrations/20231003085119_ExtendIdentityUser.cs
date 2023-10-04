@@ -5,7 +5,7 @@
 namespace Minotaur.Migrations
 {
     /// <inheritdoc />
-    public partial class ExtendIdentityUser : Migration
+    public partial class ExtendMinotaurUser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

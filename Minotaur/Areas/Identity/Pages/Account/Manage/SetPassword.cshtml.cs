@@ -8,17 +8,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Minotaur.Models;
 
 namespace Minotaur.Areas.Identity.Pages.Account.Manage
 {
     public class SetPasswordModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<MinotaurUser> _userManager;
+        private readonly SignInManager<MinotaurUser> _signInManager;
 
         public SetPasswordModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<MinotaurUser> userManager,
+            SignInManager<MinotaurUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;

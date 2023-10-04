@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Minotaur.Areas.Identity.Pages.Account;
 using Minotaur.DataAccess;
 using Minotaur.Models;
 using Minotaur.Utility;
@@ -14,18 +13,21 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<MinotaurUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+
+builder.Services.AddScoped<UserManager<MinotaurUser>>();
+builder.Services.AddScoped<SignInManager<MinotaurUser>>();
+
+builder.Services.AddRazorPages();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
 builder.Services.ConfigureApplicationCookie(option =>
 {
     option.LoginPath = $"/Areas/Identity/Account/Logout";
     option.LogoutPath = $"/Areas/Identity/Account/Login";
     option.AccessDeniedPath = $"/Areas/Identity/Account/AccessDenied";
 });
-
-builder.Services.AddRazorPages();
-
-builder.Services.AddScoped<IEmailSender, EmailSender>();
-
 
 
 
@@ -55,6 +57,6 @@ app.Run();
 
 
 
-//builder.Services.AddScoped<UserManager<IdentityUser>>();
+//builder.Services.AddScoped<UserManager<MinotaurUser>>();
 //builder.Services.AddScoped<SignInManager<User>>();
 //builder.Services.AddScoped<ILogger<LoginModel>, Logger<LoginModel>>();

@@ -5,15 +5,8 @@ namespace Minotaur.Models
 {
     public class MinotaurUser : IdentityUser
     {
-        
-        [Required]
-        [RegularExpression("[a-zA-Zа-яА-Я]+", ErrorMessage = "Только буквенное обозначение")]
         public string? FirstName { get; set; }
-        [Required]
-        [RegularExpression("[a-zA-Zа-яА-Я]+", ErrorMessage = "Только буквенное обозначение")]
         public string? LastName { get; set; }
-        [DataType(DataType.Date)]
-        [Required]
         public string? DateofBirth { get; set; } 
         public string? Region { get; set; }
         public string? City { get; set; }

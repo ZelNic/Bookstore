@@ -8,18 +8,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Minotaur.Models;
 
 namespace Minotaur.Areas.Identity.Pages.Account.Manage
 {
     public class ResetAuthenticatorModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<MinotaurUser> _userManager;
+        private readonly SignInManager<MinotaurUser> _signInManager;
         private readonly ILogger<ResetAuthenticatorModel> _logger;
 
         public ResetAuthenticatorModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<MinotaurUser> userManager,
+            SignInManager<MinotaurUser> signInManager,
             ILogger<ResetAuthenticatorModel> logger)
         {
             _userManager = userManager;

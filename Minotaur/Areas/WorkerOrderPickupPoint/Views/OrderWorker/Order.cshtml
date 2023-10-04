@@ -46,25 +46,25 @@
 
                     switch (Model.Order.OrderStatus)
                     {
-                        case SD.StatusPending_0:
+                        case OperationByOrder.StatusPending_0:
                             colorStatus = "secondary";
                             break;
-                        case SD.StatusApproved_1:
+                        case OperationByOrder.StatusApproved_1:
                             colorStatus = "info";
                             break;
-                        case SD.StatusInProcess_2:
+                        case OperationByOrder.StatusInProcess_2:
                             colorStatus = "warning";
                             break;
-                        case SD.StatusShipped_3:
+                        case OperationByOrder.StatusShipped_3:
                             colorStatus = "primary";
                             break;
-                        case SD.StatusDelivered_4:
+                        case OperationByOrder.StatusDelivered_4:
                             colorStatus = "success";
                             break;
-                        case SD.StatusCancelled_5:
+                        case OperationByOrder.StatusCancelled_5:
                             colorStatus = "danger";
                             break;
-                        case SD.StatusRefunded_6:
+                        case OperationByOrder.StatusRefunded_6:
                             colorStatus = "dark";
                             break;
                     }
@@ -149,11 +149,11 @@
                 </div>
             </div>
             <div>
-                @if (Model.Order.OrderStatus != SD.StatusDelivered_4)
+                @if (Model.Order.OrderStatus != OperationByOrder.StatusDelivered_4)
                 {
                     @switch (Model.OperationName)
                     {
-                        case SD.AcceptOrder:
+                        case OperationOrderPickUp.AcceptOrder:
                             <div>
                                 <div>
                                     <button onclick="SendNotification('/WorkerOrderPickupPoint/NotificationWorker/Send?notificationCode=5&orderId=@Model.Order.OrderId')"
@@ -164,7 +164,7 @@
                                 <h8 class="opacity-50">*отправка уведомления клиенту о прибитые посылки</h8>
                             </div>
                             break;
-                        case SD.IssueOrder:
+                        case OperationOrderPickUp.IssueOrder:
                             <div>
                                 <div>
                                     <button onclick="SendConfirmationCode('/WorkerOrderPickupPoint/OrderWorker/SendConfirmationCode?orderId=@Model.Order.OrderId')"

@@ -10,15 +10,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Minotaur.Models;
 
 namespace Minotaur.Areas.Identity.Pages.Account
 {
     public class ConfirmEmailChangeModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<MinotaurUser> _userManager;
+        private readonly SignInManager<MinotaurUser> _signInManager;
 
-        public ConfirmEmailChangeModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public ConfirmEmailChangeModel(UserManager<MinotaurUser> userManager, SignInManager<MinotaurUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;

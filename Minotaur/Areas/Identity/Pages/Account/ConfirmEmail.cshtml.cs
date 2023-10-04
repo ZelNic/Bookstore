@@ -11,14 +11,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Minotaur.Models;
 
 namespace Minotaur.Areas.Identity.Pages.Account
 {
     public class ConfirmEmailModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<MinotaurUser> _userManager;
 
-        public ConfirmEmailModel(UserManager<IdentityUser> userManager)
+        public ConfirmEmailModel(UserManager<MinotaurUser> userManager)
         {
             _userManager = userManager;
         }

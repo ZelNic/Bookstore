@@ -10,17 +10,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Minotaur.Models;
+
 namespace Minotaur.Areas.Identity.Pages.Account
 {
     public class LoginWithRecoveryCodeModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<MinotaurUser> _signInManager;
+        private readonly UserManager<MinotaurUser> _userManager;
         private readonly ILogger<LoginWithRecoveryCodeModel> _logger;
 
         public LoginWithRecoveryCodeModel(
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
+            SignInManager<MinotaurUser> signInManager,
+            UserManager<MinotaurUser> userManager,
             ILogger<LoginWithRecoveryCodeModel> logger)
         {
             _signInManager = signInManager;

@@ -18,31 +18,32 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Minotaur.Models;
+using Minotaur.Models.SD;
 
 namespace Minotaur.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IUserStore<IdentityUser> _userStore;
-        private readonly IUserEmailStore<IdentityUser> _emailStore;
+        private readonly SignInManager<MinotaurUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<MinotaurUser> _userManager;
+        private readonly IUserStore<MinotaurUser> _userStore;
+        private readonly IUserEmailStore<MinotaurUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
-        public RegisterModel(
-            UserManager<IdentityUser> userManager,
-            IUserStore<IdentityUser> userStore,
-            SignInManager<IdentityUser> signInManager,
-            ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+        public RegisterModel(UserManager<MinotaurUser> userManager, IUserStore<MinotaurUser> userStore, SignInManager<MinotaurUser> signInManager, ILogger<RegisterModel> logger,
+            IEmailSender emailSender, RoleManager<IdentityRole> roleManager)
         {
+            _roleManager = roleManager;
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         /// <summary>
@@ -102,6 +103,11 @@ namespace Minotaur.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
+            if (!_roleManager.RoleExistsAsync(Roles.RoleCustomer).GetAwaiter().GetResult())
+            {
+                _roleManager.CreateAsync(new IdentityRole(Roles.RoleCustomer)).GetAwaiter().GetResult();
+            }
+
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -154,27 +160,27 @@ namespace Minotaur.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
+        private MinotaurUser CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<IdentityUser>();
+                return Activator.CreateInstance<MinotaurUser>();
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
-                    $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(MinotaurUser)}'. " +
+                    $"Ensure that '{nameof(MinotaurUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
 
-        private IUserEmailStore<IdentityUser> GetEmailStore()
+        private IUserEmailStore<MinotaurUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<IdentityUser>)_userStore;
+            return (IUserEmailStore<MinotaurUser>)_userStore;
         }
     }
 }

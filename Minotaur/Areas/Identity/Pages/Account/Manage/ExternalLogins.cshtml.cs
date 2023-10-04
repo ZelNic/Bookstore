@@ -11,19 +11,20 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Minotaur.Models;
 
 namespace Minotaur.Areas.Identity.Pages.Account.Manage
 {
     public class ExternalLoginsModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly IUserStore<IdentityUser> _userStore;
+        private readonly UserManager<MinotaurUser> _userManager;
+        private readonly SignInManager<MinotaurUser> _signInManager;
+        private readonly IUserStore<MinotaurUser> _userStore;
 
         public ExternalLoginsModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
-            IUserStore<IdentityUser> userStore)
+            UserManager<MinotaurUser> userManager,
+            SignInManager<MinotaurUser> signInManager,
+            IUserStore<MinotaurUser> userStore)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -69,7 +70,7 @@ namespace Minotaur.Areas.Identity.Pages.Account.Manage
                 .ToList();
 
             string passwordHash = null;
-            if (_userStore is IUserPasswordStore<IdentityUser> userPasswordStore)
+            if (_userStore is IUserPasswordStore<MinotaurUser> userPasswordStore)
             {
                 passwordHash = await userPasswordStore.GetPasswordHashAsync(user, HttpContext.RequestAborted);
             }
