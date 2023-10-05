@@ -22,10 +22,9 @@ namespace Minotaur.DataAccess
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<Order> Order { get; set; }
         public DbSet<Review> Reviews { get; set; }
-        public DbSet<OrderPickupPoint> OrderPickupPoint { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<Stock> Stocks { get; set; }
         public DbSet<RecordStock> StockJournal { get; set; }
+        public DbSet<Office> Offices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

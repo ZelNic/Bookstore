@@ -4,6 +4,7 @@ using Minotaur.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 
 namespace Minotaur.Areas.Customer
 {
@@ -12,14 +13,14 @@ namespace Minotaur.Areas.Customer
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ApplicationDbContext _db;
+        private readonly UserManager<MinotaurUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, IHttpContextAccessor httpContextAccessor, ApplicationDbContext db)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db, UserManager<MinotaurUser> userManager)
         {
             _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
             _db = db;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
@@ -34,12 +35,13 @@ namespace Minotaur.Areas.Customer
             List<Category>? categoriesList = await _db.Categories.ToListAsync();
             WishList? wishLists = null;
             ShoppingBasketClient? shoppingBasketClient = null;
-            var user = User.Identity;
+            
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
 
             if (user != null)
             {
-                wishLists = await _db.WishLists.Where(u => u.UserId == user.Name).FirstOrDefaultAsync();
-                ShoppingBasket? sb = await _db.ShoppingBasket.Where(u => u.UserId == user.Name).FirstOrDefaultAsync();
+                wishLists = await _db.WishLists.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+                ShoppingBasket? sb = await _db.ShoppingBasket.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
                 if (sb != null)
                 {
                     shoppingBasketClient = new()
@@ -52,7 +54,7 @@ namespace Minotaur.Areas.Customer
 
             ProductVM bookVM = new()
             {
-                User = user.Name,
+                User = user?.Id,
                 ProductsList = productsList,
                 CategoriesList = categoriesList,
                 WishList = wishLists,

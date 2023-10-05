@@ -1,29 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Minotaur.DataAccess;
 using Minotaur.Models;
-using Minotaur.Models.Models;
+using Minotaur.Models.SD;
 
 namespace Minotaur.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = Roles.RoleAdmin)]
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly Employees _admin;
 
-        public BookController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
+        public BookController(ApplicationDbContext db)
         {
             _db = db;
-            _contextAccessor = contextAccessor;
-
-            if (_contextAccessor.HttpContext.Session.GetInt32("Id") != null)
-            {
-                _admin = _db.Employees.Where(u => u.Id == _contextAccessor.HttpContext.Session.GetString("Id")).FirstOrDefault();
-            }
         }
-
 
         public async Task<IActionResult> Index()
         {

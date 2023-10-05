@@ -16,7 +16,7 @@ namespace Minotaur.Areas.API
 
         public async Task<IActionResult> GetOrderPickupPoint()
         {
-            var orderPickupPoint = await _db.OrderPickupPoint.ToListAsync();
+            var orderPickupPoint = await _db.Offices.ToListAsync();
             return Json(new { data = orderPickupPoint });
         }
     }

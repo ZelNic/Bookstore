@@ -1,0 +1,69 @@
+﻿
+<div class="container mb-5">
+    <div class="row">
+        <div>
+            <button id="btnActive" onclick="activeFormNewOffice(true)" class="btn btn-success col-2">Добавить офис</button>
+            <button id="btnClose" onclick="activeFormNewOffice(false)" class="btn btn-success col-2" hidden>Свернуть</button>
+            <div id="dataNewOffice" hidden>
+                <div class="mb-1 col">
+                    <label for="name" class="form-label">Название</label>
+                    <input type="text" class="form-control" id="name" name="name">
+                </div>
+                <div class="mb-1 col">
+                    <label for="type" class="form-label">Тип</label>
+                    <input type="text" class="form-control" id="type" name="type">
+                </div>
+                <div class="mb-1">
+                    <label for="status" class="form-label">Статус</label>
+                    <input type="text" class="form-control" id="status" name="status">
+                </div>
+                <div class="mb-1">
+                    <label for="city" class="form-label">Город</label>
+                    <input type="text" class="form-control" id="city" name="city" required>
+                </div>
+                <div class="mb-1">
+                    <label for="street" class="form-label">Улица</label>
+                    <input type="text" class="form-control" id="street" name="street" required>
+                </div>
+                <div class="mb-1">
+                    <label for="buildingNumber" class="form-label">Номер здания</label>
+                    <input type="text" class="form-control" id="buildingNumber" name="buildingNumber" required>
+                </div>
+                <div class="mb-1">
+                    <label for="workingHours" class="form-label">Режим работы</label>
+                    <input type="text" class="form-control" id="workingHours" name="workingHours">
+                </div>
+                <div class="mb-1">
+                    <label for="supervisorId" class="form-label">ID Ответственного</label>
+                    <input type="text" class="form-control" id="supervisorId" name="supervisorId">
+                </div>
+                <div class="mb-1">
+                    <label for="workload" class="form-label">Загруженность</label>
+                    <input type="text" class="form-control" id="workload" name="workload">
+                </div>
+                <div class="mb-1">
+                    <label for="notes" class="form-label">Заметки</label>
+                    <textarea class="form-control" id="notes" name="notes"></textarea>
+                </div>
+                <button type="submit" onclick="sendDataNewOffice()" class="btn btn-primary">Добавить</button>
+
+            </div>
+        </div>
+        <h1>Офисы</h1>
+        <table id="tableOffice" class="table table-bordered table-striped pt-3 my-1">
+            <thead class="pt-4 table-dark">
+                <tr>
+                    <th>Название</th>
+                    <th>Тип</th>
+                    <th>Время работы</th>
+                    <th>Руководитель</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/Admin/OfficeHandler.js"></script>
+}

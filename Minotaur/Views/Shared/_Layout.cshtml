@@ -31,10 +31,79 @@
 
                 @if (User.Identity.IsAuthenticated == true)
                 {
-                    <button class="btn btn-dark my-4 my-sm-0" type="submit"><i class="bi bi-search"></i>ВСЕ ОКЕЙ</button>
+                    if (User.IsInRole(Roles.RoleAdmin))
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item dropdown">
+                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Управление
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark">
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Book" asp-action="Index">Книги</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">Категории</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Office" asp-action="Office">Офисы</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    }
+                    else if (User.IsInRole(Roles.RoleWorkerOrderPickupPoint))
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item dropdown">
+                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Управление заказами
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark">
+                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.ViewOrderDetails">Проверить состояние</a></li>
+                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.AcceptOrder">Прием</a></li>
+                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.IssueOrder">Выдача</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    }
+                    else if (User.IsInRole(Roles.RoleOrderPicker))
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li>
+                                <a class="nav-link text-light" asp-area="Identity" asp-controller="User" asp-action="Registration">Сборка заказа</a>
+                            </li>
+                        </ul>
+                    }
+                    else if (User.IsInRole(Roles.RoleStockkeeper))
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li>
+                                <a class="nav-link text-light" asp-area="Stockkeeper" asp-controller="Stock" asp-action="Index">Склад</a>
+                            </li>
+                        </ul>
+                    }
+
+
+                    <ul class="navbar-nav flex-grow-1 justify-content-end">
+                        <li>
+                            <a class="nav-link text-light" asp-area="Customer" asp-controller="Wishlist" asp-action="Index">
+                                <i class="bi bi-bookmark-fill"></i>Отложено
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link text-light" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="Index">
+                                <i class="bi bi-bag-check-fill"></i>Корзина
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link text-light" asp-area="Customer" asp-controller="Orders" asp-action="Index">
+                                <i class="bi bi-box-seam"></i>Заказы
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link text-light" asp-area="Customer" asp-controller="NotificationCustomer" asp-action="Index">
+                                <i class="bi bi-chat-dots-fill"></i> Сообщения
+                            </a>
+                        </li>                        
+                    </ul>
                 }
 
-                <div class="navbar-collapse collapse d-sm-inline-flex">
+                <div class="navbar-nav flex-grow-1 justify-content-end">
                     <partial name="_LoginPartial" />
                 </div>
             </div>
@@ -47,11 +116,12 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
+    <footer class="border-top fixed-bottom footer text-muted">
+        <div class="">
             &copy; 2023 - Минота́вр - <a asp-area="" asp-controller="Home" asp-action="Privacy"><i class="bi bi-shield-check"></i>Соглашение</a>
         </div>
     </footer>
+
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

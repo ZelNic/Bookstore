@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Minotaur.DataAccess;
 using Minotaur.Models;
+using Minotaur.Models.SD;
 
 namespace Minotaur.Areas.Admin.Controllers
 {
     [Area("Admin")]
-
+    [Authorize(Roles = Roles.RoleAdmin)]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -16,11 +18,6 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             _db = db;
             _contextAccessor = contextAccessor;
-
-            if (_contextAccessor.HttpContext.Session.GetInt32("Id") != null)
-            {
-
-            }
         }
 
         public async Task<IActionResult> Index()

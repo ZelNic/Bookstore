@@ -323,6 +323,47 @@ namespace Minotaur.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("Minotaur.Models.Models.Office", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BuildingNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SupervisorId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkingHours")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Workload")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Offices");
+                });
+
             modelBuilder.Entity("Minotaur.Models.Models.Order", b =>
                 {
                     b.Property<int>("OrderId")
@@ -386,38 +427,6 @@ namespace Minotaur.Migrations
                     b.HasKey("OrderId");
 
                     b.ToTable("Order");
-                });
-
-            modelBuilder.Entity("Minotaur.Models.Models.OrderPickupPoint", b =>
-                {
-                    b.Property<int>("PointId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PointId"));
-
-                    b.Property<string>("BuildingNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CountOfOrders")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WorkingHours")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PointId");
-
-                    b.ToTable("OrderPickupPoint");
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.RecordStock", b =>
@@ -520,31 +529,6 @@ namespace Minotaur.Migrations
                     b.HasKey("BasketId");
 
                     b.ToTable("ShoppingBasket");
-                });
-
-            modelBuilder.Entity("Minotaur.Models.Models.Stock", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResponsiblePersonId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Stocks");
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.WishList", b =>
