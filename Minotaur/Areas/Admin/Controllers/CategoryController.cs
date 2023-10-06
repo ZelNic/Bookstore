@@ -8,7 +8,7 @@ using Minotaur.Models.SD;
 namespace Minotaur.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = Roles.RoleAdmin)]
+    [Authorize(Roles = Roles.Role_Admin)]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _db;

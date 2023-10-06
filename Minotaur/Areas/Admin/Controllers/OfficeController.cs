@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace Minotaur.Areas.Admin.Controllers
 {
-    [Area("Admin"), Authorize(Roles = Roles.RoleAdmin)]
+    [Area("Admin"), Authorize(Roles = Roles.Role_Admin)]
     public class OfficeController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -27,11 +27,13 @@ namespace Minotaur.Areas.Admin.Controllers
             return View();
         }
 
-        public async Task<IActionResult> GetOffices()
+        public async Task<IActionResult> GetDataOffice()
         {
-            var offices = _db.Offices.ToArrayAsync();
+            Office[] offices = await _db.Offices.ToArrayAsync();
+            string[] officeTypes = Enum.GetValues(typeof(TypesOfOffices)).Cast<TypesOfOffices>().Select(e => Enum.GetName(typeof(TypesOfOffices), e)).ToArray();
+            string[] officeStatus = Enum.GetValues(typeof(OfficeStatus)).Cast<OfficeStatus>().Select(e => Enum.GetName(typeof(OfficeStatus), e)).ToArray();
 
-            return Json(new { data = offices });
+            return Json(new { offices, officeTypes, officeStatus });
         }
 
         [HttpPost]
@@ -40,8 +42,6 @@ namespace Minotaur.Areas.Admin.Controllers
             if (dataOffice == null) { return BadRequest(new { error = "Неверно заполнены данные" }); }
 
             Office? office = JsonConvert.DeserializeObject<Office>(dataOffice);
-
-
 
             if (office != null)
             {

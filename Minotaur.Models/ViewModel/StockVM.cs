@@ -4,7 +4,7 @@ namespace Minotaur.Models
 {
     public class StockVM
     {
-        public Stock? Stock { get; set; }
+        public Office? Office { get; set; }
         public List<RecordStock>? WarehouseJournal { get; set; }
     }
 }
