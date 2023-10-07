@@ -118,6 +118,7 @@ namespace Minotaur.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
+                await _userManager.AddToRoleAsync(user, Roles.Role_Customer);
 
                 if (result.Succeeded)
                 {
@@ -132,8 +133,8 @@ namespace Minotaur.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Подтвердите электронную почту",
+                        $"Пожалуйста подтвердите свой аккаунт <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>Нажмите сюда</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

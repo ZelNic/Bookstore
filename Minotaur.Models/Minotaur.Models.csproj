@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Minotaur.Utility\Minotaur.Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="OrganizationalDocumentation\NewFolder\" />
+  </ItemGroup>
+
 </Project>

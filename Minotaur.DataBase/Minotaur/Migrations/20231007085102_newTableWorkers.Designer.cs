@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Minotaur.DataAccess;
 
@@ -11,9 +12,11 @@ using Minotaur.DataAccess;
 namespace Minotaur.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231007085102_newTableWorkers")]
+    partial class newTableWorkers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -545,15 +548,7 @@ namespace Minotaur.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AdmissionOrder")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("OfficeId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OrderDismissal")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -568,25 +563,6 @@ namespace Minotaur.Migrations
                     b.HasKey("WorkerId");
 
                     b.ToTable("Workers");
-                });
-
-            modelBuilder.Entity("Minotaur.Models.OrganizationalDocumentation.HR.OrganizationalOrder", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Date")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OrganizationalOrders");
                 });
 
             modelBuilder.Entity("Minotaur.Models.Product", b =>

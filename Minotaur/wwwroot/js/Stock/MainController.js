@@ -69,7 +69,6 @@ function selectProductToPurchase(productId) {
     });
 }
 function editShelfProduct(productData) {
-    console.log(productData)
     var response = productData;
     var values = response.split('&');
     var recordId = values[0];

@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\HR\Data\**" />
+    <Compile Remove="Areas\HR\Models\**" />
+    <Content Remove="Areas\HR\Data\**" />
+    <Content Remove="Areas\HR\Models\**" />
+    <EmbeddedResource Remove="Areas\HR\Data\**" />
+    <EmbeddedResource Remove="Areas\HR\Models\**" />
+    <None Remove="Areas\HR\Data\**" />
+    <None Remove="Areas\HR\Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CassandraCSharpDriver" Version="3.19.3" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
     <PackageReference Include="DocX" Version="2.5.0" />
@@ -28,9 +39,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\HR\Controllers\" />
     <Folder Include="Areas\Picker\Controllers\" />
     <Folder Include="Areas\Picker\Views\" />
     <Folder Include="Areas\Stockkeeper\PurchaseRequisitions\" />
+    <Folder Include="wwwroot\js\HR\" />
   </ItemGroup>
 
 </Project>

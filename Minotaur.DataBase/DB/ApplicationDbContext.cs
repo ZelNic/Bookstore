@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Minotaur.Utility;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Minotaur.Models.OrganizationalDocumentation.HR;
 
 namespace Minotaur.DataAccess
 {
@@ -24,6 +25,8 @@ namespace Minotaur.DataAccess
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RecordStock> StockJournal { get; set; }
         public DbSet<Office> Offices { get; set; }
+        public DbSet<Worker> Workers { get; set; }
+        public DbSet<OrganizationalOrder> OrganizationalOrders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

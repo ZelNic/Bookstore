@@ -1,5 +1,4 @@
 ﻿
-
 var typeOffice;
 var statusOffice;
 var tableOffice;
@@ -8,77 +7,56 @@ $(document).ready(function () {
     getTableOffice();
 });
 
-
-
 function getTableOffice() {
-    $.ajax({
-        url: '/Admin/Office/GetDataOffice',
-        type: 'GET',
-        dataType: 'json',
-        success: function (response) {
-            dataForOffice = response.offices;
-            typeOffice = response.officeTypes;
-            statusOffice = response.officeStatus;
-            addFormForAddOffice();
-
-            console.log(dataForOffice);
-
-            $('#tableOffice').DataTable({
-                "columns": [
-                    {
-                        data: 'name',
-                        "width": "10%"
-                    },
-                    {
-                        data: 'type',
-                        "width": "10%"
-                    },
-                    {
-                        data: 'status',
-                        "width": "10%"
-                    },
-                    {
-                        data: function (row) {
-                            return row.city + ' ' + row.street + ' ' + row.buildingNumber;
-                        },
-                        "width": "15%"
-                    },
-                    {
-                        data: 'workingHours',
-                        "width": "10%"
-                    },
-                    {
-                        data: 'supervisorId',
-                        "width": "10%"
-                    },
-                    {
-                        data: 'workload',
-                        "width": "10%"
-                    },
-                    {
-                        data: 'notes',
-                        "width": "10%"
-                    },
-                    {
-                        data: 'id',
-                        render: function (data, type, row) {
-                            return '<a href="/Customer/Home/Details?productId=' + data + '">' + data + '</a>';
-                        },
-                        "width": "15%"
-                    }
-                ]
-            });
-        }
+    tableOffice = $('#tableOffice').DataTable({
+        "ajax": { url: '/Admin/Office/GetDataOffice' },
+        "columns": [
+            { data: 'name', "width": "10%" },
+            { data: 'type', "width": "10%" },
+            { data: 'status', "width": "10%" },
+            {
+                data: function (row) {
+                    return row.city + ' ' + row.street + ' ' + row.buildingNumber;
+                },
+                "width": "15%"
+            },
+            { data: 'workingHours', "width": "10%" },
+            { data: 'supervisorId', "width": "10%" },
+            { data: 'workload', "width": "10%" },
+            { data: 'notes', "width": "10%" },
+            {
+                data: 'id',
+                render: function (data, type, row) {
+                    return '<button class="btn btn-warning">edit</button>';
+                },
+                "width": "15%"
+            }
+        ]
     });
 }
 
+function updateDataTable() {
+    getTableOffice();
+    tableOffice.ajax.url('/Admin/Office/GetDataOffice').load();
+}
 
-
-function addFormForAddOffice() {
+function getDataForFormNewOffice() {
+    tableOffice = document.getElementById("tableOffice");
+    $.ajax({
+        url: '/Admin/Office/GetDataForFormNewOffice',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            typeOffice = response.officeTypes;
+            statusOffice = response.officeStatus;
+            addParameterForForm();
+        },
+    });
+}
+function addParameterForForm() {
     var formNewOffice = document.getElementById("formNewOffice")
     var selectTypeOffice = "";
     var stOffice = "";
-
 
     for (var type of typeOffice) {
 
@@ -99,9 +77,10 @@ function addFormForAddOffice() {
     }
 
     formNewOffice.innerHTML = `
+                <form>
                 <div class="mb-1 col">
                     <label for="name" class="form-label">Название</label>
-                    <input type="text" class="form-control" id="name" name="name">
+                    <input type="text" class="form-control" id="name" name="name" required>
                 </div>
                 <div class="mb-1 col">
                     <label for="name" class="form-label">Тип</label>
@@ -131,24 +110,25 @@ function addFormForAddOffice() {
                 </div>
                 <div class="mb-1">
                     <label for="workingHours" class="form-label">Режим работы</label>
-                    <input type="text" class="form-control" id="workingHours" name="workingHours">
+                    <input type="text" class="form-control" id="workingHours" name="workingHours" required>
                 </div>
                 <div class="mb-1">
                     <label for="supervisorId" class="form-label">ID Ответственного</label>
-                    <input type="text" class="form-control" id="supervisorId" name="supervisorId">
+                    <input type="text" class="form-control" id="supervisorId" name="supervisorId" required>
                 </div>                
                 <div class="mb-1">
                     <label for="notes" class="form-label">Заметки</label>
                     <textarea class="form-control" id="notes" name="notes"></textarea>
                 </div>
                 <button type="submit" onclick="sendDataNewOffice()" class="btn btn-primary">Добавить</button>
+                </form>
         `;
 }
-
 function activeFormNewOffice(isActive) {
     var formNewOffice = document.getElementById("formNewOffice");
     var btnActive = document.getElementById("btnActive");
     var btnClose = document.getElementById("btnClose");
+    getDataForFormNewOffice();
 
     if (isActive == true) {
         formNewOffice.removeAttribute("hidden");
@@ -161,7 +141,6 @@ function activeFormNewOffice(isActive) {
         btnClose.setAttribute("hidden", true);
     }
 }
-
 
 function sendDataNewOffice() {
     // Получение значений полей формы
@@ -187,6 +166,13 @@ function sendDataNewOffice() {
         Notes: notes
     };
 
+    for (var prop in data) {
+        if (data[prop] == '' && prop !== "Notes") {
+            return;
+        }
+    }
+
+
     var jsonDataNewOffice = JSON.stringify(data);
 
     $.ajax({
@@ -211,6 +197,6 @@ function sendDataNewOffice() {
                 timer: 1500
             })
         }
-    })
-
+    });
+    updateDataTable();
 }

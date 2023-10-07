@@ -30,11 +30,18 @@ namespace Minotaur.Areas.Admin.Controllers
         public async Task<IActionResult> GetDataOffice()
         {
             Office[] offices = await _db.Offices.ToArrayAsync();
+                       
+            return Json(new { data = offices });
+        }
+
+        public async Task<IActionResult> GetDataForFormNewOffice()
+        {
             string[] officeTypes = Enum.GetValues(typeof(TypesOfOffices)).Cast<TypesOfOffices>().Select(e => Enum.GetName(typeof(TypesOfOffices), e)).ToArray();
             string[] officeStatus = Enum.GetValues(typeof(OfficeStatus)).Cast<OfficeStatus>().Select(e => Enum.GetName(typeof(OfficeStatus), e)).ToArray();
 
-            return Json(new { offices, officeTypes, officeStatus });
+            return Json(new {officeTypes, officeStatus });
         }
+
 
         [HttpPost]
         public async Task<IActionResult> AddOffice(string dataOffice)
