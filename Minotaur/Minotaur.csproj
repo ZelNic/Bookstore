@@ -43,7 +43,6 @@
     <Folder Include="Areas\Picker\Controllers\" />
     <Folder Include="Areas\Picker\Views\" />
     <Folder Include="Areas\Stockkeeper\PurchaseRequisitions\" />
-    <Folder Include="wwwroot\js\HR\" />
   </ItemGroup>
 
 </Project>

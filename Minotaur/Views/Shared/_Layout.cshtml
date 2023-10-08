@@ -28,8 +28,7 @@
                     </form>
                 </div>
 
-
-                @if (User.Identity.IsAuthenticated == true)
+                @if (User.Identity?.IsAuthenticated == true)
                 {
                     if (User.IsInRole(Roles.Role_Admin))
                     {
@@ -42,6 +41,7 @@
                                     <li><a class="dropdown-item" asp-area="Admin" asp-controller="Book" asp-action="Index">Книги</a></li>
                                     <li><a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">Категории</a></li>
                                     <li><a class="dropdown-item" asp-area="Admin" asp-controller="Office" asp-action="Office">Офисы</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Roles" asp-action="ViewRoles">Сотрудники</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -74,6 +74,14 @@
                         <ul class="navbar-nav flex-grow-1">
                             <li>
                                 <a class="nav-link text-light" asp-area="Stockkeeper" asp-controller="Stock" asp-action="Index">Склад</a>
+                            </li>
+                        </ul>
+                    }
+                    else if (User.IsInRole(Roles.Role_HR))
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li>
+                                <a class="nav-link text-light" asp-area="HR" asp-controller="Worker" asp-action="Index">Персонал</a>
                             </li>
                         </ul>
                     }

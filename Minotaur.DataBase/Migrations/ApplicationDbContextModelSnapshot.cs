@@ -248,6 +248,9 @@ namespace Minotaur.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Surname")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -546,7 +549,6 @@ namespace Minotaur.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AdmissionOrder")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OfficeId")
@@ -554,10 +556,13 @@ namespace Minotaur.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OrderDismissal")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Minotaur.DataAccess;
@@ -12,7 +13,6 @@ namespace Minotaur.Areas.Admin.Controllers
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _db;
-
         public BookController(ApplicationDbContext db)
         {
             _db = db;

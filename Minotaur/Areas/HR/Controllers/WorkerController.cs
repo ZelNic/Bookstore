@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace Minotaur.Areas.HR.Controllers
 {
-    [Area("HR"), Authorize(Roles = Roles.Role_HR)]
+    [Area("HR"), Authorize(Roles = $"{Roles.Role_HR}, {Roles.Role_Admin}")]
     public class WorkerController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -39,7 +39,7 @@ namespace Minotaur.Areas.HR.Controllers
         {
             var workers = await _db.Workers.ToArrayAsync();
 
-            return Json(new { });
+            return Json(new { workers });
         }
 
         public async Task<IActionResult> FindUserForHiring(string? email = null, string? userId = null)
@@ -62,14 +62,14 @@ namespace Minotaur.Areas.HR.Controllers
 
         public async Task<IActionResult> RegisterNewWorker(string userId, string officeId, string role)
         {
-            if ((_userManager.FindByIdAsync(userId) != null) && (await _db.Offices.FindAsync(officeId) != null))
+            if ((_userManager.FindByIdAsync(userId) != null) && (await _db.Offices.Where(u=>u.Id == Guid.Parse(officeId)).FirstOrDefaultAsync()!= null))
             {
                 Worker worker = new()
                 {
                     Status = StatusWorker.Works,
                     UserId = userId,
                     OfficeId = officeId,
-                    Role = role
+                    Role = role,
                 };
 
                 OrganizationalOrder order = new()
@@ -93,8 +93,8 @@ namespace Minotaur.Areas.HR.Controllers
 
         public async Task<IActionResult> FireEmployee(string workerId)
         {
-            Worker? exWorker = await _db.Workers.Where(w =>w.WorkerId.ToString() == workerId).FirstOrDefaultAsync();
-            if(exWorker == null) { return BadRequest(new { error = "Работник не найден" }); }
+            Worker? exWorker = await _db.Workers.Where(w => w.WorkerId.ToString() == workerId).FirstOrDefaultAsync();
+            if (exWorker == null) { return BadRequest(new { error = "Работник не найден" }); }
 
             exWorker.Status = StatusWorker.Fired;
 

@@ -3,7 +3,8 @@
     public enum TypesOfOffices
     {
         Склад,
-        Пункт_выдачи
+        Пункт_выдачи,
+        Офис,
     }
 }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Minotaur.Models.Models
 {
@@ -7,11 +6,12 @@ namespace Minotaur.Models.Models
     {
         [Key]
         public Guid WorkerId { get; set; }
-        [Required] public string? Status { get; set;}
+        [Required] public string? Status { get; set; }
         [Required] public string? UserId { get; set; }
         [Required] public string? OfficeId { get; set; }
         [Required] public string? Role { get; set; }
-        [Required] public string? AdmissionOrder { get; set; }
-        [Required] public string? OrderDismissal { get; set; }
+        public string? AdmissionOrder { get; set; }
+        public string? OrderDismissal { get; set; }
+        
     }
 }
