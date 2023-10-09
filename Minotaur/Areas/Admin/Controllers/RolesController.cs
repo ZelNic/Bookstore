@@ -6,7 +6,6 @@ using Minotaur.DataAccess;
 using Minotaur.Models;
 using Minotaur.Models.Models;
 using Minotaur.Models.SD;
-using System.Linq;
 
 namespace Minotaur.Areas.Admin.Controllers
 {
@@ -15,6 +14,7 @@ namespace Minotaur.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<MinotaurUser> _userManager;
+
 
         public RolesController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
         {
@@ -28,32 +28,58 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDataUserRoles()
         {
-            var offices = await _db.Offices.Select(o => new { o.Id, o.Name }).ToListAsync();
+            var worker = await _db.Workers.Join(_userManager.Users, e => e.UserId, u => u.Id, (e, u) => new { Worker = e, User = u })
+                .Select(w => new
+                {
+                    w.Worker.WorkerId,
+                    w.Worker.UserId,
+                    w.Worker.Status,
+                    w.Worker.OfficeId,
+                    w.Worker.OfficeName,
+                    LFS = w.User.LastName + " " + w.User.FirstName + " " + w.User.Surname,
+                    w.Worker.AccessRights,
+                    w.Worker.Post,
+                    w.User.Email,
+                }).ToArrayAsync();
 
-            var worker = await _db.Workers.Join(_userManager.Users, e => e.UserId, u => u.Id, (e, u) => new { Worker = e, User = u }).Select(w => new
-            {
-                w.Worker.WorkerId,
-                w.Worker.UserId,
-                w.Worker.Status,
-                OfficeName = offices.AsEnumerable().FirstOrDefault(i => i.Id == Guid.Parse(w.Worker.OfficeId)),
-                w.Worker.OfficeId,
-                LFS = w.User.LastName + " " + w.User.FirstName + " " + w.User.Surname,
-                w.Worker.Role,
-                w.User.Email,
-            }).ToListAsync();
+            return Json(new { data = worker });
+        }
 
+        private List<string> ParseWorkerRoles(string role)
+        {
+            List<string> arrayRoles = role.Split('|').ToList();
 
+            return arrayRoles;
+        }
 
+        private string SerializationWorkerRoles(List<string> arrayRoles)
+        {
+            string stringRoles = string.Join('|', arrayRoles);
 
-
-            return Json(new { data = worker, offices });
+            return stringRoles;
         }
 
         [HttpPost]
         public async Task<IActionResult> SetRoleWorker(string userId, string role)
         {
             MinotaurUser? minotaurUser = await _userManager.FindByIdAsync(userId);
-            if (minotaurUser != null) { return BadRequest(new { error = "Работник не найден" }); }
+            if (minotaurUser == null) { return BadRequest(new { error = "Пользователь не найден" }); }
+
+            Worker? worker = await _db.Workers.FirstOrDefaultAsync(u => u.UserId == minotaurUser.Id);
+            if (worker == null) { return BadRequest(new { error = "Пользователь не зарегистрирован в качестве сотрудника" }); }
+
+            List<string> arrayRoles = ParseWorkerRoles(worker.AccessRights);
+
+            if (arrayRoles.Contains(role))
+            {
+                return Ok();
+            }
+
+            arrayRoles.Add(role);
+            worker.AccessRights = SerializationWorkerRoles(arrayRoles);
+
+            _db.Workers.Update(worker);
+            await _db.SaveChangesAsync();
 
             await _userManager.AddToRoleAsync(minotaurUser, role);
             return Ok();
@@ -62,9 +88,23 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveRoleWorker(string userId, string role)
         {
-
             MinotaurUser? minotaurUser = await _userManager.FindByIdAsync(userId);
-            if (minotaurUser != null) { return BadRequest(new { error = "Работник не найден" }); }
+            if (minotaurUser == null) { return BadRequest(new { error = "Работник не найден" }); }
+
+            Worker worker = await _db.Workers.FirstOrDefaultAsync(u => u.UserId == minotaurUser.Id);
+            if (worker == null) { return BadRequest(new { error = "Пользователь не зарегистрирован в качестве сотрудника" }); }
+           
+            List<string> arrayRoles = ParseWorkerRoles(worker.AccessRights);
+            if (!arrayRoles.Contains(role))
+            {
+                return Ok();
+            }
+
+            arrayRoles.Remove(role);
+            worker.AccessRights = SerializationWorkerRoles(arrayRoles);
+
+            _db.Workers.Update(worker);
+            await _db.SaveChangesAsync();
 
             await _userManager.RemoveFromRoleAsync(minotaurUser, role);
             return Ok();

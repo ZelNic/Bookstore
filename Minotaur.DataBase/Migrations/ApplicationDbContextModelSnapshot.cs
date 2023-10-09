@@ -548,17 +548,25 @@ namespace Minotaur.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AccessRights")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("AdmissionOrder")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OfficeId")
+                    b.Property<Guid?>("OfficeId")
+                        .IsRequired()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OfficeName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OrderDismissal")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Role")
+                    b.Property<string>("Post")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

@@ -29,7 +29,7 @@ namespace Minotaur.Areas.HR.Controllers
         }
 
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
@@ -37,9 +37,21 @@ namespace Minotaur.Areas.HR.Controllers
 
         public async Task<IActionResult> GetDataByWorker()
         {
-            var workers = await _db.Workers.ToArrayAsync();
+            var worker = await _db.Workers.Join(_userManager.Users, e => e.UserId, u => u.Id, (e, u) => new { Worker = e, User = u })
+                .Select(w => new
+                {
+                    w.Worker.WorkerId,
+                    w.Worker.UserId,
+                    w.Worker.Status,
+                    w.Worker.OfficeId,
+                    w.Worker.OfficeName,
+                    LFS = w.User.LastName + " " + w.User.FirstName + " " + w.User.Surname,
+                    w.Worker.AccessRights,
+                    w.Worker.Post,
+                    w.User.Email,
+                }).ToArrayAsync();
 
-            return Json(new { workers });
+            return Json(new { data = worker });
         }
 
         public async Task<IActionResult> FindUserForHiring(string? email = null, string? userId = null)
@@ -60,16 +72,20 @@ namespace Minotaur.Areas.HR.Controllers
             return Json(new { user, office, roles });
         }
 
-        public async Task<IActionResult> RegisterNewWorker(string userId, string officeId, string role)
+        public async Task<IActionResult> RegisterNewWorker(string userId, string officeId, string post)
         {
-            if ((_userManager.FindByIdAsync(userId) != null) && (await _db.Offices.Where(u=>u.Id == Guid.Parse(officeId)).FirstOrDefaultAsync()!= null))
+            if ((_userManager.FindByIdAsync(userId) != null))
             {
+                var office = await _db.Offices.Where(u => u.Id == Guid.Parse(officeId)).FirstOrDefaultAsync();
+                if (office == null) { return BadRequest(new { error = "Офис не найден" }); }
+
                 Worker worker = new()
                 {
                     Status = StatusWorker.Works,
                     UserId = userId,
-                    OfficeId = officeId,
-                    Role = role,
+                    OfficeId = Guid.Parse(officeId),
+                    OfficeName = office.Name,
+                    Post = post,
                 };
 
                 OrganizationalOrder order = new()
@@ -78,7 +94,6 @@ namespace Minotaur.Areas.HR.Controllers
                     Date = MoscowTime.GetTime().ToString("dd.MM.yyyy"),
                 };
 
-                await _userManager.AddToRoleAsync(await _userManager.FindByIdAsync(userId), role);
 
                 await _db.OrganizationalOrders.AddAsync(order);
                 await _db.Workers.AddAsync(worker);
@@ -87,7 +102,11 @@ namespace Minotaur.Areas.HR.Controllers
             }
             else
             {
-                return BadRequest(new { error = "Введенные данные недействительны" }); ;
+                return BadRequest(new
+                {
+                    error = "Работник не найден в качестве пользователя. " +
+                    "Необходимо зарегестироваться в качестве пользователя или проверить правильность данных."
+                }); ;
             }
         }
 
