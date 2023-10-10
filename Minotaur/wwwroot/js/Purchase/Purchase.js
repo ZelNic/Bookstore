@@ -3,12 +3,12 @@ $(document).ready(function () {
     getInfomationAboutBuyer();
 });
 
-var orderData;
-var listPickupPoints;
-var personalWalletAndPurchaseAmount;
+let orderData;
+let listPickupPoints;
+let personalWalletAndPurchaseAmount;
 
 function getInfomationAboutBuyer() {
-    var infomationData = document.getElementById("infomationData");
+    let infomationData = document.getElementById("infomationData");
 
     $.ajax({
         url: '/Purchase/Purchase/GetInfomationAboutBuyer',
@@ -111,7 +111,7 @@ function makePayment() {
         }).then((result) => {
             if (result.isConfirmed) {
                 orderData.purchaseAmount = personalWalletAndPurchaseAmount.purchaseAmount;
-                var orderD = JSON.stringify(orderData);
+                let orderD = JSON.stringify(orderData);
 
                 $.ajax({
                     url: '/Purchase/Purchase/Payment?dataDelivery=' + orderD,
@@ -165,8 +165,8 @@ function makePayment() {
 
 function checkData() {
 
-    var propertyBuyer = [orderData.receiverName, orderData.receiverLastName, orderData.phoneNumber]
-    var propertyDataCourier = [orderData.city, orderData.street, orderData.houseNumber]
+    let propertyBuyer = [orderData.receiverName, orderData.receiverLastName, orderData.phoneNumber]
+    let propertyDataCourier = [orderData.city, orderData.street, orderData.houseNumber]
     for (var p of propertyBuyer) {
         if (p.length === 0) {
             Swal.fire('Необходимо заполнить все поля');
@@ -180,7 +180,7 @@ function checkData() {
             return;
         }
     } else {
-        for (var p of propertyDataCourier) {
+        for (let p of propertyDataCourier) {
             if (p.length === 0) {
                 Swal.fire('Необходимо заполнить все поля');
                 return;
@@ -191,7 +191,7 @@ function checkData() {
 }
 
 function activeBtnPayment(isActive) {
-    var btnPayment = document.getElementById("btnPayment");
+    let btnPayment = document.getElementById("btnPayment");
 
     if (isActive == false) {
         btnPayment.innerHTML = ``;
@@ -209,7 +209,7 @@ function setTypeDelivery(type) {
 
     activeBtnPayment(false);
 
-    var deliveryData = document.getElementById("deliveryData");
+    let deliveryData = document.getElementById("deliveryData");
     if (type === "false") {
         orderData.isCourierDelivery = false;
         deliveryData.innerHTML = `
@@ -253,7 +253,7 @@ function setTypeDelivery(type) {
 }
 
 function changeDataBuyer(attribute, value) {
-    var property = document.getElementById(attribute);
+    let property = document.getElementById(attribute);
 
     orderData[attribute] = value;
 

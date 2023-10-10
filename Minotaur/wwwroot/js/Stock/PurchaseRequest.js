@@ -1,4 +1,4 @@
-﻿var dataTablePurchaseRequest;
+﻿let dataTablePurchaseRequest;
 $(document).ready(function () {
     loadDataTablePurchaseRequest();
 });
@@ -41,21 +41,21 @@ function loadDataTablePurchaseRequest() {
 }
 
 document.getElementById('purchaseRequestSend').addEventListener('submit', function (event) {
-    event.preventDefault(); 
+    event.preventDefault();
     sendTable();
 });
 
 function sendTable() {
-    var models = [];
+    let models = [];
 
-    var countInputs = document.querySelectorAll('input[name="Count"]');
-    var productIdInputs = document.querySelectorAll('input[name="ProductId"]');
-    var productNameInputs = document.querySelectorAll('input[name="ProductName"]');
+    let countInputs = document.querySelectorAll('input[name="Count"]');
+    let productIdInputs = document.querySelectorAll('input[name="ProductId"]');
+    let productNameInputs = document.querySelectorAll('input[name="ProductName"]');
 
     for (var i = 0; i < countInputs.length; i++) {
-        var count = parseInt(countInputs[i].value);
-        var productId = productIdInputs[i].value;
-        var productName = productNameInputs[i].value;
+        let count = parseInt(countInputs[i].value);
+        let productId = productIdInputs[i].value;
+        let productName = productNameInputs[i].value;
 
         var model = {
             Count: count,
@@ -67,9 +67,9 @@ function sendTable() {
         console.log(model);
     }
 
-    var jsonData = JSON.stringify(models);
+    let jsonData = JSON.stringify(models);
 
-    var url = "/Stockkeeper/Stock/OrderProducts";
+    const URL = "/Stockkeeper/Stock/OrderProducts";
 
     fetch(url, {
         method: "POST",
@@ -85,9 +85,9 @@ function sendTable() {
         }
     })
         .then(function (blob) {
-            var fileUrl = URL.createObjectURL(blob);
+            let fileUrl = URL.createObjectURL(blob);
 
-            var downloadLink = document.createElement("a");
+            let downloadLink = document.createElement("a");
             downloadLink.href = fileUrl;
             downloadLink.download = "Заявление.docx";
 

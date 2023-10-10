@@ -1,5 +1,5 @@
 ﻿
-var dataWorker;
+let dataWorker;
 $(document).ready(function () {
     getDataUserRoles();
 });
@@ -17,10 +17,10 @@ function getDataUserRoles() {
             {
                 data: 'userId',
                 render: function (data, type, row) {
-                    var userId = row.userId;
-                    var roleArray;
+                    let userId = row.userId;
+                    let roleArray;
                     if (row.accessRights.includes('|')) {
-                        var roleArray = row.accessRights.split("|");
+                        let roleArray = row.accessRights.split("|");
                     } else {
                         roleArray = [row.accessRights];
                     }
@@ -39,13 +39,13 @@ function getDataUserRoles() {
     });
 
     $(document).on('change', '.role-checkbox', function () {
-        var userId = $(this).attr('userId');
-        var role = $(this).attr('value');
+        let userId = $(this).attr('userId');
+        let role = $(this).attr('value');
 
-        var isChecked = $(this).is(':checked');
+        let isChecked = $(this).is(':checked');
 
-        var urlMethod;
-        var messageResponse;
+        let urlMethod;
+        let messageResponse;
 
         if (isChecked == true) {
             urlMethod = `/Admin/Roles/SetRoleWorker?userId= + ${userId} + &role= + ${role}`

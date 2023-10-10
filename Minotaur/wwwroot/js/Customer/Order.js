@@ -1,13 +1,13 @@
 
-var ordersData;
-var productNameData;
+let ordersData;
+let productNameData;
 
 $(document).ready(function () {
     getOrders();
 });
 
 function getOrders() {
-    var orders = document.getElementById("orders");
+    let orders = document.getElementById("orders");
 
     $.ajax({
         url: '/Customer/Orders/GetOrders',
@@ -22,10 +22,9 @@ function getOrders() {
 }
 
 function generateOrderCards() {
-    var countProduct = 0;
-    var sumPrice = 0;
-    var html = ``;
-
+    let countProduct = 0;
+    let sumPrice = 0;
+    let html = ``;
 
     for (var order of ordersData) {
 

@@ -3,15 +3,15 @@ $(document).ready(function () {
     getShoppingBasket();
 });
 
-var dataShoppingBasket;
-var countProduct;
-var totalPrice;
-var countSelectedProduct;
-var orderingInformation = document.getElementById("orderingInformation");
-var boxSelect = document.getElementById("boxSelect");
-var checkout = document.getElementById("checkout");
-var productArray = [];
-var isSave = false;
+let dataShoppingBasket;
+let countProduct;
+let totalPrice;
+let countSelectedProduct;
+let orderingInformation = document.getElementById("orderingInformation");
+let boxSelect = document.getElementById("boxSelect");
+let checkout = document.getElementById("checkout");
+let productArray = [];
+let isSave = false;
 
 function getShoppingBasket() {
 
@@ -26,7 +26,7 @@ function getShoppingBasket() {
         dataType: 'json',
         success: function (response) {
 
-            var shoppingBasket = document.getElementById("shoppingBasket");
+            let shoppingBasket = document.getElementById("shoppingBasket");
             if (shoppingBasket == null) {
                 return;
             }
@@ -60,9 +60,9 @@ function getShoppingBasket() {
 }
 function generateCardProduct() {
 
-    var html = "";
+    let html = "";
 
-    for (var key in dataShoppingBasket) {
+    for (let key in dataShoppingBasket) {
 
         totalPrice += dataShoppingBasket[key].price * dataShoppingBasket[key].count;
         countProduct += dataShoppingBasket[key].count;
@@ -115,7 +115,7 @@ function generateCardProduct() {
 }
 
 function showBtnSaveChange() {
-    var btnIsSave = document.getElementById("isSave");
+    let btnIsSave = document.getElementById("isSave");
     if (isSave == false) {
         btnIsSave.setAttribute('hidden', '');
     }
@@ -162,7 +162,7 @@ function activeSelectBox(key = null) {
 }
 function selectProduct(key, id, isSelect) {
 
-    var selector = document.getElementById(`selector_${id}`);
+    let selector = document.getElementById(`selector_${id}`);
     productArray = [];
 
     if (isSelect == true) {
@@ -178,7 +178,7 @@ function selectProduct(key, id, isSelect) {
         dataShoppingBasket[key].isSelect = false;
     }
 
-    for (var key in dataShoppingBasket) {
+    for (let key in dataShoppingBasket) {
         if (dataShoppingBasket[key].isSelect == true) {
             productArray.push(dataShoppingBasket[key].productId);
         }
@@ -222,7 +222,7 @@ function changeCountProduct(event, key, operation, count = 1) {
     isSave = true;
     showBtnSaveChange();
 
-    var indicateCountProduct = document.getElementById(`countProduct_${key}`);
+    let indicateCountProduct = document.getElementById(`countProduct_${key}`);
 
     if (parseInt(count) == 0) {
         removeFromShoppingBasket(event, dataShoppingBasket[key].productId);
@@ -270,7 +270,7 @@ function changeCountProduct(event, key, operation, count = 1) {
 function confirmChangeCount(event) {
     event.preventDefault();
 
-    var productData = "";
+    let productData = "";
 
     for (var i = 0; i < productArray.length; i++) {
         productData += dataShoppingBasket[productArray[i]].productId + ":" + dataShoppingBasket[productArray[i]].count;

@@ -1,5 +1,5 @@
 
-var dataTable;
+let dataTable;
 $(document).ready(function () {
     loadDataTableStock();
 });
@@ -69,13 +69,13 @@ function selectProductToPurchase(productId) {
     });
 }
 function editShelfProduct(productData) {
-    var response = productData;
-    var values = response.split('&');
-    var recordId = values[0];
-    var productId = values[1];
-    var nameProduct = values[2];
-    var count = values[3];
-    var shelfNumber = values[4];
+    let response = productData;
+    let values = response.split('&');
+    let recordId = values[0];
+    let productId = values[1];
+    let nameProduct = values[2];
+    let count = values[3];
+    let shelfNumber = values[4];
 
     Swal.fire({
         title: nameProduct,
@@ -93,8 +93,8 @@ function editShelfProduct(productData) {
         cancelButtonText: 'Отмена',
     }).then(function (result) {
         if (result.isConfirmed) {
-            var productCount = result.value;
-            var newShelfNumber = document.getElementById('shelfNumber').value;
+            let productCount = result.value;
+            let newShelfNumber = document.getElementById('shelfNumber').value;
 
             return new Promise((resolve, reject) => {
                 $.ajax({

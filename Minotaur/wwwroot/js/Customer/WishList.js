@@ -3,8 +3,8 @@ $(document).ready(function () {
     getWishList();
 });
 
-var divWishList = document.getElementById("wishList");
-var wishList;
+let divWishList = document.getElementById("wishList");
+let wishList;
 
 function getWishList() {
     $.ajax({
@@ -31,7 +31,7 @@ function getWishList() {
 }
 function generateHTML(wishList) {
 
-    var html = "";
+    let html = "";
 
     for (var key in wishList) {
         html +=

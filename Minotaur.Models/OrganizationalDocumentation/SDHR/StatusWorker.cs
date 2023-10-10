@@ -2,6 +2,7 @@
 {
     public class StatusWorker
     {
+        public const string Confirmation_Required = "Необходимо подтверждение";
         public const string Works = "Работает";
         public const string SickLeave = "На больничном";
         public const string Vacation = "Отпуск";

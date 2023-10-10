@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
 
 namespace Minotaur.Models
 {
@@ -13,6 +12,6 @@ namespace Minotaur.Models
         public string? City { get; set; }
         public string? Street { get; set; }
         public string? HouseNumber { get; set; }
-        public int PersonalWallet { get; set; }
+        public int PersonalWallet { get; set; } // FOR DEVELOPMENT ONLY 
     }
 }

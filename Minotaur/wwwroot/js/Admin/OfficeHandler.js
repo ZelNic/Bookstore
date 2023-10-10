@@ -1,7 +1,7 @@
 ﻿
-var typeOffice;
-var statusOffice;
-var tableOffice;
+let typeOffice;
+let statusOffice;
+let tableOffice;
 
 $(document).ready(function () {
     getTableOffice();
@@ -54,11 +54,11 @@ function getDataForFormNewOffice() {
     });
 }
 function addParameterForForm() {
-    var formNewOffice = document.getElementById("formNewOffice")
-    var selectTypeOffice = "";
-    var stOffice = "";
+    let formNewOffice = document.getElementById("formNewOffice")
+    let selectTypeOffice = "";
+    let stOffice = "";
 
-    for (var type of typeOffice) {
+    for (let type of typeOffice) {
 
         if (type.includes('_')) {
             type = type.replace('_', ' ');
@@ -67,7 +67,7 @@ function addParameterForForm() {
         selectTypeOffice += `<option value="${type}">${type}</option>`
     }
 
-    for (var status of statusOffice) {
+    for (let status of statusOffice) {
 
         if (status.includes('_')) {
             status = status.replace('_', ' ');
@@ -125,9 +125,9 @@ function addParameterForForm() {
         `;
 }
 function activeFormNewOffice(isActive) {
-    var formNewOffice = document.getElementById("formNewOffice");
-    var btnActive = document.getElementById("btnActive");
-    var btnClose = document.getElementById("btnClose");
+    let formNewOffice = document.getElementById("formNewOffice");
+    let btnActive = document.getElementById("btnActive");
+    let btnClose = document.getElementById("btnClose");
     getDataForFormNewOffice();
 
     if (isActive == true) {
@@ -144,17 +144,17 @@ function activeFormNewOffice(isActive) {
 
 function sendDataNewOffice() {
     // Получение значений полей формы
-    var name = document.getElementById('name').value;
-    var type = document.getElementById('type').value;
-    var status = document.getElementById('status').value;
-    var city = document.getElementById('city').value;
-    var street = document.getElementById('street').value;
-    var buildingNumber = document.getElementById('buildingNumber').value;
-    var workingHours = document.getElementById('workingHours').value;
-    var supervisorId = document.getElementById('supervisorId').value;
-    var notes = document.getElementById('notes').value;
+    let name = document.getElementById('name').value;
+    let type = document.getElementById('type').value;
+    let status = document.getElementById('status').value;
+    let city = document.getElementById('city').value;
+    let street = document.getElementById('street').value;
+    let buildingNumber = document.getElementById('buildingNumber').value;
+    let workingHours = document.getElementById('workingHours').value;
+    let supervisorId = document.getElementById('supervisorId').value;
+    let notes = document.getElementById('notes').value;
 
-    var data = {
+    let data = {
         Name: name,
         Type: type,
         Status: status,
@@ -166,14 +166,14 @@ function sendDataNewOffice() {
         Notes: notes
     };
 
-    for (var prop in data) {
+    for (let prop in data) {
         if (data[prop] == '' && prop !== "Notes") {
             return;
         }
     }
 
 
-    var jsonDataNewOffice = JSON.stringify(data);
+    let jsonDataNewOffice = JSON.stringify(data);
 
     $.ajax({
         url: '/Admin/Office/AddOffice?dataOffice=' + jsonDataNewOffice,

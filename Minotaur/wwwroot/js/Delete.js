@@ -1,4 +1,4 @@
-﻿var dataTable;
+﻿let dataTable;
 function Delete(url) {
     Swal.fire({
         title: 'Are you sure?',

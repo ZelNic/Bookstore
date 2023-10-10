@@ -2,16 +2,19 @@
 <div class="container mb-5">
     <div class="row">
         <h1>Работники</h1>
+        <button onclick="enterEmailNewWorker()" class="btn btn-success m-2 col-2 fs-8">
+            Добавить | Редактировать сотрудника
+        </button>
         <table id="tableWorker" class="display table table-bordered border border-0 rounded rounded-2 table-striped pt-3 my-1">
             <thead class="pt-4 table-dark">
                 <tr>
                     <th>UserId</th>
-                    <th>ФИО</th>
                     <th>Статус</th>
+                    <th>ФИО</th>
+                    <th>Должность</th>
                     <th>Место работы</th>
                     <th>Почта</th>
-                    <th>Должность</th>
-                    <th>Временно</th>
+                    <th>Редактировать</th>
                 </tr>
             </thead>
         </table>
