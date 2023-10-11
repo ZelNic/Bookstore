@@ -30,7 +30,7 @@ namespace Minotaur.Areas.HR.Controllers
         public async Task<IActionResult> Index() => View();
 
         public async Task<IActionResult> GetDataByWorkers(string? workerId = null)
-       {
+        {
             var workers = await _db.Workers.Join(_userManager.Users, e => e.UserId, u => u.Id, (e, u) => new { Worker = e, User = u })
                 .Select(w => new
                 {
@@ -51,7 +51,15 @@ namespace Minotaur.Areas.HR.Controllers
                 {
                     if (worker.WorkerId == Guid.Parse(workerId))
                     {
-                        return Json(new { data = worker });
+                        var status = StatusWorker.GetStatus();
+                        var offices = await _db.Offices.Select(o => new
+                        {
+                            o.Id,
+                            o.Name,
+                            o.Type
+                        }).ToArrayAsync();
+
+                        return Json(new { data = worker, status, offices });
                     }
                 }
                 return BadRequest(new { error = "Работник с таким UserId не найден" });
@@ -84,7 +92,7 @@ namespace Minotaur.Areas.HR.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveDataUser(string dataUser)
+        public async Task<IActionResult> UpsertEmployeeUserData(string dataUser)
         {
             var newDatauser = JsonConvert.DeserializeObject<MinotaurUser>(dataUser);
             if (newDatauser == null) { return BadRequest(new { error = "Ошибка в обработке данных" }); }
@@ -101,60 +109,76 @@ namespace Minotaur.Areas.HR.Controllers
             oldDataUser.Street = newDatauser.Street;
             oldDataUser.HouseNumber = newDatauser.HouseNumber;
 
-            var result = await _userManager.UpdateAsync(oldDataUser);
+            await _userManager.UpdateAsync(oldDataUser);
 
-            if (await _db.Workers.Where(u => u.UserId == newDatauser.Id).FirstAsync() == null)
+            if (await _db.Workers.Where(u => u.UserId == oldDataUser.Id).FirstOrDefaultAsync() == null)
             {
-                Worker worker = new()
-                {
-                    UserId = newDatauser.Id,
-                    Status = StatusWorker.Confirmation_Required
-                };
-
-                await _db.Workers.AddAsync(worker);
-                await _db.SaveChangesAsync();
-            }
-
-
-            if (result != null)
-            {
-                return Ok();
+                var result = AddNewWorker(oldDataUser);
+                return Json(new { data = result });
             }
             else
             {
-                return BadRequest(new { error = "Ошибка. Данные не сохранены." });
+                var workerData = await _db.Workers.Where(u => u.UserId == oldDataUser.Id).FirstAsync();
+                return Json(new { data = workerData });
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RegisterNewWorker(string dataWorker)
+        private async Task<IActionResult> AddNewWorker(MinotaurUser oldDataUser)
         {
-            var worker = JsonConvert.DeserializeObject<Worker>(dataWorker);
-            if (worker != null) { return BadRequest(new { error = "Ошибка. Данные не сохранены." }); }
-
-            if (_userManager.FindByIdAsync(worker.UserId) != null)
+            Worker worker = new()
             {
-                var office = await _db.Offices.Where(u => u.Id == Guid.Parse(worker.UserId)).FirstOrDefaultAsync();
-                if (office == null) { return BadRequest(new { error = "Офис не найден" }); }
+                UserId = oldDataUser.Id,
+                Status = StatusWorker.Confirmation_Required,
+            };
 
-                Worker newWorker = new()
-                {
-                    Status = StatusWorker.Works,
-                    UserId = worker.UserId,
-                    OfficeId = worker.OfficeId,
-                    OfficeName = office.Name,
-                    Post = worker.Post,
-                };
+            var resultOperation = await _db.Workers.AddAsync(worker);
+            await _db.SaveChangesAsync();
+
+            if (resultOperation != null)
+            {
+                var hr = await _userManager.GetUserAsync(User);
+                var hrId = hr.Id;
 
                 OrganizationalOrder order = new()
                 {
                     Name = "Приказ о приеме на работу",
+                    WorkerId = await _db.Workers.Where(w => w.UserId == oldDataUser.Id).Select(i => i.WorkerId).FirstOrDefaultAsync(),
+                    HrID = Guid.Parse(hrId),
                     Date = MoscowTime.GetTime().ToString("dd.MM.yyyy"),
                 };
-
-
                 await _db.OrganizationalOrders.AddAsync(order);
-                await _db.Workers.AddAsync(worker);
+                await _db.SaveChangesAsync();
+                return Json(new { data = worker });
+            }
+            else
+            {
+                return BadRequest(new { error = "Ошибка." });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertWorkerData(string dataWorker)
+        {
+            Worker? newDataWorker = JsonConvert.DeserializeObject<Worker>(dataWorker);
+
+
+            if (newDataWorker == null) { return BadRequest(new { error = "Ошибка. Данные не сохранены." }); }
+
+            if (await _userManager.FindByIdAsync(newDataWorker.UserId) != null)
+            {
+                var office = await _db.Offices.Where(u => u.Id == Guid.Parse(newDataWorker.UserId)).FirstOrDefaultAsync();
+                if (office == null) { return BadRequest(new { error = "Офис не найден" }); }
+
+                Worker? oldDataWorker = await _db.Workers.FindAsync(newDataWorker.WorkerId);
+                if (oldDataWorker != null) { return BadRequest(new { error = "Работник не найден" }); }
+
+                oldDataWorker.Status = newDataWorker.Status;
+                oldDataWorker.OfficeId = newDataWorker.OfficeId;
+                oldDataWorker.OfficeName = newDataWorker.OfficeName;
+                oldDataWorker.Post = newDataWorker.Post;
+                oldDataWorker.AdmissionOrder = await _db.OrganizationalOrders.Where(w => w.WorkerId == oldDataWorker.WorkerId).Select(i => i.Id).FirstOrDefaultAsync();
+                
+                await _db.Workers.AddAsync(oldDataWorker);
                 await _db.SaveChangesAsync();
                 return Ok();
             }
@@ -164,7 +188,7 @@ namespace Minotaur.Areas.HR.Controllers
                 {
                     error = "Работник не найден в качестве пользователя. " +
                     "Необходимо зарегестироваться в качестве пользователя или проверить правильность данных."
-                }); ;
+                });
             }
         }
 

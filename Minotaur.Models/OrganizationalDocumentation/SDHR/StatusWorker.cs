@@ -9,5 +9,13 @@
         public const string Decree = "Отпуск по беременности и родам";
         public const string Pension = "На пенсии";
         public const string Fired = "Уволен";
+
+
+        public static string[] GetStatus()
+        {
+            string[] status = new string[] { Confirmation_Required, Works, SickLeave, Vacation, Decree, Pension, Fired };
+
+            return status;
+        }
     }
 }

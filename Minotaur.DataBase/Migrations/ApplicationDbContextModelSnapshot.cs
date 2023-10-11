@@ -551,8 +551,8 @@ namespace Minotaur.Migrations
                     b.Property<string>("AccessRights")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AdmissionOrder")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AdmissionOrder")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("OfficeId")
                         .HasColumnType("uniqueidentifier");
@@ -560,8 +560,8 @@ namespace Minotaur.Migrations
                     b.Property<string>("OfficeName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrderDismissal")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("OrderDismissal")
+                        .HasColumnType("int");
 
                     b.Property<string>("Post")
                         .HasColumnType("nvarchar(max)");
@@ -588,8 +588,14 @@ namespace Minotaur.Migrations
                     b.Property<string>("Date")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("HrID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("WorkerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

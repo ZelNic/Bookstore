@@ -19,7 +19,7 @@ function getDataByWorker() {
             {
                 data: 'workerId',
                 render: function (data, type, row) {
-                    return `<button onclick="editDataNewWorker(${data})" class="btn btn-warning">Редактировать</button>`;
+                    return `<button onclick="editDataWorker('${data}')" class="btn btn-warning">Редактировать</button>`;
                 },
                 "width": "15%"
             }
@@ -37,12 +37,12 @@ async function enterEmailNewWorker() {
     })
 
     if (email) {
-        editEnterDataUserByNewWorker(email);
+        editEnterWorkerDataUser(email);
     }
 }
 
 
-function editEnterDataUserByNewWorker(email) {
+function editEnterWorkerDataUser(email) {
 
     $.ajax({
         url: '/HR/Worker/FindUserForHiring?email=' + email,
@@ -50,7 +50,8 @@ function editEnterDataUserByNewWorker(email) {
         dataType: 'json',
         success: function (response) {
             let formUserData = `
-                <form id="dataUser">     
+                <form id="dataUser">    
+                
                     <input type="text" value="${response.data.id}" name="Id" placeholder="Id" class="m-1" hidden>        
                     <input type="text" value="${response.data.firstName !== null ? response.data.firstName : ''}" name="FirstName" placeholder="Имя" class="m-1">                         
                     <input type="text" value="${response.data.lastName !== null ? response.data.lastName : ''}" name="LastName" placeholder="Фамилия" class="m-1">   
@@ -82,10 +83,10 @@ function editEnterDataUserByNewWorker(email) {
                         const jsonDataUser = JSON.stringify(jsonObject);
 
                         $.ajax({
-                            url: '/HR/Worker/SaveDataUser?dataUser=' + jsonDataUser,
+                            url: '/HR/Worker/UpsertEmployeeUserData?dataUser=' + jsonDataUser,
                             type: 'POST',
+                            dataType: 'json',
                             success: function (response) {
-
                                 let timerInterval
                                 Swal.fire({
                                     title: 'Данные сохранены',
@@ -100,18 +101,18 @@ function editEnterDataUserByNewWorker(email) {
                                         }, 100)
                                     },
                                     willClose: () => {
-                                        editDataNewWorker();
+                                        editDataWorker(response.data.workerId);
                                     }
                                 }).then((result) => {
                                     if (result.dismiss === Swal.DismissReason.timer) {
-                                        editDataNewWorker();
+                                        editDataWorker(response.data.workerId);
                                     }
                                 });
                             },
                             error: function (error) {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Ошибка...',
+                                    title: 0,
                                     text: 'Изменения не сохранились',
                                 });
                             }
@@ -123,7 +124,7 @@ function editEnterDataUserByNewWorker(email) {
         error: function (error) {
             Swal.fire({
                 icon: 'error',
-                title: 'Ошибка...',
+                title: 0,
                 text: 'Не удалось найти пользователя',
             });
         }
@@ -131,26 +132,73 @@ function editEnterDataUserByNewWorker(email) {
 }
 
 
-function editDataNewWorker(workerId = null) {
-    console.log("воркер = ");
-    console.log("воркер = " + workerId);
+function editDataWorker(workerId = null) {
     $.ajax({
-        url: '/HR/Worker/GetDataByWorkers' + workerId,
+        url: '/HR/Worker/GetDataByWorkers?workerId=' + workerId,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
 
+            //<input type="text" value="${response.data.officeId !== null ? response.data.officeId : ''}" name="OfficeId" placeholder="Id Офиса" class="m-1 col-11" hidden>
+            //    <label for="officeName">Место работы</label>
+            //    <input type="text" value="${response.data.officeName !== null ? response.data.officeName : ''}" name="OfficeName" class="m-1 col-11">
+            //        <label for="post">Должность</label>
+
+            var worderData = response.data;
+            var statusesWorker = response.status;
+            var offices = response.offices;
+            var selectorStatus;
+            var selectorOffices;
+
+
+            for (var status of statusesWorker) {
+                selectorStatus += `<option value="${status}">${status}</option>`;
+            }
+
+            for (var office of offices) {
+                selectorOffices += `<option value="${office.id}">${office.name}, ${office.type}</option>`;
+            }
+
+
 
             let formWorkerData = `
-            <form id="dataUser">     
-                <input type="text" value="${response.data.userId}" name="UserId" hidden>        
-                <input type="text" value="${response.data.status !== null ? response.data.status : ''}" name="Status" placeholder="Статус" class="m-1">                         
-                <input type="text" value="${response.data.officeId !== null ? response.data.officeId : ''}" name="OfficeId" placeholder="Id Офиса" class="m-1">   
-                <input type="text" value="${response.data.officeName !== null ? response.data.officeName : ''}" name="OfficeName" placeholder="Название офиса" class="m-1">                          
-                <input type="text" value="${response.data.post !== null ? response.data.post : ''}" name="Post" placeholder="Должен" class="m-1">                            
-                <input type="text" value="${response.data.admissionOrder !== null ? response.data.admissionOrder : ''}" name="AdmissionOrder" placeholder="Номер приказа о приеме на работу" class="m-1">                           
-                <input type="text" value="${response.data.orderDismissal !== null ? response.data.orderDismissal : ''}" name="OrderDismissal" placeholder="Номер приказа об увольнения на работу" class="m-1"> 
-            </form>`;
+                    <form id="dataUser">
+                          <div class="form-row">                           
+                              <input type="text" class="form-control" id="workerId" value="${worderData.workerId}" name="WorkerId" hidden>                           
+                              <input type="text" class="form-control" id="accessRights" value="${worderData.accessRights}" name="AccessRights" hidden>                           
+                              <input type="text" class="form-control" id="userId" value="${worderData.userId}" name="UserId" hidden>                           
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="status">Статус:</label>
+                              <select class="form-control" id="status" name="Status" required>
+                                ${selectorStatus}
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="officeName">Место работы:</label>
+                              <select class="form-control" id="officeName" name="OfficeName" required>
+                                <option selected disabled>Выбрать</option>
+                                ${selectorOffices}
+                              </select>
+                            </div>
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="post">Должность:</label>
+                              <input type="text" class="form-control" id="post" value="${worderData.post !== null ? worderData.post : ''}" name="Post" required>
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="admissionOrder">Номер приказа о приеме:</label>
+                              <input type="number" class="form-control" id="admissionOrder" value="${worderData.admissionOrder !== null ? worderData.admissionOrder : ''}" name="AdmissionOrder" required>
+                            </div>
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="orderDismissal">Номер приказа об увольнении:</label>
+                              <input type="number" class="form-control" id="orderDismissal" value="${worderData.orderDismissal !== null ? worderData.orderDismissal : ''}" name="OrderDismissal" required>
+                            </div>
+                          </div>
+                        </form>
+                        `;
 
             Swal.fire({
                 title: 'Данные работника',
@@ -170,7 +218,7 @@ function editDataNewWorker(workerId = null) {
                         const jsonDataUser = JSON.stringify(jsonObject);
 
                         $.ajax({
-                            url: '/HR/Worker/RegisterNewWorker?dataUser=' + jsonDataUser,
+                            url: '/HR/Worker/UpsertWorkerData?dataWorker=' + jsonDataUser,
                             type: 'POST',
                             success: function (response) {
                                 Swal.fire({
