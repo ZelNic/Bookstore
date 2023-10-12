@@ -138,31 +138,26 @@ function editDataWorker(workerId = null) {
         type: 'GET',
         dataType: 'json',
         success: function (response) {
-
-            //<input type="text" value="${response.data.officeId !== null ? response.data.officeId : ''}" name="OfficeId" placeholder="Id Офиса" class="m-1 col-11" hidden>
-            //    <label for="officeName">Место работы</label>
-            //    <input type="text" value="${response.data.officeName !== null ? response.data.officeName : ''}" name="OfficeName" class="m-1 col-11">
-            //        <label for="post">Должность</label>
-
-            var worderData = response.data;
-            var statusesWorker = response.status;
-            var offices = response.offices;
-            var selectorStatus;
-            var selectorOffices;
+                        
+            let worderData = response.data;
+            let statusesWorker = response.status;
+            let offices = response.offices;
+            let selectorStatus;
+            let selectorOffices;
 
 
-            for (var status of statusesWorker) {
+            for (let status of statusesWorker) {
                 selectorStatus += `<option value="${status}">${status}</option>`;
             }
 
-            for (var office of offices) {
+            for (let office of offices) {
                 selectorOffices += `<option value="${office.id}">${office.name}, ${office.type}</option>`;
             }
 
 
 
             let formWorkerData = `
-                    <form id="dataUser">
+                    <form id="dataUser" enctype="multipart/form-data">
                           <div class="form-row">                           
                               <input type="text" class="form-control" id="workerId" value="${worderData.workerId}" name="WorkerId" hidden>                           
                               <input type="text" class="form-control" id="accessRights" value="${worderData.accessRights}" name="AccessRights" hidden>                           
@@ -170,6 +165,7 @@ function editDataWorker(workerId = null) {
                             <div class="form-group col-md-12 mb-1">
                               <label for="status">Статус:</label>
                               <select class="form-control" id="status" name="Status" required>
+                              <option selected disabled>${worderData.status !== null ? worderData.status : 'Выбрать'}</option>
                                 ${selectorStatus}
                               </select>
                             </div>
@@ -177,8 +173,8 @@ function editDataWorker(workerId = null) {
                           <div class="form-row">
                             <div class="form-group col-md-12 mb-1">
                               <label for="officeName">Место работы:</label>
-                              <select class="form-control" id="officeName" name="OfficeName" required>
-                                <option selected disabled>Выбрать</option>
+                              <select class="form-control" id="officeName" name="OfficeId" required>
+                                <option selected disabled>${worderData.officeName !== null ? worderData.officeName : 'Выбрать'}</option>
                                 ${selectorOffices}
                               </select>
                             </div>
@@ -190,11 +186,11 @@ function editDataWorker(workerId = null) {
                           <div class="form-row">
                             <div class="form-group col-md-12 mb-1">
                               <label for="admissionOrder">Номер приказа о приеме:</label>
-                              <input type="number" class="form-control" id="admissionOrder" value="${worderData.admissionOrder !== null ? worderData.admissionOrder : ''}" name="AdmissionOrder" required>
+                              <input type="number" class="form-control" id="admissionOrder" value="${worderData.admissionOrder !== 0 ? worderData.admissionOrder : ''}" name="AdmissionOrder" required>
                             </div>
                             <div class="form-group col-md-12 mb-1">
                               <label for="orderDismissal">Номер приказа об увольнении:</label>
-                              <input type="number" class="form-control" id="orderDismissal" value="${worderData.orderDismissal !== null ? worderData.orderDismissal : ''}" name="OrderDismissal" required>
+                              <input type="number" class="form-control" id="orderDismissal" value="${worderData.orderDismissal !== 0 ? worderData.orderDismissal : '0'}" name="OrderDismissal" required>
                             </div>
                           </div>
                         </form>

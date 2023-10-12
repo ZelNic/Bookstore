@@ -421,11 +421,9 @@ namespace Minotaur.Migrations
 
             modelBuilder.Entity("Minotaur.Models.Models.RecordStock", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Count")
                         .HasColumnType("int");
@@ -434,7 +432,6 @@ namespace Minotaur.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Operation")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductDataOnPurchase")
@@ -447,21 +444,20 @@ namespace Minotaur.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ResponsiblePersonId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ShelfNumber")
                         .HasColumnType("int");
 
-                    b.Property<int>("StockId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("StockId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.ToTable("StockJournal");
+                    b.ToTable("StockMmagazine");
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.Review", b =>

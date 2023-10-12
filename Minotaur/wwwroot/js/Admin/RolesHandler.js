@@ -19,13 +19,18 @@ function getDataUserRoles() {
                 render: function (data, type, row) {
                     let userId = row.userId;
                     let roleArray;
-                    if (row.accessRights.includes('|')) {
-                        let roleArray = row.accessRights.split("|");
+
+                    if (row.accessRights == null) {
+                        roleArray = [row.accessRights];
+                    }
+                    else if (row.accessRights.includes('|')) {
+                        roleArray = row.accessRights.split("|");
                     } else {
                         roleArray = [row.accessRights];
                     }
+
                     return `<div>
-                                <input type="checkbox" class="role-checkbox" value="Admin" ${roleArray.includes("Admin") ? 'checked' : ''} userId="${userId}" /> Админ<br>
+                                <input type="checkbox" class="role-checkbox" value="Admin" ${roleArray.includes("Admin") ? 'checked' : ''} userId="${userId}" /> Администратор сайта<br>
                                 <input type="checkbox" class="role-checkbox" value="OrderPicker" ${roleArray.includes("OrderPicker") ? 'checked' : ''} userId="${userId}"/> Сборщик заказов<br>
                                 <input type="checkbox" class="role-checkbox" value="WorkerOrderPickupPoint" ${roleArray.includes("WorkerOrderPickupPoint") ? 'checked' : ''} userId="${userId}"/> Сотрудник пункта выдачи<br>
                                 <input type="checkbox" class="role-checkbox" value="Customer" ${roleArray.includes("Customer") ? 'checked' : ''} userId="${userId}"/> Пользователь<br>
@@ -41,7 +46,6 @@ function getDataUserRoles() {
     $(document).on('change', '.role-checkbox', function () {
         let userId = $(this).attr('userId');
         let role = $(this).attr('value');
-
         let isChecked = $(this).is(':checked');
 
         let urlMethod;
@@ -54,6 +58,14 @@ function getDataUserRoles() {
             urlMethod = `/Admin/Roles/RemoveRoleWorker?userId= + ${userId} + &role= + ${role}`
             messageResponse = "Роль успешно снята"
         }
+
+        //var result = await ConfirmActionAsync(userId);
+        //if (result == true) {
+
+        //}
+        //else {
+        //    Swal.fire("Неверный пароль");
+        //}
 
         $.ajax({
             url: urlMethod,
@@ -69,8 +81,36 @@ function getDataUserRoles() {
                 Swal.fire("Ошибка");
             }
         });
+       
+
     });
 }
 
 
+async function ConfirmActionAsync(userId) {
+    const { value: password } = await Swal.fire({
+        title: 'Введите пароль',
+        input: 'password',
+        inputLabel: 'Password',
+        inputPlaceholder: '',
+        inputAttributes: {
+            maxlength: 50,
+            autocapitalize: 'off',
+            autocorrect: 'off'
+        }
+    })
 
+    if (password) {
+        const operation = "Изменение роли";
+        $.ajax({
+            url: '/Admin/AuthenticationAdmin/ConfirmAction?password=' + password + "&operation=" + operation + "&userId" + userId,
+            type: 'GET',
+            success: function (response) {
+                Swal.fire("Успешно");
+            },
+            error: function (error) {
+                Swal.fire("Доступ отказан");
+            }
+        });
+    }
+}

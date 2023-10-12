@@ -15,7 +15,6 @@ namespace Minotaur.Areas.Admin.Controllers
         private readonly ApplicationDbContext _db;
         private readonly UserManager<MinotaurUser> _userManager;
 
-
         public RolesController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
         {
             _db = db;
@@ -47,7 +46,16 @@ namespace Minotaur.Areas.Admin.Controllers
 
         private List<string> ParseWorkerRoles(string role)
         {
-            List<string> arrayRoles = role.Split('|').ToList();
+            List<string>? arrayRoles = null; 
+
+            if(role == null)
+            {
+                return arrayRoles;
+            }
+            else
+            {
+                arrayRoles = role.Split('|').ToList();
+            }
 
             return arrayRoles;
         }
