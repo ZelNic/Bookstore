@@ -64,38 +64,30 @@ function sendTable() {
         };
 
         models.push(model);
-        console.log(model);
     }
 
     let jsonData = JSON.stringify(models);
 
-    const URL = "/Stockkeeper/Stock/OrderProducts";
+    $.ajax({
+        url: "/Stockkeeper/Stock/OrderProducts",
+        data: jsonData,
+        type: "POST",
+        contentType: "application/json",
+        responseType: "arraybuffer",
+        success: function (response) {
+            var fileData = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
 
-    fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: jsonData
-    }).then(function (response) {
-        if (response.ok) {
-            return response.blob();
-        } else {
-            throw new Error("Ошибка при отправке данных на сервер");
-        }
-    })
-        .then(function (blob) {
-            let fileUrl = URL.createObjectURL(blob);
+            var fileUrl = URL.createObjectURL(fileData);
 
-            let downloadLink = document.createElement("a");
+            var downloadLink = document.createElement("a");
             downloadLink.href = fileUrl;
-            downloadLink.download = "Заявление.docx";
 
             downloadLink.click();
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+        },
+        error: function (error) {
+            console.log("Ошибка");
+        }
+    });
 }
 
 

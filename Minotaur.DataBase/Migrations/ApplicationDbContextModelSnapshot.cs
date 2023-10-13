@@ -428,7 +428,7 @@ namespace Minotaur.Migrations
                     b.Property<int>("Count")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsOrder")
+                    b.Property<bool>("IsNeed")
                         .HasColumnType("bit");
 
                     b.Property<string>("Operation")
@@ -443,8 +443,8 @@ namespace Minotaur.Migrations
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ResponsiblePersonId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("ResponsiblePersonId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("ShelfNumber")
                         .HasColumnType("int");
@@ -457,7 +457,7 @@ namespace Minotaur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StockMmagazine");
+                    b.ToTable("StockMagazine");
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.Review", b =>

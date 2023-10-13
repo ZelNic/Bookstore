@@ -23,7 +23,7 @@ namespace Minotaur.DataAccess
         public DbSet<Order> Order { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<RecordStock> StockMmagazine { get; set; }
+        public DbSet<RecordStock> StockMagazine { get; set; }
         public DbSet<Office> Offices { get; set; }
         public DbSet<Worker> Workers { get; set; }
         public DbSet<OrganizationalOrder> OrganizationalOrders { get; set; }

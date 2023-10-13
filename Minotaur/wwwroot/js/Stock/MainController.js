@@ -6,15 +6,15 @@ $(document).ready(function () {
 
 function loadDataTableStock() {
     dataTable = $('#stock').DataTable({
-        "ajax": { url: '/Stockkeeper/Stock/getStock' },
+        "ajax": { url: '/Stockkeeper/Stock/GetStock' },
         "columns": [
-            { data: 'id', "width": "5%" },
+            { data: 'id', "width": "10%" },
             { data: 'productId', "width": "5%" },
             {
                 data: 'time', "width": "15%"
             },
             {
-                data: 'operation', "width": "15%"
+                data: 'operation', "width": "10%"
             },
             {
                 data: 'nameProduct',
@@ -37,7 +37,7 @@ function loadDataTableStock() {
                 data: null,
                 render: function (data) {
 
-                    if (data.isOrder == true) {
+                    if (data.isNeed == true) {
                         return `<div class="w-100 btn-group" role="group">
                     <a onClick="selectProductToPurchase('${data.productId}')" class="btn btn-warning"><i class="bi bi-check2-square"></i></a>
                     </div>`;
@@ -54,6 +54,11 @@ function loadDataTableStock() {
         ]
     });
 }
+
+function refreshDataTable() {
+    dataTable.ajax.url('/Stockkeeper/Stock/GetStock').load();
+}
+
 function selectProductToPurchase(productId) {
     $.ajax({
         url: '/Stockkeeper/Stock/SelectProductToPurchase' + "?productId=" + productId,
@@ -61,10 +66,8 @@ function selectProductToPurchase(productId) {
         data: productId,
         success: function (response) {
             refreshDataTable();
-            resolve(response);
         },
         error: function (error) {
-            reject(error);
         }
     });
 }
@@ -101,11 +104,19 @@ function editShelfProduct(productData) {
                     url: '/Stockkeeper/Stock/ChangeShelfProduct?recordId=' + recordId + "&productCount=" + productCount + "&newShelfNumber=" + newShelfNumber,
                     type: 'POST',
                     success: function (response) {
+                        Swal.fire({
+                            title: 'Изменения прошли успешно',
+                            text: response,
+                            icon: 'success'
+                        });
                         refreshDataTable();
-                        resolve(response);
                     },
                     error: function (error) {
-                        reject(error);
+                        Swal.fire({
+                            title: 'Ошибка при выполнении запроса',
+                            text: error.responseText,
+                            icon: 'error'
+                        });
                     }
                 });
             });
@@ -113,10 +124,8 @@ function editShelfProduct(productData) {
     });
 
 }
-function refreshDataTable() {
-    dataTable.ajax.url('/Stockkeeper/Stock/GetStock').load();
-}
-function addProductInStock(url) {
+
+function addProductInStock() {
     Swal.fire({
         title: 'Добавить новый товар',
         html: '<input type="number" id="productId" placeholder="Код товара" required class="swal2-input">' +
@@ -125,7 +134,6 @@ function addProductInStock(url) {
         showCancelButton: true,
         confirmButtonText: 'Подтвердить',
         showLoaderOnConfirm: true,
-
     }).then((result) => {
         if (result.isConfirmed) {
             const productId = document.getElementById('productId').value;
@@ -133,50 +141,48 @@ function addProductInStock(url) {
             const numberShelf = document.getElementById('shelfNumber').value;
 
             return new Promise((resolve, reject) => {
+                console.log("iam here");
                 $.ajax({
-                    url: url + "&productId=" + productId + "&numberShelf=" + numberShelf + "&productCount=" + productCount,
+                    url: '/Stockkeeper/Stock/AddProductInStock?productId=' + productId + "&numberShelf=" + numberShelf + "&productCount=" + productCount,
                     type: 'POST',
                     success: function (response) {
-                        resolve(response);
+                        Swal.fire({
+                            title: 'Товар добавлен',
+                            text: response,
+                            icon: 'success'
+                        });
+                        refreshDataTable();
                     },
                     error: function (error) {
-                        reject(error);
+                        Swal.fire({
+                            title: 'Ошибка при выполнении запроса',
+                            text: error.responseText,
+                            icon: 'error'
+                        });
                     }
-                });
-            }).then((response) => {
-                Swal.fire({
-                    title: 'Товар добавлен',
-                    text: response,
-                    icon: 'success'
-                });
-                refreshDataTable();
-            }).catch((error) => {
-                Swal.fire({
-                    title: 'Ошибка при выполнении запроса',
-                    text: error.responseJSON.error,
-                    icon: 'error'
                 });
             });
         } else {
-            let timerInterval
+            let timerInterval;
             Swal.fire({
                 title: 'Отмена операции',
                 timer: 500,
                 timerProgressBar: true,
                 didOpen: () => {
-                    Swal.showLoading()
-                    const b = Swal.getHtmlContainer().querySelector('b')
+                    Swal.showLoading();
+                    const b = Swal.getHtmlContainer().querySelector('b');
                     timerInterval = setInterval(() => {
-                        b.textContent = Swal.getTimerLeft()
-                    }, 100)
+                        b.textContent = Swal.getTimerLeft();
+                    }, 100);
                 },
                 willClose: () => {
-                    clearInterval(timerInterval)
+                    clearInterval(timerInterval);
                 }
-            })
+            });
         }
     });
 }
+
 
 
 

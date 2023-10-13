@@ -1,16 +1,20 @@
-﻿using Minotaur.DataAccess;
-using Minotaur.Models;
-using Minotaur.Models.Models;
-using Minotaur.Models.SD;
-using Minotaur.Utility;
+﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
+using Minotaur.DataAccess;
+using Minotaur.Models;
+using Minotaur.Models.ModelForWorkingControllers;
+using Minotaur.Models.Models;
+using Minotaur.Models.SD;
+using Minotaur.Utility;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using Xceed.Words.NET;
 
 namespace Minotaur.Areas.Stockkeeper
 {
@@ -27,44 +31,66 @@ namespace Minotaur.Areas.Stockkeeper
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        private async Task<DataByStock> GetStockDataAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            MinotaurUser? minotaurUser = await _userManager.GetUserAsync(User);
 
-            Worker? stockkeeper = await _db.Workers.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
-            if (stockkeeper == null) return BadRequest();
+            DataByStock? dataByStock = await _db.Workers.Where(w => w.UserId == minotaurUser.Id)
+                    .Join(_db.Offices, worker => worker.OfficeId, office => office.Id, (worker, office) => new { Worker = worker, Office = office })
+                    .Select(result => new DataByStock
+                    {
+                        MinotaurUser = minotaurUser,
+                        StockKeeper = result.Worker,
+                        Stock = result.Office,
+                        Records = _db.StockMagazine.Where(s => s.StockId == result.Office.Id).ToList(),
+                    }).FirstOrDefaultAsync();
 
-            Office? stock = await _db.Offices.FirstOrDefaultAsync(o => o.Id == stockkeeper.OfficeId);
-            if (stock == null) return BadRequest();
-
-            RecordStock[]? recordStock = await _db.StockMmagazine.Where(s => s.StockId == stock.Id).ToArrayAsync();
-
-            StockVM stockVM = new()
-            {
-                Office = stock,
-                WarehouseJournal = recordStock,
-            };
-
-            return View(stockVM);
+            return dataByStock;
         }
 
+        public async Task<IActionResult> Index()
+        {
+            DataByStock? dataByStock = await GetStockDataAsync();
+            return View(dataByStock.Stock);
+        }
+
+        public async Task<IActionResult> GetStock()
+        {
+            DataByStock? dataByStock = await GetStockDataAsync();
+
+            var stockJournal = dataByStock.Records.Where(u => u.ResponsiblePersonId == dataByStock.StockKeeper.WorkerId)
+                .Join(_db.Products, s => s.ProductId, b => b.ProductId, (s, b) => new
+                {
+                    id = s.Id,
+                    productId = s.ProductId,
+                    time = s.Time.ToString("dd/MM/yyyy hh:mm"),
+                    operation = s.Operation,
+                    nameProduct = b.Name,
+                    count = s.Count,
+                    totalProduct = dataByStock.Records.Where(i => i.ProductId == s.ProductId).Sum(s => s.Count),
+                    shelfNumber = s.ShelfNumber,
+                    isNeed = s.IsNeed,
+                }).ToArray();
+
+            return Json(new { data = stockJournal });
+        }
+
+
         [HttpPost]
-        public async Task<IActionResult> AddProductInStock(string stockId, int productId, int numberShelf, int productCount)
+        public async Task<IActionResult> AddProductInStock(int productId, int numberShelf, int productCount)
         {
             Product? product = await _db.Products.FindAsync(productId);
-            if (product == null) { return BadRequest(new { error = "Такого товара нет в базе. Проверьте правильность введенных данных." }); }
+            if (product == null) { return BadRequest("Такого товара нет в базе. Проверьте правильность введенных данных."); }
 
-            Office? stock = await _db.Offices.FirstOrDefaultAsync(s => s.Id == Guid.Parse(stockId));
-            if (stock == null) { return BadRequest(new { error = "Склад не найден." }); }
+            DataByStock? dataByStock = await GetStockDataAsync();
+            if (dataByStock.Stock == null) { return BadRequest("Склад не найден."); }
 
-            RecordStock[]? recordsByStock = await _db.StockMmagazine.Where(s => s.StockId == stock.Id).ToArrayAsync();
-
-            RecordStock shelfWithSameProduct = recordsByStock.Where(p => p.ProductId == product.ProductId).Where(s => s.ShelfNumber == numberShelf).FirstOrDefault();
+            RecordStock? shelfWithSameProduct = dataByStock.Records?.Where(p => p.ProductId == product.ProductId).Where(s => s.ShelfNumber == numberShelf).FirstOrDefault();
 
             if (shelfWithSameProduct != null)
             {
                 shelfWithSameProduct.Count += productCount;
-                _db.StockMmagazine.Update(shelfWithSameProduct);
+                _db.StockMagazine.Update(shelfWithSameProduct);
             }
             else
             {
@@ -73,248 +99,241 @@ namespace Minotaur.Areas.Stockkeeper
 
                 RecordStock record = new()
                 {
-                    StockId = stock.Id,
+                    StockId = dataByStock.Stock.Id,
                     ResponsiblePersonId = stockkeper.WorkerId,
                     Time = MoscowTime.GetTime(),
                     ProductId = productId,
                     Count = productCount,
                     ShelfNumber = numberShelf,
                     Operation = OperationStock.ReceiptOfGoods,
-                    IsNeed = await _db.StockMmagazine.Where(u => u.ProductId == productId).Select(u => u.IsNeed).FirstOrDefaultAsync(),
+                    IsNeed = await _db.StockMagazine.Where(u => u.ProductId == productId).Select(u => u.IsNeed).FirstOrDefaultAsync(),
                 };
-                await _db.StockMmagazine.AddAsync(record);
+                await _db.StockMagazine.AddAsync(record);
             }
 
             await _db.SaveChangesAsync();
-            return Ok("Товар " + product.Name + " добавлен на полку " + numberShelf + " в количестве " + productCount + " шт.");
+            return Ok($"Товар {product.Name} добавлен на полку {numberShelf} в количестве {productCount} шт.");
 
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> ChangeShelfProduct(int recordId, int productCount, int newShelfNumber)
-        //{
-        //    RecordStock? selectedRecord = await _db.StockJournal.Where(u => u.ResponsiblePersonId == _stockkeeper.Id).Where(i => i.Id == recordId).FirstOrDefaultAsync();
-        //    if (selectedRecord == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPost]
+        public async Task<IActionResult> ChangeShelfProduct(string recordId, int productCount, int newShelfNumber)
+        {
+            DataByStock? dataByStock = await GetStockDataAsync();
 
-        //    if (selectedRecord.ShelfNumber == newShelfNumber)
-        //    {
-        //        return Ok();
-        //    }
+            RecordStock? selectedRecord = dataByStock?.Records?.Where(i => i.Id == Guid.Parse(recordId)).FirstOrDefault();
+            if (selectedRecord == null)
+            {
+                return BadRequest($"Запись с ID:{recordId} не найдена.");
+            }
 
-        //    RecordStock? productOnShelf = await _db.StockJournal.Where(u => u.ProductId == selectedRecord.ProductId).Where(s => s.ShelfNumber == newShelfNumber).FirstOrDefaultAsync();
+            if (selectedRecord.ShelfNumber == newShelfNumber)
+            {
+                return Ok($"Перемещение на ту же полку.");
+            }
 
-        //    selectedRecord.Count -= productCount;
-        //    if (selectedRecord.Count <= 0)
-        //    {
-        //        _db.StockJournal.Remove(selectedRecord);
-        //    }
-        //    else
-        //    {
-        //        _db.StockJournal.Update(selectedRecord);
-        //    }
+            RecordStock? productOnShelf = dataByStock?.Records?.Where(u => u.ProductId == selectedRecord.ProductId).Where(s => s.ShelfNumber == newShelfNumber).FirstOrDefault();
+            selectedRecord.Count -= productCount;
 
-
-        //    if (productOnShelf != null)
-        //    {
-        //        productOnShelf.Count += productCount;
-
-        //        _db.StockJournal.Update(productOnShelf);
-        //        await _db.SaveChangesAsync();
-        //        return Ok();
-        //    }
-        //    else
-        //    {
-        //        RecordStock newRecord = new()
-        //        {
-        //            StockId = _stock.Id,
-        //            ResponsiblePersonId = _stockkeeper.Id,
-        //            Time = MoscowTime.GetTime(),
-        //            ProductId = selectedRecord.ProductId,
-        //            ShelfNumber = newShelfNumber,
-        //            Count = productCount,
-        //            Operation = OperationStock.MovementOfGoods,
-        //            IsOrder = await _db.StockJournal.Where(u => u.ProductId == selectedRecord.ProductId).Select(u => u.IsOrder).FirstOrDefaultAsync(),
-        //        };
-
-        //        await _db.StockJournal.AddAsync(newRecord);
-        //        await _db.SaveChangesAsync();
-
-        //        return Ok();
-        //    }
-        //}
-
-        //public async Task<IActionResult> GetStock()
-        //{
-        //    var stockJournal = await _db.StockJournal.Where(u => u.ResponsiblePersonId == _stockkeeper.Id)
-        //        .Join(_db.Products, s => s.ProductId, b => b.ProductId, (s, b) => new
-        //        {
-        //            id = s.Id,
-        //            productId = s.ProductId,
-        //            time = s.Time.ToString("dd/MM/yyyy hh:mm"),
-        //            operation = s.Operation,
-        //            nameProduct = b.Name,
-        //            count = s.Count,
-        //            totalProduct = _db.StockJournal.Where(i => i.ProductId == s.ProductId).Sum(s => s.Count),
-        //            shelfNumber = s.ShelfNumber,
-        //            isOrder = s.IsOrder,
-        //        }).ToListAsync();
-
-        //    return Json(new { data = stockJournal });
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> SelectProductToPurchase(int productId, params int[] products)
-        //{
-        //    IEnumerable<RecordStock> allProduct = await _db.StockJournal.Where(i => i.ProductId == productId).ToListAsync();
-
-        //    foreach (var product in allProduct)
-        //    {
-        //        product.IsOrder = product.IsOrder ? false : true;
-        //    }
-
-        //    _db.StockJournal.UpdateRange(allProduct);
-        //    await _db.SaveChangesAsync();
-
-        //    return Ok();
-        //}
-
-        //[HttpGet]
-        //public IActionResult PurchaseRequest()
-        //{
-        //    return View();
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> GetTablePurchaseRequest()
-        //{
-        //    var request = await _db.StockJournal.Where(u => u.IsOrder == true).Join(_db.Products, s => s.ProductId, b => b.ProductId, (s, b) => new
-        //    {
-        //        ProductId = s.ProductId,
-        //        TitleProduct = _db.Products.Where(u => u.ProductId == s.ProductId).Select(u => u.Name).FirstOrDefault(),
-        //        TotalProduct = _db.StockJournal.Where(u => u.IsOrder == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
-        //    }).Distinct().ToListAsync();
-
-        //    return Json(new { data = request });
-        //}
+            if (selectedRecord.Count <= 0)
+            {
+                dataByStock?.Records?.Remove(selectedRecord);
+            }
+            else
+            {
+                _db.StockMagazine.Update(selectedRecord);
+            }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> OrderProducts([FromBody] RecordStock[] purchaseRequestData)
-        //{
-        //    if (purchaseRequestData == null)
-        //    {
-        //        return BadRequest(new { error = "Нет товаров на закупку." });
-        //    }
+            if (productOnShelf != null)
+            {
+                productOnShelf.Count += productCount;
 
-        //    string productDataOnPurchase = "";
+                _db.StockMagazine.Update(productOnShelf);
+                await _db.SaveChangesAsync();
+                return Ok();
+            }
+            else
+            {
+                RecordStock newRecord = new()
+                {
+                    StockId = dataByStock.Stock.Id,
+                    ResponsiblePersonId = dataByStock.StockKeeper.WorkerId,
+                    Time = MoscowTime.GetTime(),
+                    ProductId = selectedRecord.ProductId,
+                    ShelfNumber = newShelfNumber,
+                    Count = productCount,
+                    Operation = OperationStock.MovementOfGoods,
+                    IsNeed = await _db.StockMagazine.Where(u => u.ProductId == selectedRecord.ProductId).Select(u => u.IsNeed).FirstOrDefaultAsync(),
+                };
 
-        //    foreach (var item in purchaseRequestData)
-        //    {
-        //        productDataOnPurchase += item.ProductId.ToString() + ":";
-        //        productDataOnPurchase += item.Count.ToString() + "/";
-        //    }
+                await _db.StockMagazine.AddAsync(newRecord);
+                await _db.SaveChangesAsync();
 
-        //    RecordStock recordStockPurchase = new()
-        //    {
-        //        StockId = _stock.Id,
-        //        ResponsiblePersonId = _stockkeeper.Id,
-        //        Time = MoscowTime.GetTime(),
-        //        Operation = OperationStock.ApplicationForPurchaseOfGoods,
-        //        ProductDataOnPurchase = productDataOnPurchase
-        //    };
+                return Ok();
+            }
+        }
 
-        //    await _db.StockJournal.AddAsync(recordStockPurchase);
-        //    await _db.SaveChangesAsync();
+        [HttpPost]
+        public async Task<IActionResult> SelectProductToPurchase(int productId, params string[] products)
+        {
+            DataByStock? dataByStock = await GetStockDataAsync();
 
-        //    //-----------------------------------------------------------------------------------------------------------------------------
+            if (dataByStock.Records == null) { BadRequest($"Отсутсвуют записи по складу {dataByStock.Stock.Name}."); }
 
+            var recordsWithNeedProduct = dataByStock.Records.Where(p => p.ProductId == productId).ToArray();
 
-        //    string templatePath = "F:\\GitHub\\Minotaur\\Minotaur\\Areas\\Stockkeeper\\Sample\\Заявка на закупку товаров.docx";
-        //    string nameFile = "Заявка" + recordStockPurchase.Time.ToString("_dd.MM.yyyy");
-        //    string filledFilePath = $"F:\\GitHub\\Minotaur\\Minotaur\\Areas\\Stockkeeper\\PurchaseRequisitions\\{nameFile}.docx";
+            foreach (var product in recordsWithNeedProduct)
+            {
+                product.IsNeed = product.IsNeed ? false : true;
+            }
 
+            _db.StockMagazine.UpdateRange(recordsWithNeedProduct);
+            await _db.SaveChangesAsync();
 
+            return Ok();
+        }
 
-        //    System.IO.File.Copy(templatePath, filledFilePath, true);
+        //For PurchaseRequest
 
-        //    using (WordprocessingDocument docx = WordprocessingDocument.Open(filledFilePath, true))
-        //    {
-        //        // Получаем главный документ Word
-        //        MainDocumentPart? mainPart = docx.MainDocumentPart;
+        [HttpGet]
+        public IActionResult PurchaseRequest()
+        {
+            return View();
+        }
 
-        //        if (mainPart == null)
-        //        {
-        //            return NotFound();
-        //        }
-
-        //        string docText = null;
-        //        using (StreamReader sr = new StreamReader(docx.MainDocumentPart.GetStream()))
-        //        {
-        //            docText = sr.ReadToEnd();
-        //        }
+        [HttpGet]
+        public async Task<IActionResult> GetTablePurchaseRequest()
+        {
+            DataByStock? dataByStock = await GetStockDataAsync();
+            if (dataByStock.Records == null) { return BadRequest($"Отсутсвуют записи по складу {dataByStock.Stock.Name}."); }
 
 
-        //        Dictionary<string, string> replacements = new Dictionary<string, string>
-        //        {
-        //            {"Number", recordStockPurchase.Id.ToString()},
-        //            {"Street", _stock.Street.ToString()},
-        //            {"City", _stock.City.ToString()},
-        //            {"ApplicationTime", recordStockPurchase.Time.ToString("dd.MM.yyyy")},
-        //            {"FirstName", _stockkeeper.FirstName.ToString()},
-        //            {"SecondName", _stockkeeper.LastName.ToString()},
-        //            {"Phone", _stockkeeper.PhoneNumber.ToString()}
-        //        };
+            var request = dataByStock.Records.Where(p => p.IsNeed == true)
+                .Join(_db.Products, s => s.ProductId, b => b.ProductId, (s, b) => new
+                {
+                    s.ProductId,
+                    TitleProduct = _db.Products.Where(u => u.ProductId == s.ProductId).Select(u => u.Name).FirstOrDefault(),
+                    TotalProduct = _db.StockMagazine.Where(u => u.IsNeed == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
+                }).Distinct().ToArray();
 
-        //        Regex regexText = new Regex(string.Join("|", replacements.Keys));
-        //        docText = regexText.Replace(docText, match => replacements[match.Value]);
 
-        //        using (StreamWriter sw = new StreamWriter(docx.MainDocumentPart.GetStream(FileMode.Create)))
-        //        {
-        //            sw.Write(docText);
-        //        }
+            return Json(new { data = request });
+        }
 
-        //        //-----------------------------------------------------------------------------------------------------------------------
-        //        //-----------------------------------------------------------------------------------------------------------------------
-        //        //-----------------------------------------------------------------------------------------------------------------------
 
-        //        Table table = mainPart.Document.Body.Elements<Table>().FirstOrDefault();
-        //        TableProperties tableProperties = table.GetFirstChild<TableProperties>();
+        [HttpPost]
+        public async Task<IActionResult> OrderProducts([FromBody] RecordStock[] purchaseRequestData)
+        {
+            if (purchaseRequestData == null) { return BadRequest("Список товаров на закупку пуст."); }
 
-        //        foreach (var replacement in purchaseRequestData)
-        //        {
-        //            TableRow newRow = new TableRow();
+            string productDataOnPurchase = "";
 
-        //            TableCell cellId = new TableCell(new Paragraph(new Run(new Text("-"))));
-        //            TableCell productNameCell = new TableCell(new Paragraph(new Run(new Text(replacement.ProductName + ", " + replacement.ProductId.ToString()))));
-        //            TableCell countCell = new TableCell(new Paragraph(new Run(new Text(replacement.Count.ToString()))));
+            DataByStock dataByStock = await GetStockDataAsync();
 
-        //            newRow.AppendChild(cellId);
-        //            newRow.AppendChild(productNameCell);
-        //            newRow.AppendChild(countCell);
+            foreach (var item in purchaseRequestData)
+            {
+                productDataOnPurchase += item.ProductId.ToString() + ":";
+                productDataOnPurchase += item.Count.ToString() + "/";
+            }
 
-        //            // Clone the TableProperties and apply it to each new cell
-        //            TableCellProperties cellProperties = new TableCellProperties();
-        //            cellProperties.Append(tableProperties.CloneNode(true));
+            RecordStock recordStockPurchase = new()
+            {
+                StockId = dataByStock.Stock.Id,
+                ResponsiblePersonId = dataByStock.StockKeeper.WorkerId,
+                Time = MoscowTime.GetTime(),
+                Operation = OperationStock.ApplicationForPurchaseOfGoods,
+                ProductDataOnPurchase = productDataOnPurchase
+            };
 
-        //            cellId.AppendChild(cellProperties.CloneNode(true));
-        //            productNameCell.AppendChild(cellProperties.CloneNode(true));
-        //            countCell.AppendChild(cellProperties.CloneNode(true));
+            await _db.StockMagazine.AddAsync(recordStockPurchase);
 
-        //            table.AppendChild(newRow);
-        //        }
-        //    }
 
-        //    byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
-        //    string fileName = "example.docx";
+            //-----------------------------------------------------------------------------------------------------------------------------
 
-        //    // Устанавливаем заголовки ответа
-        //    Response.Headers.Add("Content-Disposition", "attachment; filename=" + fileName);
-        //    Response.Headers.Add("X-Content-Type-Options", "nosniff");
 
-        //    return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-        //}
+            string templatePath = "F:\\GitHub\\Minotaur\\Minotaur\\Areas\\Stockkeeper\\Sample\\Заявка на закупку товаров.docx";
+            string nameFile = $"Заявка_{recordStockPurchase.Id}";
+            string filledFilePath = $"F:\\GitHub\\Minotaur\\Minotaur\\Areas\\Stockkeeper\\PurchaseRequisitions\\{nameFile}.docx";
+
+
+            System.IO.File.Copy(templatePath, filledFilePath, true);
+
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(templatePath, true))
+            {
+                // Получаем основную часть документа
+                MainDocumentPart mainPart = doc.MainDocumentPart;
+
+                // Получаем текст документа
+                string docText;
+                using (StreamReader sr = new StreamReader(mainPart.GetStream()))
+                {
+                    docText = sr.ReadToEnd();
+                }
+
+                // Заменяем значения в тексте документа
+                Dictionary<string, string> replacements = new Dictionary<string, string>{
+                    {"Number", recordStockPurchase.Id.ToString()},
+                    {"Street", dataByStock.Stock.Street.ToString()},
+                    {"City", dataByStock.Stock.City.ToString()},
+                    {"ApplicationTime", recordStockPurchase.Time.ToString("dd.MM.yyyy")},
+                    {"FirstName", dataByStock.MinotaurUser.FirstName.ToString()},
+                    {"LastName", dataByStock.MinotaurUser.LastName.ToString()},
+                    {"Surname", dataByStock.MinotaurUser.Surname.ToString()},
+                    {"Phone", dataByStock.MinotaurUser.PhoneNumber.ToString()} };
+
+
+                Regex regexText = new Regex(string.Join("|", replacements.Keys));
+                docText = regexText.Replace(docText, match => replacements[match.Value]);
+
+                // Записываем измененный текст обратно в документ
+                using (StreamWriter sw = new StreamWriter(mainPart.GetStream(FileMode.Create)))
+                {
+                    sw.Write(docText);
+                }
+
+                // Добавляем таблицу в документ
+                Table table = mainPart.Document.Body.Elements<Table>().FirstOrDefault();
+                TableProperties tableProperties = table.GetFirstChild<TableProperties>();
+
+                foreach (var replacement in purchaseRequestData)
+                {
+                    TableRow newRow = new TableRow();
+
+                    TableCell cellId = new TableCell(new Paragraph(new Run(new Text("-"))));
+                    TableCell productNameCell = new TableCell(new Paragraph(new Run(new Text(replacement.ProductName + ", " + replacement.ProductId.ToString()))));
+                    TableCell countCell = new TableCell(new Paragraph(new Run(new Text(replacement.Count.ToString()))));
+
+                    newRow.AppendChild(cellId);
+                    newRow.AppendChild(productNameCell);
+                    newRow.AppendChild(countCell);
+
+                    TableCellProperties cellProperties = new TableCellProperties();
+                    cellProperties.Append(tableProperties.CloneNode(true));
+
+                    cellId.AppendChild(cellProperties.CloneNode(true));
+                    productNameCell.AppendChild(cellProperties.CloneNode(true));
+                    countCell.AppendChild(cellProperties.CloneNode(true));
+
+                    table.AppendChild(newRow);
+                }
+
+                // Сохраняем изменения в документе
+                mainPart.Document.Save();
+            }
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
+
+            var contentDispositionHeader = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = nameFile
+            };
+
+            Response.Headers.Add(HeaderNames.ContentDisposition, contentDispositionHeader.ToString());
+            Response.Headers.Add(HeaderNames.XContentTypeOptions, "nosniff");
+
+            await _db.SaveChangesAsync();
+            return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        }
     }
 }
