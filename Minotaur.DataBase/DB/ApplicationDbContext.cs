@@ -18,9 +18,9 @@ namespace Minotaur.DataAccess
         public DbSet<MinotaurUser> MinotaurUsers { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<ShoppingBasket> ShoppingBasket { get; set; }
+        public DbSet<ShoppingBasket> ShoppingBaskets { get; set; }
         public DbSet<WishList> WishLists { get; set; }
-        public DbSet<Order> Order { get; set; }
+        public DbSet<Order> Orders { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RecordStock> StockMagazine { get; set; }

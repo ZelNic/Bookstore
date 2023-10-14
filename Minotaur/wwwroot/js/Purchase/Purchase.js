@@ -4,7 +4,7 @@ $(document).ready(function () {
 });
 
 let orderData;
-let listPickupPoints;
+let arrayPickupPoints;
 let personalWalletAndPurchaseAmount;
 
 function getInfomationAboutBuyer() {
@@ -50,29 +50,34 @@ function getInfomationAboutBuyer() {
             `
         },
         error: function (error) {
-            console.log(error.responseJSON.error);
+            console.log(error.responseText);
         }
     });
 }
 
-function getOrderPickupPoint() {
-
-    var orderPickupPoint = document.getElementById("orderPickupPoint");
+function getOrderPickupPoint(callback) {
     $.ajax({
         url: '/API/API/GetOrderPickupPoint',
         type: 'GET',
         dataType: 'json',
 
         success: function (response) {
-            listPickupPoints = response.data;
+            arrayPickupPoints = response.data;
 
-            for (var pickupPoint of listPickupPoints) {
-                var option = document.createElement("option");
-                option.value = pickupPoint.pointId;
-                option.textContent = pickupPoint.city + ", " + pickupPoint.street + " " + pickupPoint.buildingNumber;
-                orderPickupPoint.appendChild(option);
+            let optionPickUp;
+
+            for (var pickupPoint of arrayPickupPoints) {
+
+                optionPickUp += `<option value="${pickupPoint.id}">${pickupPoint.name}, ${pickupPoint.city}, ${pickupPoint.street} ${pickupPoint.buildingNumber}</option>`;
             }
-        }
+            callback(optionPickUp);
+        },
+        error: function (error) {
+            Swal.fire({
+                icon: 'error',
+                title: error.responseText,
+            });
+        },
     });
 }
 
@@ -141,7 +146,7 @@ function makePayment() {
                         })
                     },
                     error: function (error) {
-                        Swal.fire(error.responseJSON.error);
+                        Swal.fire(error.responseText);
                     }
                 });
             } else if (result.isDenied) {
@@ -213,16 +218,16 @@ function setTypeDelivery(type) {
     if (type === "false") {
         orderData.isCourierDelivery = false;
         deliveryData.innerHTML = `
-            <div class="mt-2">
-                <label>Выберите пункт выдачи</label>
-                <select id="orderPickupPoint" class="rounded" onchange="setOrderPickupPoint(document.getElementById('orderPickupPoint').value); activeBtnPayment(true)" required>
-                    <option value="" selected disabled>Выбрать</option>
-                </select>
-            </div>
-            <hr />
-        `;
-        getOrderPickupPoint();
-    } else if (type === "true") {
+                    <div class="mt-2">
+                        <label>Выберите пункт выдачи</label>
+                        <select id="orderPickupPoint" class="rounded" onchange="setOrderPickupPoint(document.getElementById('orderPickupPoint').value); activeBtnPayment(true)" required>
+                            <option value="" selected disabled>Выбрать</option>
+                            ${getOrderPickupPoint(function (options) { document.getElementById('orderPickupPoint').innerHTML = options; })}
+                        </select>
+                    </div>
+                    <hr />`;
+    }
+    else if (type === "true") {
 
         orderData.isCourierDelivery = true;
         activeBtnPayment(true);
@@ -233,11 +238,11 @@ function setTypeDelivery(type) {
             orderData.houseNumber = "";
         }
 
-        deliveryData.innerHTML = `       
-            <div>
+        deliveryData.innerHTML = `
+        < div >
                 <label class="ms-1 my-1 text-dark fs-5" style="display: block;">Город</label>
                 <input id="city" value="${orderData.city}" onblur="changeDataBuyer('city', document.getElementById('city').value)" class="border border-1 rounded rounded-1" type="text" required />
-            </div>
+            </div >
             <div>
                 <label class="ms-1 my-1 text-dark fs-5" style="display: block;">Улица</label>
                 <input id="street" value="${orderData.street}" onblur="changeDataBuyer('street', document.getElementById('street').value)" class="border border-1 rounded rounded-1" type="text" required/>
@@ -247,7 +252,7 @@ function setTypeDelivery(type) {
                 <input id="houseNumber" value="${orderData.houseNumber}" onblur="changeDataBuyer('houseNumber', document.getElementById('houseNumber').value)" class="border border-1 rounded rounded-1" type="text" required/>
             </div>
             <hr />
-        `;
+    `;
     }
     else { return; }
 }

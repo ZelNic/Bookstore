@@ -35,13 +35,13 @@ namespace Minotaur.Areas.Customer
             List<Category>? categoriesList = await _db.Categories.ToListAsync();
             WishList? wishLists = null;
             ShoppingBasketClient? shoppingBasketClient = null;
-            
+
             MinotaurUser? user = await _userManager.GetUserAsync(User);
 
             if (user != null)
             {
                 wishLists = await _db.WishLists.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
-                ShoppingBasket? sb = await _db.ShoppingBasket.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+                ShoppingBasket? sb = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
                 if (sb != null)
                 {
                     shoppingBasketClient = new()

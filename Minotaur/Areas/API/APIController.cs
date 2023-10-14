@@ -1,6 +1,7 @@
 ﻿using Minotaur.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Minotaur.Models.Models;
 
 namespace Minotaur.Areas.API
 {
@@ -16,7 +17,7 @@ namespace Minotaur.Areas.API
 
         public async Task<IActionResult> GetOrderPickupPoint()
         {
-            var orderPickupPoint = await _db.Offices.ToListAsync();
+            Office[] orderPickupPoint = await _db.Offices.Where(p =>p.Type == "Пункт выдачи").ToArrayAsync();
             return Json(new { data = orderPickupPoint });
         }
     }

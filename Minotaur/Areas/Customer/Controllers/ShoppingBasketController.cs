@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Minotaur.Models.SD;
 using Microsoft.AspNetCore.Identity;
+using System.Linq;
 
 namespace Minotaur.Areas.Customer
 {
@@ -31,7 +32,7 @@ namespace Minotaur.Areas.Customer
         {
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
-            ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+            ShoppingBasket? shoppingBasket = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
 
             if (shoppingBasket == null)
             {
@@ -100,7 +101,7 @@ namespace Minotaur.Areas.Customer
         {
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
-            ShoppingBasket shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+            ShoppingBasket? shoppingBasket = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
 
             if (shoppingBasket != null)
             {
@@ -117,17 +118,17 @@ namespace Minotaur.Areas.Customer
                     productIdAndCount.Add(productId, 1);
                     shoppingBasket.ProductIdAndCount = SerializationProductData(productIdAndCount);
                 }
-                _db.ShoppingBasket.Update(shoppingBasket);
+                _db.ShoppingBaskets.Update(shoppingBasket);
             }
             else
             {
                 ShoppingBasket newShoppingBasket = new()
                 {
-                    UserId = user.Id,
+                    UserId = Guid.Parse(user.Id),
                     ProductIdAndCount = productId.ToString() + ":1"
                 };
 
-                await _db.ShoppingBasket.AddAsync(newShoppingBasket);
+                await _db.ShoppingBaskets.AddAsync(newShoppingBasket);
             }
 
             await _db.SaveChangesAsync();
@@ -147,14 +148,14 @@ namespace Minotaur.Areas.Customer
         {
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
-            ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+            ShoppingBasket? shoppingBasket = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
             if (shoppingBasket == null) { return BadRequest(); }
 
-            List<int> ids = productsId.Split(',').Select(int.Parse).ToList();
+            List<int> listProductsId = productsId.Split(',').Select(int.Parse).ToList();
 
             Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
 
-            foreach (int product in ids)
+            foreach (int product in listProductsId)
             {
                 if (productIdAndCount.ContainsKey(product))
                 {
@@ -164,7 +165,7 @@ namespace Minotaur.Areas.Customer
 
             if (productIdAndCount.Count == 0)
             {
-                _db.ShoppingBasket.Remove(shoppingBasket);
+                _db.ShoppingBaskets.Remove(shoppingBasket);
                 await _db.SaveChangesAsync();
                 return BadRequest(new { error = "Пустая корзина" }); ;
             }
@@ -172,7 +173,7 @@ namespace Minotaur.Areas.Customer
             {
                 shoppingBasket.ProductIdAndCount = SerializationProductData(productIdAndCount);
                 await _db.SaveChangesAsync();
-                _db.ShoppingBasket.Update(shoppingBasket);
+                _db.ShoppingBaskets.Update(shoppingBasket);
                 return Ok();
             }
         }
@@ -183,7 +184,7 @@ namespace Minotaur.Areas.Customer
         {
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
-            ShoppingBasket? shoppingBasket = await _db.ShoppingBasket.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+            ShoppingBasket? shoppingBasket = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
 
             if (shoppingBasket == null) { return BadRequest(); }
 
@@ -200,7 +201,7 @@ namespace Minotaur.Areas.Customer
             }
 
             shoppingBasket.ProductIdAndCount = SerializationProductData(oldProductIdAndCount);
-            _db.ShoppingBasket.Update(shoppingBasket);
+            _db.ShoppingBaskets.Update(shoppingBasket);
             await _db.SaveChangesAsync();
 
             return Ok();

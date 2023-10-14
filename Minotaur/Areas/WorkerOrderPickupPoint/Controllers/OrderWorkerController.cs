@@ -1,168 +1,164 @@
-﻿//using Minotaur.DataAccess;
-//using Minotaur.Models;
-//using Minotaur.Models.Models;
-//using Minotaur.Models.SD;
-//using Minotaur.Models.ViewModel;
-//using Minotaur.Utility;
-//using Microsoft.AspNetCore.Http.HttpResults;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
+﻿using Minotaur.DataAccess;
+using Minotaur.Models;
+using Minotaur.Models.Models;
+using Minotaur.Models.SD;
+using Minotaur.Models.ViewModel;
+using Minotaur.Utility;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
-//namespace Minotaur.Areas.WorkerOrderPickupPoint
-//{
-//    [Area("WorkerOrderPickupPoint")]
-//    public class OrderWorkerController : Controller
-//    {
-//        private readonly ApplicationDbContext _db;
-//        private readonly IHttpContextAccessor _contextAccessor;
-//        private readonly User _user;
+namespace Minotaur.Areas.WorkerOrderPickupPoint
+{
+    [Area("WorkerOrderPickupPoint"), Authorize(Roles = Roles.Role_Worker_Order_Pickup_Point)]
+    public class OrderWorkerController : Controller
+    {
+        private readonly ApplicationDbContext _db;
+        private readonly UserManager<MinotaurUser> _userManager;
 
-//        public OrderWorkerController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
-//        {
-//            _db = db;
-//            _contextAccessor = contextAccessor;
+        public OrderWorkerController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        {
+            _db = db;
+            _userManager = userManager;
+        }
 
-//            if (_contextAccessor.HttpContext.Session.GetInt32("Id") != null)
-//            {
-//                int? userId = _contextAccessor.HttpContext.Session.GetInt32("Id");
-//                if ((userId != null) && (_db.User.Find(userId) != null))
-//                {
-//                    _user = _db.User.Find(userId);
-//                }
-//            }
-//        }
+        public IActionResult Order(string operation)
+        {
+            if (operation == null)
+            {
+                return NotFound("Такой операции нет.");
+            }
 
-//        public IActionResult Order(string operation)
-//        {
-//            if (operation == null)
-//            {
-//                return NotFound("Такой операции нет.");
-//            }
+            switch (operation)
+            {
+                case OperationOrderPickUp.ViewOrderDetails:
+                    ViewBag.operation = OperationOrderPickUp.ViewOrderDetails;
+                    break;
+                case OperationOrderPickUp.AcceptOrder:
+                    ViewBag.operation = OperationOrderPickUp.AcceptOrder;
+                    break;
+                case OperationOrderPickUp.IssueOrder:
+                    ViewBag.operation = OperationOrderPickUp.IssueOrder;
+                    break;
+                default:
+                    return NotFound(operation);
+            }
 
-//            switch (operation)
-//            {
-//                case SD.ViewOrderDetails:
-//                    ViewBag.operation = SD.ViewOrderDetails;
-//                    break;
-//                case SD.AcceptOrder:
-//                    ViewBag.operation = SD.AcceptOrder;
-//                    break;
-//                case SD.IssueOrder:
-//                    ViewBag.operation = SD.IssueOrder;
-//                    break;
-//                default:
-//                    return NotFound(operation);
-//            }
+            return View();
+        }
 
-//            return View();
-//        }
+        [HttpPost]
+        public async Task<IActionResult> Order(string searchOrderId, string operation)
+        {
+            OrderVM orderVM = new()
+            {
+                Order = await _db.Orders.Where(u => u.OrderId == Guid.Parse(searchOrderId)).FirstOrDefaultAsync(),
+                OperationName = operation
+            };
 
-//        [HttpPost]
-//        public async Task<IActionResult> Order(int searchOrderId, string operation)
-//        {
-//            OrderVM orderVM = new()
-//            {
-//                Order = await _db.Order.Where(u => u.OrderId == searchOrderId).FirstOrDefaultAsync(),
-//                OperationName = operation
-//            };
+            if (orderVM.Order == null)
+            {
+                return BadRequest("Заказ не найден");
+            }
 
-//            if (orderVM.Order == null)
-//            {
-//                return NotFound(SD.NotFoundUser);
-//            }
+            return View(orderVM);
+        }
 
 
-//            return View(orderVM);
-//        }
-
-//        //Пока не используется, надо сделать для приема товара смену кода
-//        public IActionResult Deliver(int orderId, int? statusCode)
-//        {
-//            Order? order = _db.Order.Find(orderId);
-//            if (order != null)
-//            {
-//                switch (statusCode)
-//                {
-//                    case 0:
-//                        order.OrderStatus = SD.StatusPending_0;
-//                        break;
-//                    case 1:
-//                        order.OrderStatus = SD.StatusApproved_1;
-//                        break;
-//                    case 2:
-//                        order.OrderStatus = SD.StatusInProcess_2;
-//                        break;
-//                    case 3:
-//                        order.OrderStatus = SD.StatusShipped_3;
-//                        break;
-//                    case 4:
-//                        order.OrderStatus = SD.StatusDelivered_4;
-//                        break;
-//                    case 5:
-//                        order.OrderStatus = SD.StatusCancelled_5;
-//                        break;
-//                    case 6:
-//                        order.OrderStatus = SD.StatusRefunded_6;
-//                        break;
-//                }
-//                _db.Order.Update(order);
-//                _db.SaveChanges();
-//            }
-//            return RedirectToAction("Index", "Orders", new { area = "Customer" });
-//        }
+        public IActionResult Deliver(int orderId, int? statusCode)
+        {
+            Order? order = _db.Orders.Find(orderId);
+            if (order != null)
+            {
+                switch (statusCode)
+                {
+                    case 0:
+                        order.OrderStatus = OperationByOrder.StatusPending_0;
+                        break;
+                    case 1:
+                        order.OrderStatus = OperationByOrder.StatusApproved_1;
+                        break;
+                    case 2:
+                        order.OrderStatus = OperationByOrder.StatusInProcess_2;
+                        break;
+                    case 3:
+                        order.OrderStatus = OperationByOrder.StatusShipped_3;
+                        break;
+                    case 4:
+                        order.OrderStatus = OperationByOrder.StatusDelivered_4;
+                        break;
+                    case 5:
+                        order.OrderStatus = OperationByOrder.StatusCancelled_5;
+                        break;
+                    case 6:
+                        order.OrderStatus = OperationByOrder.StatusRefunded_6;
+                        break;
+                }
+                _db.Orders.Update(order);
+                _db.SaveChanges();
+            }
+            return RedirectToAction("Index", "Orders", new { area = "Customer" });
+        }
 
 
-//        [HttpPost]
-//        public async Task<IActionResult> SendConfirmationCode(int orderId)
-//        {
-//            var order = _db.Order.Find(orderId);
+        [HttpPost]
+        public async Task<IActionResult> SendConfirmationCode(string orderId)
+        {
+            var order = _db.Orders.Find(orderId);
 
-//            if (order == null)
-//            {
-//                NotFound(SD.NotFoundOrder);
-//            }
+            if (order == null)
+            {
+                return BadRequest("Заказ не найден");
+            }
 
-//            Random random = new();
-//            int confirmationСode = random.Next(100000, 999999);
+            Random random = new();
+            int confirmationСode = random.Next(100000, 999999);
 
-//            Notification notification = new()
-//            {
-//                OrderId = orderId,
-//                RecipientId = _user.Id,
-//                SenderId = order.UserId,
-//                SendingTime = MoscowTime.GetTime(),
-//                Text = NotificationSD.IssueCode + ' ' + confirmationСode + ' ' + "Скажите его оператору для выдачи заказа."
-//            };
+            // +++
+            var user = await _userManager.GetUserAsync(User);
+            Worker? workerOrderPUp = await _db.Workers.FirstOrDefaultAsync(w => w.UserId == user.Id);
 
-//            order.ConfirmationCode = confirmationСode;
 
-//            _db.Order.Update(order);
-//            _db.Notifications.Add(notification);
-//            await _db.SaveChangesAsync();
-//            return Ok();
-//        }
+            Notification notification = new()
+            {
+                OrderId = Guid.Parse(orderId),
+                RecipientId = workerOrderPUp.WorkerId,
+                SenderId = order.UserId,
+                SendingTime = MoscowTime.GetTime(),
+                Text = NotificationSD.IssueCode + ' ' + confirmationСode + ' ' + "Скажите его оператору для выдачи заказа."
+            };
 
-//        public async Task<IActionResult> CheckVerificationCode(int orderId, int confirmationCode)
-//        {
-//            var order = _db.Order.Find(orderId);
+            order.ConfirmationCode = confirmationСode;
 
-//            if (order == null)
-//            {
-//                return BadRequest();
-//            }
+            _db.Orders.Update(order);
+            _db.Notifications.Add(notification);
+            await _db.SaveChangesAsync();
+            return Ok();
+        }
 
-//            if (order.ConfirmationCode == confirmationCode)
-//            {
-//                order.ConfirmationCode = 0;
-//                order.OrderStatus = SD.StatusDelivered_4;
-//                _db.Order.Update(order);
-//                _db.SaveChanges();
-//                return Ok();
-//            }
-//            else
-//            {
-//                return BadRequest();
-//            }
-//        }
-//    }
-//}
+        public async Task<IActionResult> CheckVerificationCode(string orderId, int confirmationCode)
+        {
+            Order? order = await _db.Orders.FindAsync(orderId);
+
+            if (order == null)
+            {
+                return BadRequest("Заказ не найден");
+            }
+
+            if (order.ConfirmationCode == confirmationCode)
+            {
+                order.ConfirmationCode = 0;
+                order.OrderStatus = OperationByOrder.StatusDelivered_4;
+                _db.Orders.Update(order);
+                _db.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Код подтверждения неверный");
+            }
+        }
+    }
+}

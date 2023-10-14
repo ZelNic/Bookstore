@@ -22,8 +22,8 @@ namespace Minotaur.Areas.Customer
 
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
-            IEnumerable<Notification> notifications = await _db.Notifications.Where(u => u.RecipientId == user.Id).Where(s => s.IsHidden == false).ToListAsync();
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
+            IEnumerable<Notification> notifications = await _db.Notifications.Where(u => u.RecipientId == Guid.Parse(user.Id)).Where(s => s.IsHidden == false).ToListAsync();
 
             return View(notifications);
         }
@@ -36,6 +36,8 @@ namespace Minotaur.Areas.Customer
                 _db.Notifications.Remove(notification);
                 await _db.SaveChangesAsync();
             }
+
+            //change
 
             return RedirectToAction("Index");
         }

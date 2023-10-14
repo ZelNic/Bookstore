@@ -6,11 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Minotaur.Models.SD;
 
 namespace Minotaur.Areas.Customer
 {
     [Area("Customer")]
-    [Authorize]
+    [Authorize(Roles = Roles.Role_Customer)]
     public class OrdersController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -31,7 +32,7 @@ namespace Minotaur.Areas.Customer
         {
             var user = await _userManager.GetUserAsync(User);
 
-            Order[] ordersDB = await _db.Order.Where(u => u.UserId == user.Id).OrderByDescending(u => u.OrderId).ToArrayAsync();
+            Order[] ordersDB = await _db.Orders.Where(u => u.UserId == Guid.Parse(user.Id)).OrderByDescending(u => u.OrderId).ToArrayAsync();
             Product[] productsDB = await _db.Products.ToArrayAsync();
 
             var formatedOrders = ordersDB.Select(o => new

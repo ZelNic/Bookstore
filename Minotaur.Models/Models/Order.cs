@@ -5,9 +5,9 @@ namespace Minotaur.Models.Models
     public class Order
     {
         [Key]
-        public int OrderId { get; set; }
+        public Guid OrderId { get; set; }
         [Required]
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
         public string? ReceiverName { get; set; }
         public string? ReceiverLastName { get; set; }
         public string? ProductData { get; set; }
@@ -17,7 +17,7 @@ namespace Minotaur.Models.Models
         public string? CurrentPosition { get; set; }
         public string? TravelHistory { get; set; } 
         public bool IsCourierDelivery { get; set; }
-        public int OrderPickupPointId { get; set; }
+        public Guid OrderPickupPointId { get; set; }
         public string? Region { get; set; }
         public string? City { get; set; }
         public string? Street { get; set; }

@@ -169,7 +169,7 @@ namespace Minotaur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
 
                     b.HasData(
                         new
@@ -273,25 +273,21 @@ namespace Minotaur.Migrations
 
             modelBuilder.Entity("Minotaur.Models.Models.Notification", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsHidden")
                         .HasColumnType("bit");
 
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("RecipientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("RecipientId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("SendingTime")
                         .HasColumnType("datetime2");
@@ -302,7 +298,7 @@ namespace Minotaur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.Office", b =>
@@ -351,16 +347,14 @@ namespace Minotaur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Offices");
+                    b.ToTable("Offices", (string)null);
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.Order", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<Guid>("OrderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
@@ -410,13 +404,12 @@ namespace Minotaur.Migrations
                     b.Property<string>("TravelHistory")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("OrderId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.RecordStock", b =>
@@ -457,7 +450,7 @@ namespace Minotaur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StockMagazine");
+                    b.ToTable("StockMagazine", (string)null);
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.Review", b =>
@@ -493,28 +486,25 @@ namespace Minotaur.Migrations
 
                     b.HasKey("ReviewsId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.ShoppingBasket", b =>
                 {
-                    b.Property<int>("BasketId")
+                    b.Property<Guid>("BasketId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BasketId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ProductIdAndCount")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("BasketId");
 
-                    b.ToTable("ShoppingBasket");
+                    b.ToTable("ShoppingBaskets", (string)null);
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.WishList", b =>
@@ -535,7 +525,7 @@ namespace Minotaur.Migrations
 
                     b.HasKey("WishListId");
 
-                    b.ToTable("WishLists");
+                    b.ToTable("WishLists", (string)null);
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.Worker", b =>
@@ -570,7 +560,7 @@ namespace Minotaur.Migrations
 
                     b.HasKey("WorkerId");
 
-                    b.ToTable("Workers");
+                    b.ToTable("Workers", (string)null);
                 });
 
             modelBuilder.Entity("Minotaur.Models.OrganizationalDocumentation.HR.OrganizationalOrder", b =>
@@ -595,7 +585,7 @@ namespace Minotaur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrganizationalOrders");
+                    b.ToTable("OrganizationalOrders", (string)null);
                 });
 
             modelBuilder.Entity("Minotaur.Models.Product", b =>
@@ -635,7 +625,7 @@ namespace Minotaur.Migrations
 
                     b.HasKey("ProductId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
 
                     b.HasData(
                         new
