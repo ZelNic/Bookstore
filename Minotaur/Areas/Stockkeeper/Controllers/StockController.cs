@@ -259,7 +259,7 @@ namespace Minotaur.Areas.Stockkeeper
 
             System.IO.File.Copy(templatePath, filledFilePath, true);
 
-            using (WordprocessingDocument doc = WordprocessingDocument.Open(templatePath, true))
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(filledFilePath, true))
             {
                 // Получаем основную часть документа
                 MainDocumentPart mainPart = doc.MainDocumentPart;
@@ -274,7 +274,8 @@ namespace Minotaur.Areas.Stockkeeper
                 // Заменяем значения в тексте документа
                 Dictionary<string, string> replacements = new Dictionary<string, string>{
                     {"Number", recordStockPurchase.Id.ToString()},
-                    {"Street", dataByStock.Stock.Street.ToString()},
+                    {"TypeOffice", dataByStock.Stock.Type.ToString()},
+                    {"NameOffice", dataByStock.Stock.Name.ToString()},
                     {"City", dataByStock.Stock.City.ToString()},
                     {"ApplicationTime", recordStockPurchase.Time.ToString("dd.MM.yyyy")},
                     {"FirstName", dataByStock.MinotaurUser.FirstName.ToString()},
@@ -286,30 +287,40 @@ namespace Minotaur.Areas.Stockkeeper
                 Regex regexText = new Regex(string.Join("|", replacements.Keys));
                 docText = regexText.Replace(docText, match => replacements[match.Value]);
 
-                // Записываем измененный текст обратно в документ
                 using (StreamWriter sw = new StreamWriter(mainPart.GetStream(FileMode.Create)))
                 {
                     sw.Write(docText);
                 }
 
-                // Добавляем таблицу в документ
                 Table table = mainPart.Document.Body.Elements<Table>().FirstOrDefault();
-                TableProperties tableProperties = table.GetFirstChild<TableProperties>();
+                TableProperties sourceTableProperties = table.GetFirstChild<TableProperties>();
 
-                foreach (var replacement in purchaseRequestData)
+                TableProperties copiedTableProperties = (TableProperties)sourceTableProperties.CloneNode(true);
+
+                for (int i = 0; i < purchaseRequestData.Length; i++)
                 {
                     TableRow newRow = new TableRow();
 
-                    TableCell cellId = new TableCell(new Paragraph(new Run(new Text("-"))));
-                    TableCell productNameCell = new TableCell(new Paragraph(new Run(new Text(replacement.ProductName + ", " + replacement.ProductId.ToString()))));
-                    TableCell countCell = new TableCell(new Paragraph(new Run(new Text(replacement.Count.ToString()))));
+                    TableCell cellId = new TableCell(new Paragraph(new Run(new Text($"{i + 1}"))));
+                    TableCell productNameCell = new TableCell(new Paragraph(new Run(new Text(purchaseRequestData[i].ProductName + ", " + purchaseRequestData[i].ProductId.ToString()))));
+                    TableCell countCell = new TableCell(new Paragraph(new Run(new Text(purchaseRequestData[i].Count.ToString()))));
 
                     newRow.AppendChild(cellId);
                     newRow.AppendChild(productNameCell);
                     newRow.AppendChild(countCell);
 
                     TableCellProperties cellProperties = new TableCellProperties();
-                    cellProperties.Append(tableProperties.CloneNode(true));
+                    cellProperties.Append(copiedTableProperties.CloneNode(true));
+
+                    RunProperties runProperties = new(
+                        new RunFonts()
+                        {
+                            Ascii = "Arial",
+                        });
+
+                    runProperties.Append(new FontSize() { Val = "12" });
+
+                    cellProperties.Append(runProperties);
 
                     cellId.AppendChild(cellProperties.CloneNode(true));
                     productNameCell.AppendChild(cellProperties.CloneNode(true));
@@ -318,7 +329,8 @@ namespace Minotaur.Areas.Stockkeeper
                     table.AppendChild(newRow);
                 }
 
-                // Сохраняем изменения в документе
+
+
                 mainPart.Document.Save();
             }
 
