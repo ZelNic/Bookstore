@@ -121,7 +121,6 @@ namespace Minotaur.Areas.Purchase
             if (confirmedPrice != order.PurchaseAmount) { return BadRequest("Ошибочная стоимость заказа."); }
 
             ShoppingBasket? sb = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
-
             if (sb == null) return BadRequest("Запись о списке покупок не найдена.");
 
             Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount);
@@ -153,6 +152,8 @@ namespace Minotaur.Areas.Purchase
 
                     await _db.SaveChangesAsync();
 
+
+
                     return Ok();
                 }
                 else
@@ -162,7 +163,7 @@ namespace Minotaur.Areas.Purchase
             }
             else
             {
-                return BadRequest("Не хватает средств.");
+                return BadRequest("Не хватает средств на счету.");
             }
         }
     }

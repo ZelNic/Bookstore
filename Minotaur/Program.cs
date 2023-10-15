@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Minotaur.DataAccess;
+using Minotaur.DataAccess.DbInitializer;
+using Minotaur.DataAccess.Repository;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Utility;
 
@@ -20,7 +23,9 @@ builder.Services.AddScoped<UserManager<MinotaurUser>>();
 builder.Services.AddScoped<SignInManager<MinotaurUser>>();
 
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<UnitOfWork, UnitOfWork>();
 
 builder.Services.ConfigureApplicationCookie(option =>
 {
@@ -43,6 +48,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+SeedDatabase();
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -56,7 +63,11 @@ app.Run();
 
 
 
-
-//builder.Services.AddScoped<UserManager<MinotaurUser>>();
-//builder.Services.AddScoped<SignInManager<User>>();
-//builder.Services.AddScoped<ILogger<LoginModel>, Logger<LoginModel>>();
+void SeedDatabase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}
