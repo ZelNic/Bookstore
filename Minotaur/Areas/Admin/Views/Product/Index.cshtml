@@ -1,9 +1,7 @@
-﻿
-
-@model ProductVM
+﻿@model ProductVM
 
 <div class="col-2 pb-3 mt-2 pt-3 text-right">
-    <a asp-action="Upsert" class="btn btn-warning border-0 form-control">Добавить товар</a>
+    <a asp-action="DetailsProduct" class="btn btn-warning border-0 form-control">Добавить товар</a>
 </div>
 
 <div class="">
@@ -44,9 +42,12 @@
                                     </div>
                                 </div>
                                 <div class="card-footer bg-transparent">
-                                    <a asp-controller="Product" asp-action="Upsert" asp-route-productId="@product.ProductId" class="btn btn-success border-0 form-control">
-                                        Изменить
-                                    </a>
+                                    <div class="text-center">
+                                        <a class="btn btn-success mb-3 bi bi-pencil-square" asp-area="Admin" asp-controller="Product" asp-action="DetailsProduct" asp-route-productId="@product.ProductId"></a>
+                                    </div>
+                                    <div class="text-center">
+                                        <a class="btn btn-danger mb-3 bi bi-trash" onclick="deleteProduct(@product.ProductId)"></a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -55,3 +56,7 @@
             }
     </div>
 </div>
+
+@section Scripts{
+    <script src="/js/Admin/Product.js"></script>
+}

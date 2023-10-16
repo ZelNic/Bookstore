@@ -33,16 +33,17 @@ function getShoppingBasket() {
 
             dataShoppingBasket = response.data;
 
-            shoppingBasket.innerHTML = `
-                <h1>Корзина</h1>          
-                <div class="row row-cols-1">
-                    <div class="container col-10">
-                        <div class="row row-cols-2 row-cols-md-6 mb-5">
-                            ${generateCardProduct()}
-                        </div>
-                    </div>                    
-                </div>
-            `;
+            shoppingBasket.innerHTML = 
+                `
+                    <h1>Корзина</h1>          
+                    <div class="row row-cols-1">
+                        <div class="container col-10">
+                            <div class="row row-cols-2 row-cols-md-6 mb-5">
+                                ${generateCardProduct()}
+                            </div>
+                        </div>                    
+                    </div>
+                `;
 
 
 
@@ -51,7 +52,7 @@ function getShoppingBasket() {
             activeSelectBox();
         },
         error: function (error) {
-            shoppingBasket.innerHTML = `<h1>${error.responseJSON.error}</h1>`
+            shoppingBasket.innerHTML = `<h1>${error.responseText}</h1>`
             orderingInformation.innerHTML = ``;
             checkout.innerHTML = ``;
             boxSelect.innerHTML = ``;
@@ -219,17 +220,18 @@ function removeFromShoppingBasket(event, productId) {
 
 function changeCountProduct(event, key, operation, count = 1) {
 
-    isSave = true;
-    showBtnSaveChange();
-
-    let indicateCountProduct = document.getElementById(`countProduct_${key}`);
-
     if (parseInt(count) == 0) {
         removeFromShoppingBasket(event, dataShoppingBasket[key].productId);
         isSave = false;
         showBtnSaveChange();
         return;
     }
+
+    isSave = true;
+    showBtnSaveChange();
+
+    let indicateCountProduct = document.getElementById(`countProduct_${key}`);
+
 
     switch (operation) {
         case "minus":

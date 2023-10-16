@@ -36,7 +36,7 @@ namespace Minotaur.Areas.Customer
 
             if (shoppingBasket == null)
             {
-                return BadRequest(new { error = "Пустая корзина" }); ;
+                return BadRequest("Пустая корзина");
             }
 
             Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
@@ -61,7 +61,17 @@ namespace Minotaur.Areas.Customer
 
         public static Dictionary<int, int> ParseProductData(string shoppingBasket)
         {
-            List<string> productData = new();
+            List<string>? productData = new List<string> { };
+            Dictionary<int, int>? productIdAndCount = null;
+
+            if (shoppingBasket == null)
+            {
+                return productIdAndCount;
+            }
+            else
+            {
+                productIdAndCount = new Dictionary<int, int> { };
+            }
 
             if (shoppingBasket.Contains('|') == true)
             {
@@ -72,7 +82,6 @@ namespace Minotaur.Areas.Customer
                 productData.Add(shoppingBasket);
             }
 
-            Dictionary<int, int> productIdAndCount = new Dictionary<int, int>();
 
             foreach (string idAndCount in productData)
             {
@@ -105,7 +114,12 @@ namespace Minotaur.Areas.Customer
 
             if (shoppingBasket != null)
             {
-                Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
+                Dictionary<int, int>? productIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
+
+                if (productIdAndCount == null)
+                {
+                    return BadRequest("Корзина пуста");
+                }
 
                 if (productIdAndCount.ContainsKey(productId))
                 {
@@ -181,7 +195,7 @@ namespace Minotaur.Areas.Customer
 
         [HttpPost]
         public async Task<IActionResult> ChangeCountProduct(string productData)
-        {
+        {           
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
             ShoppingBasket? shoppingBasket = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();

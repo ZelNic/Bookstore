@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.SD;
-using System.Linq;
+using Newtonsoft.Json;
 
 namespace Minotaur.Areas.Admin.Controllers
 {
@@ -20,8 +20,8 @@ namespace Minotaur.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            List<Product> productsList =  _unitOfWork.Products.GetAll().ToList();
-            List<Category> categoriesList =  _unitOfWork.Categories.GetAll().ToList();
+            List<Product> productsList = _unitOfWork.Products.GetAll().ToList();
+            List<Category> categoriesList = _unitOfWork.Categories.GetAll().ToList();
 
             ProductVM productVM = new()
             {
@@ -33,10 +33,8 @@ namespace Minotaur.Areas.Admin.Controllers
         }
 
 
-
-
         [HttpGet]
-        public async Task<IActionResult> Upsert(int? productId)
+        public async Task<IActionResult> DetailsProduct(int? productId)
         {
             var product = new Product();
 
@@ -48,8 +46,8 @@ namespace Minotaur.Areas.Admin.Controllers
             ProductVM bookVM = new()
             {
                 Product = product,
-                CategoriesList = _unitOfWork.Categories.GetAll().ToList()   
-            };
+                CategoriesList = _unitOfWork.Categories.GetAll().ToList()
+            };           
 
             return View(bookVM);
         }
@@ -57,26 +55,29 @@ namespace Minotaur.Areas.Admin.Controllers
 
 
         [HttpPost]
-        [ActionName("Upsert")]
-        public async Task<IActionResult> UpsertPost(ProductVM productVM)
+        public async Task<IActionResult> UpdateOrAdd(string dataProduct)
         {
-            if (productVM.Product.ProductId == 0)
+            Product? product = JsonConvert.DeserializeObject<Product>(dataProduct);
+            if(product == null) { return BadRequest("Ошибка в отправленных данных"); }
+
+            if (product.ProductId == 0)
             {
-                _unitOfWork.Products.AddAsync(productVM.Product);
+                _unitOfWork.Products.AddAsync(product);
             }
             else
             {
-                var oldVersionBook = await _unitOfWork.Products.GetAsync(p => p.ProductId == productVM.Product.ProductId);
+                var oldVersionBook = await _unitOfWork.Products.GetAsync(p => p.ProductId == product.ProductId);
 
                 if (oldVersionBook != null)
                 {
-                    oldVersionBook.Name = productVM.Product.Name;
-                    oldVersionBook.Author = productVM.Product.Author;
-                    oldVersionBook.ISBN = productVM.Product.ISBN;
-                    oldVersionBook.Description = productVM.Product.Description;
-                    oldVersionBook.Price = productVM.Product.Price;
-                    oldVersionBook.Category = productVM.Product.Category;
-                    oldVersionBook.ImageURL = productVM.Product.ImageURL;
+                    oldVersionBook.Name = product.Name;
+                    oldVersionBook.Author = product.Author;
+                    oldVersionBook.ISBN = product.ISBN;
+                    oldVersionBook.Description = product.Description;
+                    oldVersionBook.Price = product.Price;
+                    oldVersionBook.Category = product.Category;
+                    oldVersionBook.ImageURL = product.ImageURL;
+                    oldVersionBook.EditorId = product.EditorId;
                     _unitOfWork.Products.Update(oldVersionBook);
                 }
             }
@@ -86,32 +87,19 @@ namespace Minotaur.Areas.Admin.Controllers
         }
 
 
-
-        [HttpGet]
-        [ActionName("Delete")]
-        public async Task<IActionResult> ConfirmDelete(int? id)
-        {
-            if (id != null)
-            {
-                var productOnDelete = await _unitOfWork.Products.GetAsync(p=>p.ProductId == id);
-                return View(productOnDelete);
-            }
-            else return NotFound();
-        }
-
         [HttpPost]
-        public async Task<IActionResult> Delete(Product product)
+        public async Task<IActionResult> Delete(int productId)
         {
-            var productOnDelete = await _unitOfWork.Products.GetAsync(p=>p.ProductId == product.ProductId);
+            var productOnDelete = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
             if (productOnDelete != null)
             {
                 _unitOfWork.Products.Remove(productOnDelete);
                 _unitOfWork.SaveAsync();
-                return RedirectToAction("Index", "Book");
+                return Ok();
             }
             else
             {
-                return NotFound();
+                return BadRequest();
             }
         }
     }
