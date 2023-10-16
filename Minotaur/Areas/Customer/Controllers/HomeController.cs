@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
+using Minotaur.DataAccess.Repository.IRepository;
 
 namespace Minotaur.Areas.Customer
 {
@@ -12,14 +13,12 @@ namespace Minotaur.Areas.Customer
 
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        public HomeController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
-            _logger = logger;
-            _db = db;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
@@ -31,8 +30,8 @@ namespace Minotaur.Areas.Customer
 
         public async Task<ProductVM> GetProductsVM()
         {
-            List<Product>? productsList = await _db.Products.ToListAsync();
-            List<Category>? categoriesList = await _db.Categories.ToListAsync();
+            List<Product>? productsList = _unitOfWork.Products.GetAll().ToList();
+            List<Category>? categoriesList = _unitOfWork.Categories.GetAll().ToList();
             WishList? wishLists = null;
             ShoppingBasketClient? shoppingBasketClient = null;
 
@@ -40,8 +39,8 @@ namespace Minotaur.Areas.Customer
 
             if (user != null)
             {
-                wishLists = await _db.WishLists.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
-                ShoppingBasket? sb = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
+                wishLists = await _unitOfWork.WishLists.GetAsync(u => u.UserId == user.Id);
+                ShoppingBasket? sb = await _unitOfWork.ShoppingBaskets.GetAsync(u => u.UserId == Guid.Parse(user.Id));
                 if (sb != null)
                 {
                     shoppingBasketClient = new()
@@ -66,7 +65,7 @@ namespace Minotaur.Areas.Customer
 
         public async Task<IActionResult> Details(int productId)
         {
-            var product = await _db.Products.FindAsync(productId);
+            var product = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
 
             return View(product);
         }
@@ -78,7 +77,7 @@ namespace Minotaur.Areas.Customer
             {
                 return RedirectToAction("Index");
             }
-            IEnumerable<Product> products = await _db.Products.Where(book => book.Name.Contains(searchString.ToLower())).ToListAsync();
+            List<Product> products = _unitOfWork.Products.GetAll(product => product.Name.Contains(searchString.ToLower())).ToList();
 
             return View(products);
         }

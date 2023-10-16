@@ -7,7 +7,7 @@ namespace Minotaur.DataAccess.Repository
     public class Repository<T> : IRepository<T> where T : class
     {
         private readonly ApplicationDbContext _db;
-        internal DbSet<T> dbSet;
+        private DbSet<T> dbSet;
 
         public Repository(ApplicationDbContext db)
         {
@@ -44,13 +44,14 @@ namespace Minotaur.DataAccess.Repository
 
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter, string? includeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
             if (filter != null)
             {
                 query = query.Where(filter);
             }
+
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -58,7 +59,8 @@ namespace Minotaur.DataAccess.Repository
                     query = query.Include(includeProp);
                 }
             }
-            return await query.ToListAsync();
+
+            return query.ToList();
         }
 
         public void Remove(T entity)

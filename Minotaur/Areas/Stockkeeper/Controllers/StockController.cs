@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Minotaur.DataAccess;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.ModelForWorkingControllers;
 using Minotaur.Models.Models;
@@ -22,12 +22,12 @@ namespace Minotaur.Areas.Stockkeeper
     [Authorize(Roles = Roles.Role_Stockkeeper)]
     public class StockController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
 
-        public StockController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        public StockController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
@@ -35,15 +35,15 @@ namespace Minotaur.Areas.Stockkeeper
         {
             MinotaurUser? minotaurUser = await _userManager.GetUserAsync(User);
 
-            DataByStock? dataByStock = await _db.Workers.Where(w => w.UserId == minotaurUser.Id)
-                    .Join(_db.Offices, worker => worker.OfficeId, office => office.Id, (worker, office) => new { Worker = worker, Office = office })
-                    .Select(result => new DataByStock
-                    {
-                        MinotaurUser = minotaurUser,
-                        StockKeeper = result.Worker,
-                        Stock = result.Office,
-                        Records = _db.StockMagazine.Where(s => s.StockId == result.Office.Id).ToList(),
-                    }).FirstOrDefaultAsync();
+            DataByStock? dataByStock = _unitOfWork.Workers.GetAll(w => w.UserId == minotaurUser.Id)
+                   .Join(_unitOfWork.Offices.GetAll(), worker => worker.OfficeId, office => office.Id, (worker, office) => new { Worker = worker, Office = office })
+                   .Select(result => new DataByStock
+                   {
+                       MinotaurUser = minotaurUser,
+                       StockKeeper = result.Worker,
+                       Stock = result.Office,
+                       Records = _unitOfWork.StockMagazine.GetAll(s => s.StockId == result.Office.Id).ToList(),
+                   }).FirstOrDefault();
 
             return dataByStock;
         }
@@ -59,7 +59,7 @@ namespace Minotaur.Areas.Stockkeeper
             DataByStock? dataByStock = await GetStockDataAsync();
 
             var stockJournal = dataByStock.Records.Where(u => u.ResponsiblePersonId == dataByStock.StockKeeper.WorkerId)
-                .Join(_db.Products, s => s.ProductId, b => b.ProductId, (s, b) => new
+                .Join(_unitOfWork.Products.GetAll(), s => s.ProductId, b => b.ProductId, (s, b) => new
                 {
                     id = s.Id,
                     productId = s.ProductId,
@@ -79,7 +79,7 @@ namespace Minotaur.Areas.Stockkeeper
         [HttpPost]
         public async Task<IActionResult> AddProductInStock(int productId, int numberShelf, int productCount)
         {
-            Product? product = await _db.Products.FindAsync(productId);
+            Product product = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
             if (product == null) { return BadRequest("Такого товара нет в базе. Проверьте правильность введенных данных."); }
 
             DataByStock? dataByStock = await GetStockDataAsync();
@@ -90,12 +90,12 @@ namespace Minotaur.Areas.Stockkeeper
             if (shelfWithSameProduct != null)
             {
                 shelfWithSameProduct.Count += productCount;
-                _db.StockMagazine.Update(shelfWithSameProduct);
+                _unitOfWork.StockMagazine.Update(shelfWithSameProduct);
             }
             else
             {
                 var user = await _userManager.GetUserAsync(User);
-                var stockkeper = await _db.Workers.FirstOrDefaultAsync(u => u.UserId == user.Id);
+                var stockkeper = await _unitOfWork.Workers.GetAsync(u => u.UserId == user.Id);
 
                 RecordStock record = new()
                 {
@@ -106,12 +106,12 @@ namespace Minotaur.Areas.Stockkeeper
                     Count = productCount,
                     ShelfNumber = numberShelf,
                     Operation = OperationStock.ReceiptOfGoods,
-                    IsNeed = await _db.StockMagazine.Where(u => u.ProductId == productId).Select(u => u.IsNeed).FirstOrDefaultAsync(),
+                    IsNeed = _unitOfWork.StockMagazine.GetAsync(u => u.ProductId == productId).Result.IsNeed
                 };
-                await _db.StockMagazine.AddAsync(record);
+                _unitOfWork.StockMagazine.AddAsync(record);
             }
 
-            await _db.SaveChangesAsync();
+            _unitOfWork.SaveAsync();
             return Ok($"Товар {product.Name} добавлен на полку {numberShelf} в количестве {productCount} шт.");
 
         }
@@ -141,7 +141,7 @@ namespace Minotaur.Areas.Stockkeeper
             }
             else
             {
-                _db.StockMagazine.Update(selectedRecord);
+                _unitOfWork.StockMagazine.Update(selectedRecord);
             }
 
 
@@ -149,8 +149,8 @@ namespace Minotaur.Areas.Stockkeeper
             {
                 productOnShelf.Count += productCount;
 
-                _db.StockMagazine.Update(productOnShelf);
-                await _db.SaveChangesAsync();
+                _unitOfWork.StockMagazine.Update(productOnShelf);
+                _unitOfWork.SaveAsync();
                 return Ok();
             }
             else
@@ -164,11 +164,11 @@ namespace Minotaur.Areas.Stockkeeper
                     ShelfNumber = newShelfNumber,
                     Count = productCount,
                     Operation = OperationStock.MovementOfGoods,
-                    IsNeed = await _db.StockMagazine.Where(u => u.ProductId == selectedRecord.ProductId).Select(u => u.IsNeed).FirstOrDefaultAsync(),
+                    IsNeed = _unitOfWork.StockMagazine.GetAsync(u => u.ProductId == selectedRecord.ProductId).Result.IsNeed,
                 };
 
-                await _db.StockMagazine.AddAsync(newRecord);
-                await _db.SaveChangesAsync();
+                _unitOfWork.StockMagazine.AddAsync(newRecord);
+                _unitOfWork.SaveAsync();
 
                 return Ok();
             }
@@ -188,8 +188,8 @@ namespace Minotaur.Areas.Stockkeeper
                 product.IsNeed = product.IsNeed ? false : true;
             }
 
-            _db.StockMagazine.UpdateRange(recordsWithNeedProduct);
-            await _db.SaveChangesAsync();
+            _unitOfWork.StockMagazine.UpdateRange(recordsWithNeedProduct);
+            _unitOfWork.SaveAsync();
 
             return Ok();
         }
@@ -205,16 +205,16 @@ namespace Minotaur.Areas.Stockkeeper
         [HttpGet]
         public async Task<IActionResult> GetTablePurchaseRequest()
         {
-            DataByStock? dataByStock = await GetStockDataAsync();
+            DataByStock dataByStock = await GetStockDataAsync();
             if (dataByStock.Records == null) { return BadRequest($"Отсутсвуют записи по складу {dataByStock.Stock.Name}."); }
 
 
             var request = dataByStock.Records.Where(p => p.IsNeed == true)
-                .Join(_db.Products, s => s.ProductId, b => b.ProductId, (s, b) => new
+                .Join(_unitOfWork.Products.GetAll(), s => s.ProductId, b => b.ProductId, (s, b) => new
                 {
                     s.ProductId,
-                    TitleProduct = _db.Products.Where(u => u.ProductId == s.ProductId).Select(u => u.Name).FirstOrDefault(),
-                    TotalProduct = _db.StockMagazine.Where(u => u.IsNeed == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
+                    TitleProduct = _unitOfWork.Products.GetAll(u => u.ProductId == s.ProductId).Select(u => u.Name).FirstOrDefault(),
+                    TotalProduct = _unitOfWork.StockMagazine.GetAll(u => u.IsNeed == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
                 }).Distinct().ToArray();
 
 
@@ -246,8 +246,7 @@ namespace Minotaur.Areas.Stockkeeper
                 ProductDataOnPurchase = productDataOnPurchase
             };
 
-            await _db.StockMagazine.AddAsync(recordStockPurchase);
-
+            _unitOfWork.StockMagazine.AddAsync(recordStockPurchase);
 
             //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -344,7 +343,7 @@ namespace Minotaur.Areas.Stockkeeper
             Response.Headers.Add(HeaderNames.ContentDisposition, contentDispositionHeader.ToString());
             Response.Headers.Add(HeaderNames.XContentTypeOptions, "nosniff");
 
-            await _db.SaveChangesAsync();
+            _unitOfWork.SaveAsync();
             return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         }
     }

@@ -1,17 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Minotaur.DataAccess.Repository.IRepository
+﻿namespace Minotaur.DataAccess.Repository.IRepository
 {
     public interface IUnitOfWork
     {
-        public interface IUnitOfWork
-        {           
-            IProductRepository Product { get; }         
-            void SaveAsync();
-        }
+        IProductRepository Products { get; }
+        IMinotaurUsersRepository MinotaurUsers { get; }
+        ICategoryRepository Categories { get; }
+        IShoppingBasketsRepository ShoppingBaskets { get; }
+        IWishListRepository WishLists { get; }
+        IOrdersRepository Orders { get; }
+        IReviewsRepository Reviews { get; }
+        INotificationsRepository Notifications { get; }
+        IStockMagazineRepository StockMagazine { get; }
+        IOfficesRepository Offices { get; }
+        IWorkersRepository Workers { get; }
+        IOrganizationalOrderRepository OrganizationalOrders { get; }
+        void SaveAsync();
     }
 }

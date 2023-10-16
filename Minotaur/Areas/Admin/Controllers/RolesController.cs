@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Minotaur.DataAccess;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
 using Minotaur.Models.SD;
@@ -12,12 +13,12 @@ namespace Minotaur.Areas.Admin.Controllers
     [Area("Admin"), Authorize(Roles = Roles.Role_Admin)]
     public class RolesController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
 
-        public RolesController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        public RolesController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
@@ -27,7 +28,9 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDataUserRoles()
         {
-            var worker = await _db.Workers.Join(_userManager.Users, e => e.UserId, u => u.Id, (e, u) => new { Worker = e, User = u })
+            var worker = _unitOfWork.Workers.GetAll().ToArray();
+
+            var dataWorkerWithUserData = worker.Join(_userManager.Users, e => e.UserId, u => u.Id, (e, u) => new { Worker = e, User = u })
                 .Select(w => new
                 {
                     w.Worker.WorkerId,
@@ -39,16 +42,16 @@ namespace Minotaur.Areas.Admin.Controllers
                     w.Worker.AccessRights,
                     w.Worker.Post,
                     w.User.Email,
-                }).ToArrayAsync();
+                }).ToArray();
 
-            return Json(new { data = worker });
+            return Json(new { data = dataWorkerWithUserData });
         }
 
         private List<string> ParseWorkerRoles(string role)
         {
-            List<string>? arrayRoles = null; 
+            List<string>? arrayRoles = null;
 
-            if(role == null)
+            if (role == null)
             {
                 return arrayRoles;
             }
@@ -67,13 +70,15 @@ namespace Minotaur.Areas.Admin.Controllers
             return stringRoles;
         }
 
+
+
         [HttpPost]
         public async Task<IActionResult> SetRoleWorker(string userId, string role)
         {
             MinotaurUser? minotaurUser = await _userManager.FindByIdAsync(userId);
             if (minotaurUser == null) { return BadRequest(new { error = "Пользователь не найден" }); }
 
-            Worker? worker = await _db.Workers.FirstOrDefaultAsync(u => u.UserId == minotaurUser.Id);
+            Worker? worker = await _unitOfWork.Workers.GetAsync(u => u.UserId == minotaurUser.Id);
             if (worker == null) { return BadRequest(new { error = "Пользователь не зарегистрирован в качестве сотрудника" }); }
 
             List<string> arrayRoles = ParseWorkerRoles(worker.AccessRights);
@@ -86,8 +91,8 @@ namespace Minotaur.Areas.Admin.Controllers
             arrayRoles.Add(role);
             worker.AccessRights = SerializationWorkerRoles(arrayRoles);
 
-            _db.Workers.Update(worker);
-            await _db.SaveChangesAsync();
+            _unitOfWork.Workers.Update(worker);
+            _unitOfWork.SaveAsync();
 
             await _userManager.AddToRoleAsync(minotaurUser, role);
             return Ok();
@@ -99,9 +104,9 @@ namespace Minotaur.Areas.Admin.Controllers
             MinotaurUser? minotaurUser = await _userManager.FindByIdAsync(userId);
             if (minotaurUser == null) { return BadRequest(new { error = "Работник не найден" }); }
 
-            Worker worker = await _db.Workers.FirstOrDefaultAsync(u => u.UserId == minotaurUser.Id);
+            Worker worker = await _unitOfWork.Workers.GetAsync(u => u.UserId == minotaurUser.Id);
             if (worker == null) { return BadRequest(new { error = "Пользователь не зарегистрирован в качестве сотрудника" }); }
-           
+
             List<string> arrayRoles = ParseWorkerRoles(worker.AccessRights);
             if (!arrayRoles.Contains(role))
             {
@@ -111,8 +116,8 @@ namespace Minotaur.Areas.Admin.Controllers
             arrayRoles.Remove(role);
             worker.AccessRights = SerializationWorkerRoles(arrayRoles);
 
-            _db.Workers.Update(worker);
-            await _db.SaveChangesAsync();
+            _unitOfWork.Workers.Update(worker);
+            _unitOfWork.SaveAsync();
 
             await _userManager.RemoveFromRoleAsync(minotaurUser, role);
             return Ok();

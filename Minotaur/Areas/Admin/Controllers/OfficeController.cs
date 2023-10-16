@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Minotaur.DataAccess;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
 using Minotaur.Models.SD;
@@ -13,12 +12,12 @@ namespace Minotaur.Areas.Admin.Controllers
     [Area("Admin"), Authorize(Roles = Roles.Role_Admin)]
     public class OfficeController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
 
-        public OfficeController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        public OfficeController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
@@ -29,8 +28,8 @@ namespace Minotaur.Areas.Admin.Controllers
 
         public async Task<IActionResult> GetDataOffice()
         {
-            Office[] offices = await _db.Offices.ToArrayAsync();
-                       
+            Office[] offices = _unitOfWork.Offices.GetAll().ToArray();
+
             return Json(new { data = offices });
         }
 
@@ -39,7 +38,7 @@ namespace Minotaur.Areas.Admin.Controllers
             string[] officeTypes = Enum.GetValues(typeof(TypesOfOffices)).Cast<TypesOfOffices>().Select(e => Enum.GetName(typeof(TypesOfOffices), e)).ToArray();
             string[] officeStatus = Enum.GetValues(typeof(OfficeStatus)).Cast<OfficeStatus>().Select(e => Enum.GetName(typeof(OfficeStatus), e)).ToArray();
 
-            return Json(new {officeTypes, officeStatus });
+            return Json(new { officeTypes, officeStatus });
         }
 
 
@@ -52,8 +51,8 @@ namespace Minotaur.Areas.Admin.Controllers
 
             if (office != null)
             {
-                await _db.Offices.AddAsync(office);
-                await _db.SaveChangesAsync();
+                _unitOfWork.Offices.AddAsync(office);
+                _unitOfWork.SaveAsync();
             }
 
             return Ok();

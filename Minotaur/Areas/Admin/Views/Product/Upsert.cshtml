@@ -1,0 +1,104 @@
+﻿@model ProductVM
+
+<div class="container">
+    <div class="text-center">
+        @if (Model.Product.ProductId != 0)
+        {
+            <h2>Обновить данные по товару</h2>
+        }
+        else
+        {
+            <h2>Добавить новый товар</h2>
+        }
+    </div>
+
+
+    <div class="container">
+
+        <form method="post" class="row" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-3">
+                    <input asp-for="Product.ProductId" hidden />
+                    <div class="form-floating mb-2 pb-2 mt-2">
+                        <input asp-for="Product.Name" class="form-control border-0 shadow" />
+                        <label asp-for="Product.Name" class="ms-1 my-1 text-dark">Название</label>
+                        <span asp-validation-for="Product.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-2 pb-2">
+                        <input asp-for="Product.Author" class="form-control border-0 shadow" />
+                        <label asp-for="Product.Author" class="ms-1 my-1 text-dark">Автор</label>
+                        <span asp-validation-for="Product.Author" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-2 pb-2">
+                        <input asp-for="Product.ISBN" class="form-control border-0 shadow" />
+                        <label asp-for="Product.ISBN" class="ms-1 my-1 text-dark"></label>
+                        <span asp-validation-for="Product.ISBN" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-2 pb-2">
+                        <input asp-for="Product.Price" class="form-control border-0 shadow" />
+                        <label asp-for="Product.Price" class="ms-1 my-1 text-dark">Цена</label>
+                        <span asp-validation-for="Product.Price" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-2 pb-2">
+                        <input asp-for="Product.ImageURL" class="form-control border-0 shadow" />
+                        <label asp-for="Product.ImageURL" class="ms-1 my-1 text-dark">Ссылка на картинку</label>
+                        <span asp-validation-for="Product.ImageURL" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-2 pb-2">
+                        <select asp-for="Product.Category" class="form-control border-0 shadow">
+                            <option value="">Выберите категорию</option>
+                            @foreach (var category in Model.CategoriesList ?? Enumerable.Empty<Category>())
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                        <label asp-for="Product.Category" class="ms-1 my-1 text-dark text-muted">Жанр</label>
+                        <span asp-validation-for="Product.Category" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-7 flex-lg-column d-flex h-auto">
+                    <div class="form-floating py-2">
+                        <label asp-for="Product.Description" class="ms-2 text-muted">Описание</label>
+                        <textarea asp-for="Product.Description" class="form-control border-0 shadow"></textarea>
+                    </div>
+                </div>
+
+                <div class="col-2">
+                    @if (Model.Product.ProductId != 0)
+                    {
+                        <div class="container mt-4 ">
+                            <div class="row justify-content-center align-items-center">
+                                <div class="text-center">
+                                    <a class="btn btn-danger mb-3" asp-action="Delete" asp-controller="Product" asp-route-id="@Model.Product.ProductId">Удалить</a>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-success form-control">Обновить</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-success form-control">Создать</button>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+@section Scripts{
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons  lists   table visualblocks wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough |  align lineheight | numlist bullist indent outdent',
+        });
+    </script>
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

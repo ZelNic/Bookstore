@@ -1,17 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Minotaur.DataAccess.Repository.IRepository;
-using Minotaur.Models.Models;
-using Minotaur.Models.OrganizationalDocumentation.HR;
-using Minotaur.Models;
+﻿using Minotaur.DataAccess.Repository.IRepository;
 
 namespace Minotaur.DataAccess.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {
         private ApplicationDbContext _db;
-        public IProductRepository Products { get; private set; }
+        public IProductRepository Products { get; }
         public IMinotaurUsersRepository MinotaurUsers { get; set; }
-
         public ICategoryRepository Categories { get; set; }
         public IShoppingBasketsRepository ShoppingBaskets { get; set; }
         public IWishListRepository WishLists { get; set; }
@@ -21,7 +16,7 @@ namespace Minotaur.DataAccess.Repository
         public IStockMagazineRepository StockMagazine { get; set; }
         public IOfficesRepository Offices { get; set; }
         public IWorkersRepository Workers { get; set; }
-        public DbSet<OrganizationalOrder> OrganizationalOrders { get; set; }
+        public IOrganizationalOrderRepository OrganizationalOrders { get; set; }
 
 
         public UnitOfWork(ApplicationDbContext db)
@@ -29,12 +24,22 @@ namespace Minotaur.DataAccess.Repository
             _db = db;
 
             Products = new ProductRepository(_db);
-
+            MinotaurUsers = new MinotaurUserRepository(_db);
+            Categories = new CategoryRepository(_db);
+            ShoppingBaskets = new ShoppingBasketRepository(_db);
+            WishLists = new WishListRepository(_db);
+            Orders = new OrdersRepository(_db);
+            Reviews = new ReviewRepository(_db);
+            Notifications = new NotificationsRepository(_db);
+            StockMagazine = new StockMagazineRepository(_db);
+            Offices = new OfficesRepository(_db);
+            Workers = new WorkersRepository(_db);
+            OrganizationalOrders = new OrganizationalOrdersRepository(_db);
         }
 
-        public async void SaveAsync()
+        public void SaveAsync()
         {
-            await _db.SaveChangesAsync();
+            _db.SaveChanges();
         }
     }
 }

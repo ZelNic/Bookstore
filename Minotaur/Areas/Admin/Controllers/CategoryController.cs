@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Minotaur.DataAccess;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.SD;
 
@@ -11,18 +12,16 @@ namespace Minotaur.Areas.Admin.Controllers
     [Authorize(Roles = Roles.Role_Admin)]
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryController(ApplicationDbContext db, IHttpContextAccessor contextAccessor)
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _db = db;
-            _contextAccessor = contextAccessor;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IActionResult> Index()
         {
-            List<Category> categoryList = await _db.Categories.ToListAsync();
+            List<Category> categoryList = _unitOfWork.Categories.GetAll().ToList();
             return View(categoryList);
         }
 
@@ -30,8 +29,8 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             CategoryVM categoryVM = new()
             {
-                BookList = await _db.Products.Where(u => u.Category == categoryId).ToListAsync(),
-                CategoryList = await _db.Categories.ToListAsync()
+                BookList = _unitOfWork.Products.GetAll(u => u.Category == categoryId).ToList(),
+                CategoryList = _unitOfWork.Categories.GetAll().ToList()
             };
 
             return View(categoryVM);
@@ -46,7 +45,7 @@ namespace Minotaur.Areas.Admin.Controllers
                 return View(category);
             }
 
-            var book = await _db.Categories.FindAsync(categoryId);
+            var book = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
 
             return View(book);
         }
@@ -56,14 +55,14 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             if (category.Id == 0)
             {
-                _db.Add(category);
+                _unitOfWork.Categories.Update(category);
             }
             else
             {
-                _db.Update(category);
+                _unitOfWork.Categories.Update(category);
             }
 
-            _db.SaveChanges();
+            _unitOfWork.SaveAsync();
             return RedirectToAction("Index", "Category");
         }
 
@@ -73,7 +72,7 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             if (categoryId != null)
             {
-                var categoryOnDelete = await _db.Categories.FindAsync(categoryId);
+                var categoryOnDelete = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
                 return View(categoryOnDelete);
             }
             else return NotFound();
@@ -82,11 +81,11 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int? categoryId)
         {
-            var categoryOnDelete = await _db.Categories.FindAsync(categoryId);
+            var categoryOnDelete = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
             if (categoryOnDelete != null)
             {
-                _db.Categories.Remove(categoryOnDelete);
-                await _db.SaveChangesAsync();
+                _unitOfWork.Categories.Remove(categoryOnDelete);
+                _unitOfWork.SaveAsync();
                 return RedirectToAction("Index", "Category");
             }
             else

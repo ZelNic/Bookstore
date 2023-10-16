@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
+using Minotaur.DataAccess.Repository.IRepository;
 
 namespace Minotaur.Areas.Purchase
 {
@@ -17,12 +18,12 @@ namespace Minotaur.Areas.Purchase
     [Authorize(Roles = Roles.Role_Customer)]
     public class PurchaseController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
 
-        public PurchaseController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        public PurchaseController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
@@ -50,24 +51,24 @@ namespace Minotaur.Areas.Purchase
         }
 
 
-        public async Task<OrderProductData[]> GetVerifiedProductData()
+        public async Task<List<OrderProductData>> GetVerifiedProductData()
         {
             MinotaurUser? user = await _userManager.GetUserAsync(User);
 
 
-            ShoppingBasket? shoppingBasket = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
+            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAll().Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefault();
             if (shoppingBasket == null) { return null; }
 
             Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(shoppingBasket.ProductIdAndCount);
 
-            OrderProductData[] purchaseData = await _db.Products
+            var purchaseData = _unitOfWork.Products.GetAll()
                 .Where(u => productIdAndCount.Keys.Contains(u.ProductId))
                 .Select(p => new OrderProductData
                 {
                     Id = p.ProductId,
                     Price = p.Price,
                     Count = productIdAndCount[p.ProductId]
-                }).ToArrayAsync();
+                }).ToList();
 
 
             return purchaseData;
@@ -85,7 +86,7 @@ namespace Minotaur.Areas.Purchase
             MinotaurUser? user = await _userManager.GetUserAsync(User);
 
             int sumOnWallet = user.PersonalWallet;
-            OrderProductData[] purchaseData = await GetVerifiedProductData();
+            List<OrderProductData> purchaseData = await GetVerifiedProductData();
             int purchaseAmount = purchaseData.Sum(product => product.Count * product.Price);
             var data = new
             {
@@ -116,17 +117,17 @@ namespace Minotaur.Areas.Purchase
             Order? order = JsonConvert.DeserializeObject<Order>(dataDelivery);
             if (order == null) return BadRequest("Ошибка в отправленных данных.");
 
-            OrderProductData[] purchaseData = await GetVerifiedProductData();
+            List<OrderProductData> purchaseData = await GetVerifiedProductData();
             int confirmedPrice = purchaseData.Sum(product => product.Count * product.Price);
             if (confirmedPrice != order.PurchaseAmount) { return BadRequest("Ошибочная стоимость заказа."); }
 
-            ShoppingBasket? sb = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
+            ShoppingBasket? sb = await _unitOfWork.ShoppingBaskets.GetAsync(u => u.UserId == Guid.Parse(user.Id));
             if (sb == null) return BadRequest("Запись о списке покупок не найдена.");
 
             Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount);
 
 
-            OrderProductData[] productData = await GetVerifiedProductData();
+            List<OrderProductData> productData = await GetVerifiedProductData();
             string prodDataJson = JsonConvert.SerializeObject(productData);
 
 
@@ -143,14 +144,14 @@ namespace Minotaur.Areas.Purchase
                     user.PersonalWallet -= order.PurchaseAmount;
                     admin.PersonalWallet += order.PurchaseAmount;
 
-                    _db.ShoppingBaskets.Remove(sb);
+                    _unitOfWork.ShoppingBaskets.Remove(sb);
 
                     await _userManager.UpdateAsync(admin);
                     await _userManager.UpdateAsync(user);
 
-                    await _db.Orders.AddAsync(order);
+                    _unitOfWork.Orders.AddAsync(order);
 
-                    await _db.SaveChangesAsync();
+                    _unitOfWork.SaveAsync();
 
 
 
