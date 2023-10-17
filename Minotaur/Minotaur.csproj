@@ -41,8 +41,6 @@
   <ItemGroup>
     <Folder Include="Areas\Customer\API\" />
     <Folder Include="Areas\HR\Controllers\" />
-    <Folder Include="Areas\Picker\Controllers\" />
-    <Folder Include="Areas\Picker\Views\" />
     <Folder Include="Areas\Stockkeeper\PurchaseRequisitions\" />
   </ItemGroup>
 

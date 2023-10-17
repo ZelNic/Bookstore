@@ -66,7 +66,7 @@ namespace Minotaur.Areas.Admin.Controllers
             }
             else
             {
-                var oldVersionBook = await _unitOfWork.Products.GetAsync(p => p.ProductId == product.ProductId);
+                var oldVersionBook =  await _unitOfWork.Products.GetAsync(p => p.ProductId == product.ProductId);
 
                 if (oldVersionBook != null)
                 {
@@ -90,7 +90,7 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int productId)
         {
-            var productOnDelete = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
+            var productOnDelete =  await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
             if (productOnDelete != null)
             {
                 _unitOfWork.Products.Remove(productOnDelete);

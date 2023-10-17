@@ -45,7 +45,7 @@ namespace Minotaur.Areas.Admin.Controllers
                 return View(category);
             }
 
-            var book = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
+            var book = _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
 
             return View(book);
         }
@@ -72,7 +72,7 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             if (categoryId != null)
             {
-                var categoryOnDelete = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
+                var categoryOnDelete = _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
                 return View(categoryOnDelete);
             }
             else return NotFound();

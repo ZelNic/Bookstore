@@ -46,25 +46,25 @@
 
                     switch (Model.Order.OrderStatus)
                     {
-                        case OperationByOrder.StatusPending_0:
+                        case StatusByOrder.StatusPending_0:
                             colorStatus = "secondary";
                             break;
-                        case OperationByOrder.StatusApproved_1:
+                        case StatusByOrder.StatusApproved_1:
                             colorStatus = "info";
                             break;
-                        case OperationByOrder.StatusInProcess_2:
+                        case StatusByOrder.StatusInProcess_2:
                             colorStatus = "warning";
                             break;
-                        case OperationByOrder.StatusShipped_3:
+                        case StatusByOrder.StatusShipped_3:
                             colorStatus = "primary";
                             break;
-                        case OperationByOrder.StatusDelivered_4:
+                        case StatusByOrder.StatusDelivered_4:
                             colorStatus = "success";
                             break;
-                        case OperationByOrder.StatusCancelled_5:
+                        case StatusByOrder.StatusCancelled_5:
                             colorStatus = "danger";
                             break;
-                        case OperationByOrder.StatusRefunded_6:
+                        case StatusByOrder.StatusRefunded_6:
                             colorStatus = "dark";
                             break;
                     }
@@ -149,7 +149,7 @@
                 </div>
             </div>
             <div>
-                @if (Model.Order.OrderStatus != OperationByOrder.StatusDelivered_4)
+                @if (Model.Order.OrderStatus != StatusByOrder.StatusDelivered_4)
                 {
                     @switch (Model.OperationName)
                     {

@@ -11,8 +11,11 @@ namespace Minotaur.DataAccess
 {
     public class ApplicationDbContext : IdentityDbContext<MinotaurUser>
     {
+        DbContextOptionsBuilder optionsBuilder;
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+            optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.EnableSensitiveDataLogging();
         }
 
         public DbSet<MinotaurUser> MinotaurUsers { get; set; }

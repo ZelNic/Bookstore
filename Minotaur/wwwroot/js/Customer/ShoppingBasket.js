@@ -33,7 +33,7 @@ function getShoppingBasket() {
 
             dataShoppingBasket = response.data;
 
-            shoppingBasket.innerHTML = 
+            shoppingBasket.innerHTML =
                 `
                     <h1>Корзина</h1>          
                     <div class="row row-cols-1">
@@ -71,7 +71,7 @@ function generateCardProduct() {
         html +=
             `<div class="mb-3 p-1">
                     <div class="card card-subtitle h-100 shadow pt-1 border-0 m-0 p-0">
-                        <img src="${dataShoppingBasket[key].image}" class="card-img-top mx-auto rounded-1" alt="Product Image" style="object-fit: cover; width: 70%;" />
+                        <img src="${dataShoppingBasket[key].image}" class="card-img-top mx-auto rounded-1" alt="Product Image" style="object-fit: cover; width: 80%;" />
                         <div class="card-body mt-0 pb-0">
                             <div class="fs-6">
                                 ${dataShoppingBasket[key].nameProduct}
@@ -100,7 +100,7 @@ function generateCardProduct() {
                                         <div class="mx-auto">
                                             <button onclick="changeCountProduct(event, ${key}, 'minus')" type="submit" class="btn bi bi-dash-circle opacity-100"></button> 
                                             <input onblur="changeCountProduct(event, ${key}, 'input', document.getElementById('countProduct_${key}').value)"
-                                                id="countProduct_${key}"  type="number" min="1" max="50" name="count" value="${dataShoppingBasket[key].count}" required/>
+                                                id="countProduct_${key}"  type="number" min="1" max="50" name="count" value="${dataShoppingBasket[key].count}" style="object-fit: width: 4px; height: 20px; " required/>
                                             <button onclick="changeCountProduct(event, ${key},'plus')" type="submit" class="btn bi bi-plus-circle opacity-100"></button>   
                                         </div>
                                     </div>
@@ -143,8 +143,8 @@ function doCheckout() {
             window.location.href = '/Purchase/Purchase/FillDeliveryDate';
         },
         error: function (error) {
-            console.log(error.responseJSON.error);
-        }    
+            console.log();
+        }
     });
 }
 
@@ -239,7 +239,9 @@ function changeCountProduct(event, key, operation, count = 1) {
             countProduct--;
             totalPrice -= dataShoppingBasket[key].price
             if (dataShoppingBasket[key].count <= 0) {
-                removeFromShoppingBasket(event, productId)
+                isSave = false;
+                showBtnSaveChange();
+                removeFromShoppingBasket(event, dataShoppingBasket[key].productId)
             }
             break;
         case "plus":
@@ -257,9 +259,14 @@ function changeCountProduct(event, key, operation, count = 1) {
             totalPrice += dataShoppingBasket[key].count * dataShoppingBasket[key].price;
             break
         default:
-            console.log("Error 404");
+            Swal.fire({
+                icon: 'error',
+                text: 'Произошла ошибка. Обновите страницу.'
+            })
             break;
     }
+
+
 
     if (!productArray.includes(key)) {
         productArray.push(key);

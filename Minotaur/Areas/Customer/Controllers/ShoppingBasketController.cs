@@ -32,7 +32,7 @@ namespace Minotaur.Areas.Customer
         {
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
-            ShoppingBasket? shoppingBasket = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefaultAsync();
+            ShoppingBasket? shoppingBasket = await _db.ShoppingBaskets.Where(u => u.UserId == Guid.Parse(user.Id)).Where(n=>n.IsPurchased == false).FirstOrDefaultAsync();
 
             if (shoppingBasket == null)
             {

@@ -1,4 +1,5 @@
-﻿using Minotaur.DataAccess.Repository.IRepository;
+﻿using Microsoft.EntityFrameworkCore;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models.Models;
 
 namespace Minotaur.DataAccess.Repository
@@ -13,6 +14,7 @@ namespace Minotaur.DataAccess.Repository
         
         public void Update(ShoppingBasket basket)
         {
+            _db.Entry(basket).State = EntityState.Detached;
             _db.Update(basket);
         }
 

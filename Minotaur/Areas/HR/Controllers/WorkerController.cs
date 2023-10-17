@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Minotaur.DataAccess;
 using Minotaur.DataAccess.Repository;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
 using Minotaur.Models.OrganizationalDocumentation.HR;
@@ -18,10 +19,10 @@ namespace Minotaur.Areas.HR.Controllers
     [Area("HR"), Authorize(Roles = $"{Roles.Role_HR}, {Roles.Role_Admin}")]
     public class WorkerController : Controller
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
 
-        public WorkerController(UnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
+        public WorkerController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;

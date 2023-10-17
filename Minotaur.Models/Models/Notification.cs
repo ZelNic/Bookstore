@@ -6,11 +6,13 @@ namespace Minotaur.Models.Models
     {
         [Key]
         public Guid Id { get; set; }
-        [DataType(DataType.DateTime)][Required] public DateTime SendingTime { get; set; }
+        [DataType(DataType.DateTime)] public DateTime SendingTime { get; set; }
         public Guid OrderId { get; set; }
-        [Required] public Guid SenderId { get; set; }
-        [Required] public Guid RecipientId { get; set; }
-        [Required] public string? Text { get; set; }
-        [Required] public bool IsHidden { get; set; }
+        public Guid SenderId { get; set; }
+        public Guid RecipientId { get; set; }
+        public string? EmailSender { get; set; }
+        public string? EmailRecipien { get; set; }
+        public string? Text { get; set; }
+        public bool IsHidden { get; set; }
     }
 }

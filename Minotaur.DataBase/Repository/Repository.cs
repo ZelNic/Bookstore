@@ -7,7 +7,7 @@ namespace Minotaur.DataAccess.Repository
     public class Repository<T> : IRepository<T> where T : class
     {
         private readonly ApplicationDbContext _db;
-        private DbSet<T> dbSet;
+        internal DbSet<T> dbSet;
 
         public Repository(ApplicationDbContext db)
         {

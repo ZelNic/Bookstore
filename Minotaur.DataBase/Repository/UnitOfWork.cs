@@ -1,4 +1,6 @@
-﻿using Minotaur.DataAccess.Repository.IRepository;
+﻿using Microsoft.EntityFrameworkCore;
+using Minotaur.DataAccess.Repository.IRepository;
+using Minotaur.Models.Models;
 
 namespace Minotaur.DataAccess.Repository
 {
@@ -41,5 +43,6 @@ namespace Minotaur.DataAccess.Repository
         {
             _db.SaveChanges();
         }
+      
     }
 }

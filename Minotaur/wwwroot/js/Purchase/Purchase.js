@@ -218,14 +218,14 @@ function setTypeDelivery(type) {
     if (type === "false") {
         orderData.isCourierDelivery = false;
         deliveryData.innerHTML = `
-                    <div class="mt-2">
+                  <div class="mt-2">
                         <label>Выберите пункт выдачи</label>
                         <select id="orderPickupPoint" class="rounded" onchange="setOrderPickupPoint(document.getElementById('orderPickupPoint').value); activeBtnPayment(true)" required>
                             <option value="" selected disabled>Выбрать</option>
                             ${getOrderPickupPoint(function (options) { document.getElementById('orderPickupPoint').innerHTML = options; })}
                         </select>
-                    </div>
-                    <hr />`;
+                  </div>
+                  <hr />`;
     }
     else if (type === "true") {
 
@@ -239,10 +239,10 @@ function setTypeDelivery(type) {
         }
 
         deliveryData.innerHTML = `
-        < div >
+            <div>
                 <label class="ms-1 my-1 text-dark fs-5" style="display: block;">Город</label>
                 <input id="city" value="${orderData.city}" onblur="changeDataBuyer('city', document.getElementById('city').value)" class="border border-1 rounded rounded-1" type="text" required />
-            </div >
+            </div>
             <div>
                 <label class="ms-1 my-1 text-dark fs-5" style="display: block;">Улица</label>
                 <input id="street" value="${orderData.street}" onblur="changeDataBuyer('street', document.getElementById('street').value)" class="border border-1 rounded rounded-1" type="text" required/>

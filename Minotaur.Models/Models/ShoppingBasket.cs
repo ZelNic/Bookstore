@@ -7,5 +7,6 @@ namespace Minotaur.Models.Models
         [Key] public Guid BasketId { get; set; }
         [Required] public Guid UserId { get; set; }
         [Required] public string? ProductIdAndCount { get; set; }
+        public bool IsPurchased { get; set; } = false;
     }
 }

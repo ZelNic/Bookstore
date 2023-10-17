@@ -1,4 +1,6 @@
-﻿namespace Minotaur.DataAccess.Repository.IRepository
+﻿using Minotaur.Models.Models;
+
+namespace Minotaur.DataAccess.Repository.IRepository
 {
     public interface IUnitOfWork
     {

@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using Minotaur.DataAccess.Repository.IRepository;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using DocumentFormat.OpenXml.Vml.Office;
+using Minotaur.DataAccess.Repository;
 
 namespace Minotaur.Areas.Purchase
 {
@@ -39,7 +42,7 @@ namespace Minotaur.Areas.Purchase
                 UserId = Guid.Parse(user.Id),
                 ReceiverName = user.FirstName,
                 ReceiverLastName = user.LastName,
-                OrderStatus = OperationByOrder.StatusPending_0,
+                OrderStatus = StatusByOrder.StatusPending_0,
                 Region = user.Region,
                 City = user.City,
                 Street = user.Street,
@@ -117,15 +120,17 @@ namespace Minotaur.Areas.Purchase
             Order? order = JsonConvert.DeserializeObject<Order>(dataDelivery);
             if (order == null) return BadRequest("Ошибка в отправленных данных.");
 
+
             List<OrderProductData> purchaseData = await GetVerifiedProductData();
             int confirmedPrice = purchaseData.Sum(product => product.Count * product.Price);
             if (confirmedPrice != order.PurchaseAmount) { return BadRequest("Ошибочная стоимость заказа."); }
 
-            ShoppingBasket? sb = await _unitOfWork.ShoppingBaskets.GetAsync(u => u.UserId == Guid.Parse(user.Id));
+
+            List<ShoppingBasket> sb = _unitOfWork.ShoppingBaskets.GetAll(u => u.UserId == Guid.Parse(user.Id)).Where(n=>n.IsPurchased == false).ToList();
             if (sb == null) return BadRequest("Запись о списке покупок не найдена.");
 
-            Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount);
 
+            Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(sb[0].ProductIdAndCount);
 
             List<OrderProductData> productData = await GetVerifiedProductData();
             string prodDataJson = JsonConvert.SerializeObject(productData);
@@ -137,28 +142,28 @@ namespace Minotaur.Areas.Purchase
                 if (admin != null)
                 {
                     order.ProductData = prodDataJson;
-                    order.OrderStatus = OperationByOrder.StatusApproved_1;
+                    order.OrderStatus = StatusByOrder.StatusApproved_1;
                     order.PurchaseDate = MoscowTime.GetTime();
 
 
                     user.PersonalWallet -= order.PurchaseAmount;
                     admin.PersonalWallet += order.PurchaseAmount;
 
-                    _unitOfWork.ShoppingBaskets.Remove(sb);
+                    MinotaurUser[] users = new MinotaurUser[] { admin, user };
 
-                    await _userManager.UpdateAsync(admin);
-                    await _userManager.UpdateAsync(user);
+
+                    _unitOfWork.MinotaurUsers.UpdateRange(users);
+
+                    sb[0].IsPurchased = true;
+                    _unitOfWork.ShoppingBaskets.UpdateRange(sb.ToArray());
 
                     _unitOfWork.Orders.AddAsync(order);
-
                     _unitOfWork.SaveAsync();
-
-
 
                     return Ok();
                 }
                 else
-                {
+                {                   
                     return BadRequest("Технические проблемы со стороны магазина.");
                 }
             }

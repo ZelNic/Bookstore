@@ -75,25 +75,25 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
                 switch (statusCode)
                 {
                     case 0:
-                        order.OrderStatus = OperationByOrder.StatusPending_0;
+                        order.OrderStatus = StatusByOrder.StatusPending_0;
                         break;
                     case 1:
-                        order.OrderStatus = OperationByOrder.StatusApproved_1;
+                        order.OrderStatus = StatusByOrder.StatusApproved_1;
                         break;
                     case 2:
-                        order.OrderStatus = OperationByOrder.StatusInProcess_2;
+                        order.OrderStatus = StatusByOrder.StatusInProcess_2;
                         break;
                     case 3:
-                        order.OrderStatus = OperationByOrder.StatusShipped_3;
+                        order.OrderStatus = StatusByOrder.StatusShipped_3;
                         break;
                     case 4:
-                        order.OrderStatus = OperationByOrder.StatusDelivered_4;
+                        order.OrderStatus = StatusByOrder.StatusDelivered_4;
                         break;
                     case 5:
-                        order.OrderStatus = OperationByOrder.StatusCancelled_5;
+                        order.OrderStatus = StatusByOrder.StatusCancelled_5;
                         break;
                     case 6:
-                        order.OrderStatus = OperationByOrder.StatusRefunded_6;
+                        order.OrderStatus = StatusByOrder.StatusRefunded_6;
                         break;
                 }
                 _db.Orders.Update(order);
@@ -150,7 +150,7 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
             if (order.ConfirmationCode == confirmationCode)
             {
                 order.ConfirmationCode = 0;
-                order.OrderStatus = OperationByOrder.StatusDelivered_4;
+                order.OrderStatus = StatusByOrder.StatusDelivered_4;
                 _db.Orders.Update(order);
                 _db.SaveChanges();
                 return Ok();
