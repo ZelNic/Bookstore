@@ -39,7 +39,7 @@ namespace Minotaur.Areas.Picker.Controllers
                                  p.ProductId,
                                  p.Name,
                                  p.Author,
-                                 o.Count,                                 
+                                 o.Count,                                      
                              }),
                          PurchaseDate = s.PurchaseDate.ToString("dd.MM.yyyy HH:mm"),
                      }).ToList();

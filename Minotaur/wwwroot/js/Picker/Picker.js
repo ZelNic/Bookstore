@@ -12,7 +12,7 @@ function generateDataOrder() {
     let productData = ``;
 
     $.ajax({
-        url: '/Picker/OrderPicker/GetAssemblyOrders',
+        url: '/Picker/OrderPicking/GetAssemblyOrders',
         type: 'GET',
         dataType: 'json',
 
@@ -20,13 +20,17 @@ function generateDataOrder() {
             let dataOrder = response.data;
 
             for (let order of dataOrder) {
-                for (let productData of order) {
+                for (let product of order.products) {
                     productData +=
                         `
-                            <td>${productData.productId}</td>
-                            <td>${productData.name}</td>
-                            <td>${productData.author}</td>
-                            <td>${productData.price}</td>
+                            <td>${product.productId}</td>
+                            <td>${product.name}</td>
+                            <td>${product.author}</td>
+                            <td>${product.count}</td>
+                            <td>
+                                <button class="btn btn-success">Button 1</button>
+                                <button class="btn btn-success">Button 2</button>
+                            </td>
                         `;
                 }
 
@@ -70,7 +74,7 @@ function generateDataOrder() {
                     `;
             }
 
-            dataOrders.innerHTML(cardOrder);
+            dataOrders.innerHTML = `${cardOrder}`
         },
 
         error: function (error) {
