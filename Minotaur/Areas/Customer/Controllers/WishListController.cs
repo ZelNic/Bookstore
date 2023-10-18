@@ -31,7 +31,7 @@ namespace Minotaur.Areas.Customer
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
             WishList? wishList = await _db.WishLists.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
-            if (wishList == null) { return BadRequest(new { error = "Список желаний пуст" }); }
+            if (wishList == null) { return BadRequest("Список желаний пуст"); }
 
             List<int>? listId = wishList.ProductId.Split('|').Select(int.Parse).ToList();
 

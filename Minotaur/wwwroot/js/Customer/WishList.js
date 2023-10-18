@@ -1,12 +1,17 @@
 ﻿
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
     getWishList();
 });
 
-let divWishList = document.getElementById("wishList");
 let wishList;
 
 function getWishList() {
+    let divWishList = document.getElementById("wishList");
+
+    if (divWishList === undefined) {
+        retutn;
+    }
+
     $.ajax({
         url: '/Customer/WishList/GetWishList',
         type: 'GET',
@@ -24,8 +29,8 @@ function getWishList() {
                 </div>
             `;
         },
-        error: function (error) {
-            divWishList.innerHTML = `<h1>${error.responseJSON.error}</h1>`;
+        error: function (error) {          
+            divWishList.innerHTML = `<h1>${error.responseText}</h1>`;
         }
     });
 }

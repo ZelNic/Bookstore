@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Minotaur.DataAccess;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
@@ -28,9 +26,9 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDataUserRoles()
         {
-            var worker = _unitOfWork.Workers.GetAll().ToArray();
+            var worker = await _unitOfWork.Workers.GetAllAsync();
 
-            var dataWorkerWithUserData = worker.Join(_userManager.Users, e => e.UserId, u => u.Id, (e, u) => new { Worker = e, User = u })
+            var dataWorkerWithUserData = worker.Join(_unitOfWork.MinotaurUsers.GetAll(), w => w.UserId, u => Guid.Parse(u.Id), (w, u) => new { Worker = w, User = u })
                 .Select(w => new
                 {
                     w.Worker.WorkerId,
@@ -78,7 +76,7 @@ namespace Minotaur.Areas.Admin.Controllers
             MinotaurUser? minotaurUser = await _userManager.FindByIdAsync(userId);
             if (minotaurUser == null) { return BadRequest(new { error = "Пользователь не найден" }); }
 
-            Worker? worker = await _unitOfWork.Workers.GetAsync(u => u.UserId == minotaurUser.Id);
+            Worker? worker = await _unitOfWork.Workers.GetAsync(u => u.UserId == Guid.Parse(minotaurUser.Id));
             if (worker == null) { return BadRequest(new { error = "Пользователь не зарегистрирован в качестве сотрудника" }); }
 
             List<string> arrayRoles = ParseWorkerRoles(worker.AccessRights);
@@ -104,7 +102,7 @@ namespace Minotaur.Areas.Admin.Controllers
             MinotaurUser? minotaurUser = await _userManager.FindByIdAsync(userId);
             if (minotaurUser == null) { return BadRequest(new { error = "Работник не найден" }); }
 
-            Worker worker = await _unitOfWork.Workers.GetAsync(u => u.UserId == minotaurUser.Id);
+            Worker worker = await _unitOfWork.Workers.GetAsync(u => u.UserId == Guid.Parse(minotaurUser.Id));
             if (worker == null) { return BadRequest(new { error = "Пользователь не зарегистрирован в качестве сотрудника" }); }
 
             List<string> arrayRoles = ParseWorkerRoles(worker.AccessRights);

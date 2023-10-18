@@ -59,12 +59,12 @@ namespace Minotaur.Areas.Purchase
             MinotaurUser? user = await _userManager.GetUserAsync(User);
 
 
-            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAll().Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefault();
+            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAllAsync().Result.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefault();
             if (shoppingBasket == null) { return null; }
 
             Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(shoppingBasket.ProductIdAndCount);
 
-            var purchaseData = _unitOfWork.Products.GetAll()
+            var purchaseData = _unitOfWork.Products.GetAllAsync().Result
                 .Where(u => productIdAndCount.Keys.Contains(u.ProductId))
                 .Select(p => new OrderProductData
                 {
@@ -126,7 +126,7 @@ namespace Minotaur.Areas.Purchase
             if (confirmedPrice != order.PurchaseAmount) { return BadRequest("Ошибочная стоимость заказа."); }
 
 
-            List<ShoppingBasket> sb = _unitOfWork.ShoppingBaskets.GetAll(u => u.UserId == Guid.Parse(user.Id)).Where(n=>n.IsPurchased == false).ToList();
+            List<ShoppingBasket> sb = _unitOfWork.ShoppingBaskets.GetAllAsync(u => u.UserId == Guid.Parse(user.Id)).Result.Where(n=>n.IsPurchased == false).ToList();
             if (sb == null) return BadRequest("Запись о списке покупок не найдена.");
 
 

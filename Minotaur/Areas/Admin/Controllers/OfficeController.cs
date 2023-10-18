@@ -28,7 +28,7 @@ namespace Minotaur.Areas.Admin.Controllers
 
         public async Task<IActionResult> GetDataOffice()
         {
-            Office[] offices = _unitOfWork.Offices.GetAll().ToArray();
+            var offices = _unitOfWork.Offices.GetAllAsync().Result;
 
             return Json(new { data = offices });
         }

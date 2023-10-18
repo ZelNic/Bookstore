@@ -20,8 +20,8 @@ namespace Minotaur.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            List<Product> productsList = _unitOfWork.Products.GetAll().ToList();
-            List<Category> categoriesList = _unitOfWork.Categories.GetAll().ToList();
+            List<Product> productsList = _unitOfWork.Products.GetAllAsync().Result.ToList();
+            List<Category> categoriesList = _unitOfWork.Categories.GetAllAsync().Result.ToList();
 
             ProductVM productVM = new()
             {
@@ -46,7 +46,7 @@ namespace Minotaur.Areas.Admin.Controllers
             ProductVM bookVM = new()
             {
                 Product = product,
-                CategoriesList = _unitOfWork.Categories.GetAll().ToList()
+                CategoriesList = _unitOfWork.Categories.GetAllAsync().Result.ToList()
             };           
 
             return View(bookVM);

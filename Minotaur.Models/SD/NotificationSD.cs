@@ -14,5 +14,8 @@ namespace Minotaur.Models.SD
         public const string OrderСancelled_7 = "Заказ отменен.";
 
         public const string IssueCode = "Код выдачи:";
+
+
+        public const string IncompleteOrderType = "Неполный заказ. Требуется подтверждение.";
     }
 }

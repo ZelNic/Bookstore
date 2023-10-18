@@ -1,26 +1,26 @@
-﻿using Minotaur.DataAccess;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Minotaur.DataAccess;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
 using Minotaur.Models.SD;
 using Minotaur.Models.ViewModel;
 using Minotaur.Utility;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 
 namespace Minotaur.Areas.WorkerOrderPickupPoint
 {
     [Area("WorkerOrderPickupPoint"), Authorize(Roles = Roles.Role_Worker_Order_Pickup_Point)]
     public class OrderWorkerController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
 
-        public OrderWorkerController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        public OrderWorkerController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
@@ -54,7 +54,7 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
         {
             OrderVM orderVM = new()
             {
-                Order = await _db.Orders.Where(u => u.OrderId == Guid.Parse(searchOrderId)).FirstOrDefaultAsync(),
+                Order = await _unitOfWork.Orders.GetAsync(u => u.OrderId == Guid.Parse(searchOrderId)),
                 OperationName = operation
             };
 
@@ -67,9 +67,9 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
         }
 
 
-        public IActionResult Deliver(int orderId, int? statusCode)
+        public async Task<IActionResult> Deliver(string orderId, int? statusCode)
         {
-            Order? order = _db.Orders.Find(orderId);
+            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(orderId));
             if (order != null)
             {
                 switch (statusCode)
@@ -96,8 +96,8 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
                         order.OrderStatus = StatusByOrder.StatusRefunded_6;
                         break;
                 }
-                _db.Orders.Update(order);
-                _db.SaveChanges();
+                _unitOfWork.Orders.Update(order);
+                _unitOfWork.SaveAsync();
             }
             return RedirectToAction("Index", "Orders", new { area = "Customer" });
         }
@@ -106,7 +106,7 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
         [HttpPost]
         public async Task<IActionResult> SendConfirmationCode(string orderId)
         {
-            var order = _db.Orders.Find(orderId);
+            var order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(orderId));
 
             if (order == null)
             {
@@ -118,7 +118,7 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
 
             // +++
             var user = await _userManager.GetUserAsync(User);
-            Worker? workerOrderPUp = await _db.Workers.FirstOrDefaultAsync(w => w.UserId == user.Id);
+            Worker? workerOrderPUp = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(user.Id));
 
 
             Notification notification = new()
@@ -132,15 +132,15 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
 
             order.ConfirmationCode = confirmationСode;
 
-            _db.Orders.Update(order);
-            _db.Notifications.Add(notification);
-            await _db.SaveChangesAsync();
+            _unitOfWork.Orders.Update(order);
+            _unitOfWork.Notifications.AddAsync(notification);
+            _unitOfWork.SaveAsync();
             return Ok();
         }
 
         public async Task<IActionResult> CheckVerificationCode(string orderId, int confirmationCode)
         {
-            Order? order = await _db.Orders.FindAsync(orderId);
+            Order? order = await _unitOfWork.Orders.GetAsync(o=>o.OrderId == Guid.Parse(orderId));
 
             if (order == null)
             {
@@ -151,8 +151,8 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
             {
                 order.ConfirmationCode = 0;
                 order.OrderStatus = StatusByOrder.StatusDelivered_4;
-                _db.Orders.Update(order);
-                _db.SaveChanges();
+                _unitOfWork.Orders.Update(order);
+                _unitOfWork.SaveAsync();
                 return Ok();
             }
             else

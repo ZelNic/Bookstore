@@ -10,6 +10,8 @@
         public const string StatusCancelled_5 = "Отменено";
         public const string StatusRefunded_6 = "Возмещено";
 
+        public const string AwaitingConfirmationForIncompleteOrder_7 = "Ожидает согласия от покупателя на отправку неполного заказ";
+
         public const string PaymentStatusPending = "В ожидании";
         public const string PaymentStatusApproved = "Одобренный";
         public const string PaymentStatusDelayedPayment = "Утверждено для задержанного платежа";

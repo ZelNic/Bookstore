@@ -23,6 +23,7 @@ namespace Minotaur.Models.Models
         public string? Street { get; set; }
         public string? HouseNumber { get; set; }
         [DataType(DataType.PhoneNumber)] public string? PhoneNumber { get; set; }
+        public Guid AssemblyResponsibleWorkerId { get; set; }
         public int ConfirmationCode { get; set; }
     }
 }

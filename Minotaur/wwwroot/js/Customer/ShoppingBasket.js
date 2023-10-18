@@ -1,5 +1,7 @@
 
-$(document).ready(function () {
+
+
+document.addEventListener("DOMContentLoaded", function () {
     getShoppingBasket();
 });
 
@@ -19,15 +21,19 @@ function getShoppingBasket() {
     countSelectedProduct = 0;
     totalPrice = 0;
     productArray = [];
+    let shoppingBasket = document.getElementById("shoppingBasket");
+
+    if (shoppingBasket === undefined) {
+        return;
+    }
 
     $.ajax({
         url: '/Customer/ShoppingBasket/GetShoppingBasket',
         type: 'GET',
         dataType: 'json',
-        success: function (response) {
+        success: function (response) {            
 
-            let shoppingBasket = document.getElementById("shoppingBasket");
-            if (shoppingBasket == null) {
+            if (shoppingBasket === undefined) {
                 return;
             }
 
@@ -45,17 +51,17 @@ function getShoppingBasket() {
                     </div>
                 `;
 
-
-
             showBtnSaveChange();
             showTotal();
             activeSelectBox();
         },
         error: function (error) {
-            shoppingBasket.innerHTML = `<h1>${error.responseText}</h1>`
-            orderingInformation.innerHTML = ``;
-            checkout.innerHTML = ``;
-            boxSelect.innerHTML = ``;
+            if (shoppingBasket != undefined) {
+                shoppingBasket.innerHTML = `<h1>${error.responseText}</h1>`
+                orderingInformation.innerHTML = ``;
+                checkout.innerHTML = ``;
+                boxSelect.innerHTML = ``;
+            }
         }
     });
 }

@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
-using Minotaur.DataAccess;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.ModelForWorkingControllers;
@@ -14,7 +12,6 @@ using Minotaur.Models.Models;
 using Minotaur.Models.SD;
 using Minotaur.Utility;
 using System.Text.RegularExpressions;
-using Xceed.Words.NET;
 
 namespace Minotaur.Areas.Stockkeeper
 {
@@ -35,14 +32,14 @@ namespace Minotaur.Areas.Stockkeeper
         {
             MinotaurUser? minotaurUser = await _userManager.GetUserAsync(User);
 
-            DataByStock? dataByStock = _unitOfWork.Workers.GetAll(w => w.UserId == minotaurUser.Id)
+            DataByStock? dataByStock = _unitOfWork.Workers.GetAll(w => w.UserId == Guid.Parse(minotaurUser.Id))
                    .Join(_unitOfWork.Offices.GetAll(), worker => worker.OfficeId, office => office.Id, (worker, office) => new { Worker = worker, Office = office })
                    .Select(result => new DataByStock
                    {
                        MinotaurUser = minotaurUser,
                        StockKeeper = result.Worker,
                        Stock = result.Office,
-                       Records = _unitOfWork.StockMagazine.GetAll(s => s.StockId == result.Office.Id).ToList(),
+                       Records = _unitOfWork.StockMagazine.GetAllAsync(s => s.StockId == result.Office.Id).Result.ToList(),
                    }).FirstOrDefault();
 
             return dataByStock;
@@ -59,7 +56,7 @@ namespace Minotaur.Areas.Stockkeeper
             DataByStock? dataByStock = await GetStockDataAsync();
 
             var stockJournal = dataByStock.Records.Where(u => u.ResponsiblePersonId == dataByStock.StockKeeper.WorkerId)
-                .Join(_unitOfWork.Products.GetAll(), s => s.ProductId, b => b.ProductId, (s, b) => new
+                .Join(_unitOfWork.Products.GetAllAsync().Result, s => s.ProductId, b => b.ProductId, (s, b) => new
                 {
                     id = s.Id,
                     productId = s.ProductId,
@@ -95,7 +92,7 @@ namespace Minotaur.Areas.Stockkeeper
             else
             {
                 var user = await _userManager.GetUserAsync(User);
-                var stockkeper = await _unitOfWork.Workers.GetAsync(u => u.UserId == user.Id);
+                var stockkeper = await _unitOfWork.Workers.GetAsync(u => u.UserId == Guid.Parse(user.Id));
 
                 RecordStock record = new()
                 {
@@ -210,11 +207,11 @@ namespace Minotaur.Areas.Stockkeeper
 
 
             var request = dataByStock.Records.Where(p => p.IsNeed == true)
-                .Join(_unitOfWork.Products.GetAll(), s => s.ProductId, b => b.ProductId, (s, b) => new
+                .Join(_unitOfWork.Products.GetAllAsync().Result, s => s.ProductId, b => b.ProductId, (s, b) => new
                 {
                     s.ProductId,
-                    TitleProduct = _unitOfWork.Products.GetAll(u => u.ProductId == s.ProductId).Select(u => u.Name).FirstOrDefault(),
-                    TotalProduct = _unitOfWork.StockMagazine.GetAll(u => u.IsNeed == true).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
+                    TitleProduct = _unitOfWork.Products.GetAllAsync(u => u.ProductId == s.ProductId).Result.Select(u => u.Name).FirstOrDefault(),
+                    TotalProduct = _unitOfWork.StockMagazine.GetAllAsync(u => u.IsNeed == true).Result.Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
                 }).Distinct().ToArray();
 
 

@@ -21,7 +21,7 @@ namespace Minotaur.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            List<Category> categoryList = _unitOfWork.Categories.GetAll().ToList();
+            List<Category> categoryList = _unitOfWork.Categories.GetAllAsync().Result.ToList();
             return View(categoryList);
         }
 
@@ -29,8 +29,8 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             CategoryVM categoryVM = new()
             {
-                BookList = _unitOfWork.Products.GetAll(u => u.Category == categoryId).ToList(),
-                CategoryList = _unitOfWork.Categories.GetAll().ToList()
+                BookList = _unitOfWork.Products.GetAllAsync(u => u.Category == categoryId).Result.ToList(),
+                CategoryList = _unitOfWork.Categories.GetAllAsync().Result.ToList()
             };
 
             return View(categoryVM);

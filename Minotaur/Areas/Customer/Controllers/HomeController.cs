@@ -1,11 +1,9 @@
-﻿using Minotaur.DataAccess;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using Microsoft.AspNetCore.Identity;
-using Minotaur.DataAccess.Repository.IRepository;
 
 namespace Minotaur.Areas.Customer
 {
@@ -30,8 +28,8 @@ namespace Minotaur.Areas.Customer
 
         public async Task<ProductVM> GetProductsVM()
         {
-            List<Product>? productsList = _unitOfWork.Products.GetAll().ToList();
-            List<Category>? categoriesList = _unitOfWork.Categories.GetAll().ToList();
+            List<Product>? productsList = _unitOfWork.Products.GetAllAsync().Result.ToList();
+            List<Category>? categoriesList = _unitOfWork.Categories.GetAllAsync().Result.ToList();
             WishList? wishLists = null;
             ShoppingBasketClient? shoppingBasketClient = null;
 
@@ -40,7 +38,7 @@ namespace Minotaur.Areas.Customer
             if (user != null)
             {
                 wishLists = await _unitOfWork.WishLists.GetAsync(u => u.UserId == user.Id);
-                ShoppingBasket? sb = await _unitOfWork.ShoppingBaskets.GetAsync(u => u.UserId == Guid.Parse(user.Id));
+                ShoppingBasket? sb = _unitOfWork.ShoppingBaskets.GetAllAsync(u => u.UserId == Guid.Parse(user.Id)).Result.Where(n => n.IsPurchased == false).FirstOrDefault();
                 if (sb != null)
                 {
                     shoppingBasketClient = new()
@@ -77,7 +75,7 @@ namespace Minotaur.Areas.Customer
             {
                 return RedirectToAction("Index");
             }
-            List<Product> products = _unitOfWork.Products.GetAll(product => product.Name.Contains(searchString.ToLower())).ToList();
+            List<Product> products = _unitOfWork.Products.GetAllAsync(product => product.Name.Contains(searchString.ToLower())).Result.ToList();
 
             return View(products);
         }
