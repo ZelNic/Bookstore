@@ -10,7 +10,9 @@ namespace Minotaur.Models.Models
         public Guid UserId { get; set; }
         public string? ReceiverName { get; set; }
         public string? ReceiverLastName { get; set; }
-        public string? ProductData { get; set; }
+        public string? OrderedProducts { get; set; }
+        public string? ShippedProducts { get; set; }
+        public string? MissingItems { get; set; }
         [DataType(DataType.DateTime)] public DateTime PurchaseDate { get; set; }
         public int PurchaseAmount { get; set; }
         public string? OrderStatus { get; set; }

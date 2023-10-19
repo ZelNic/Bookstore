@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Minotaur.Models.SD;
+using Minotaur.DataAccess.Repository.IRepository;
 
 namespace Minotaur.Areas.Customer
 {
@@ -14,11 +15,11 @@ namespace Minotaur.Areas.Customer
     [Authorize(Roles = Roles.Role_Customer)]
     public class OrdersController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
-        public OrdersController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        public OrdersController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
@@ -32,8 +33,7 @@ namespace Minotaur.Areas.Customer
         {
             var user = await _userManager.GetUserAsync(User);
 
-            Order[] ordersDB = await _db.Orders.Where(u => u.UserId == Guid.Parse(user.Id)).OrderByDescending(u => u.OrderId).ToArrayAsync();
-            Product[] productsDB = await _db.Products.ToArrayAsync();
+            var ordersDB = _unitOfWork.Orders.GetAll(u => u.UserId == Guid.Parse(user.Id)).OrderByDescending(u => u.OrderId);            
 
             var formatedOrders = ordersDB.Select(o => new
             {
@@ -42,7 +42,7 @@ namespace Minotaur.Areas.Customer
                 o.ReceiverName,
                 o.ReceiverLastName,
                 o.PhoneNumber,
-                ProductData = JsonConvert.DeserializeObject<IEnumerable<OrderProductData>>(o.ProductData),
+                OrderedProducts = JsonConvert.DeserializeObject<IEnumerable<OrderProductData>>(o.OrderedProducts),
                 PurchaseDate = o.PurchaseDate.ToString("dd.MM.yyyy HH:mm"),
                 o.PurchaseAmount,
                 o.City,
@@ -53,16 +53,16 @@ namespace Minotaur.Areas.Customer
                 o.OrderPickupPointId,
                 o.OrderStatus,
                 o.TravelHistory
-            }).ToArray();
+            });
 
             Dictionary<int, string> prodIdAndName = new();
 
             foreach (var order in formatedOrders)
             {
-                IEnumerable<OrderProductData> opd = order.ProductData;
+                IEnumerable<OrderProductData> opd = order.OrderedProducts;
                 foreach (var productData in opd)
                 {
-                    prodIdAndName.TryAdd(productData.Id, productsDB.Where(u => u.ProductId == productData.Id).FirstOrDefault()?.Name);
+                    prodIdAndName.TryAdd(productData.Id, _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id).Result.Name);
                 }
             }
 

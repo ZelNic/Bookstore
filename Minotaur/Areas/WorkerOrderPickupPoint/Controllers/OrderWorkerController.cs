@@ -97,7 +97,7 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
                         break;
                 }
                 _unitOfWork.Orders.Update(order);
-                _unitOfWork.SaveAsync();
+                _unitOfWork.Save();
             }
             return RedirectToAction("Index", "Orders", new { area = "Customer" });
         }
@@ -134,7 +134,7 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
 
             _unitOfWork.Orders.Update(order);
             _unitOfWork.Notifications.AddAsync(notification);
-            _unitOfWork.SaveAsync();
+            _unitOfWork.Save();
             return Ok();
         }
 
@@ -152,7 +152,7 @@ namespace Minotaur.Areas.WorkerOrderPickupPoint
                 order.ConfirmationCode = 0;
                 order.OrderStatus = StatusByOrder.StatusDelivered_4;
                 _unitOfWork.Orders.Update(order);
-                _unitOfWork.SaveAsync();
+                _unitOfWork.Save();
                 return Ok();
             }
             else

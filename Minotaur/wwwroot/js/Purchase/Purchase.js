@@ -50,7 +50,10 @@ function getInfomationAboutBuyer() {
             `
         },
         error: function (error) {
-            console.log(error.responseText);
+            Swal.fire({
+                icon: 'error',
+                title: error.responseText,
+            });
         }
     });
 }

@@ -16,6 +16,6 @@ namespace Minotaur.DataAccess.Repository.IRepository
         IOfficesRepository Offices { get; }
         IWorkersRepository Workers { get; }
         IOrganizationalOrderRepository OrganizationalOrders { get; }
-        void SaveAsync();
+        void Save();
     }
 }

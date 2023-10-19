@@ -32,7 +32,7 @@
 
             @{
                 IEnumerable<OrderProductData>
-                productsData = JsonConvert.DeserializeObject<IEnumerable<OrderProductData>>(@Model.Order.ProductData);
+                productsData = JsonConvert.DeserializeObject<IEnumerable<OrderProductData>>(@Model.Order.OrderedProducts);
             }
             @{
                 int countProduct = 0;

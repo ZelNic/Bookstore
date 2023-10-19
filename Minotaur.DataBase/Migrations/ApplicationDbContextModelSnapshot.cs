@@ -382,16 +382,19 @@ namespace Minotaur.Migrations
                     b.Property<bool>("IsCourierDelivery")
                         .HasColumnType("bit");
 
+                    b.Property<string>("MissingItems")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OrderPickupPointId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("OrderStatus")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
+                    b.Property<string>("OrderedProducts")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProductData")
+                    b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PurchaseAmount")
@@ -407,6 +410,9 @@ namespace Minotaur.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Region")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShippedProducts")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Street")

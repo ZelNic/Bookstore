@@ -59,7 +59,7 @@ namespace Minotaur.Areas.Purchase
             MinotaurUser? user = await _userManager.GetUserAsync(User);
 
 
-            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAllAsync().Result.Where(u => u.UserId == Guid.Parse(user.Id)).FirstOrDefault();
+            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAllAsync().Result.Where(u => u.UserId == Guid.Parse(user.Id)).Where(n => n.IsPurchased == false).FirstOrDefault();
             if (shoppingBasket == null) { return null; }
 
             Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(shoppingBasket.ProductIdAndCount);
@@ -69,6 +69,7 @@ namespace Minotaur.Areas.Purchase
                 .Select(p => new OrderProductData
                 {
                     Id = p.ProductId,
+                    ProductName = p.Name,
                     Price = p.Price,
                     Count = productIdAndCount[p.ProductId]
                 }).ToList();
@@ -141,7 +142,7 @@ namespace Minotaur.Areas.Purchase
                 MinotaurUser? admin = await _userManager.FindByIdAsync("604c075d-c691-49d6-9d6f-877cfa866e59");
                 if (admin != null)
                 {
-                    order.ProductData = prodDataJson;
+                    order.OrderedProducts = prodDataJson;
                     order.OrderStatus = StatusByOrder.StatusApproved_1;
                     order.PurchaseDate = MoscowTime.GetTime();
 
@@ -155,10 +156,11 @@ namespace Minotaur.Areas.Purchase
                     _unitOfWork.MinotaurUsers.UpdateRange(users);
 
                     sb[0].IsPurchased = true;
+
                     _unitOfWork.ShoppingBaskets.UpdateRange(sb.ToArray());
 
                     _unitOfWork.Orders.AddAsync(order);
-                    _unitOfWork.SaveAsync();
+                    _unitOfWork.Save();
 
                     return Ok();
                 }

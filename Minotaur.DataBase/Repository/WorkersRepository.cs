@@ -16,7 +16,7 @@ namespace Minotaur.DataAccess.Repository
             _db.Workers.Update(worker);
         }
 
-        public void UpdateRange(Worker[] workers)
+        public void UpdateRange(List<Worker> workers)
         {
             _db.Workers.UpdateRange(workers);
         }

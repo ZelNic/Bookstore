@@ -7,6 +7,6 @@ namespace Minotaur.DataAccess.Repository.IRepository
     public interface IWorkersRepository : IRepository<Worker>
     {
         void Update(Worker worker);
-        void UpdateRange(Worker[] workers);
+        void UpdateRange(List<Worker> workers);
     }
 }

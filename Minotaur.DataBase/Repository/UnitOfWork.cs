@@ -39,10 +39,10 @@ namespace Minotaur.DataAccess.Repository
             OrganizationalOrders = new OrganizationalOrdersRepository(_db);
         }
 
-        public void SaveAsync()
+        public async void Save()
         {
             _db.SaveChanges();
         }
-      
+
     }
 }

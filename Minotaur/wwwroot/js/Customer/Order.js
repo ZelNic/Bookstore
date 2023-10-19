@@ -29,7 +29,7 @@ function generateOrderCards() {
     for (var order of ordersData) {
 
         var tableOrder = ``;
-        for (var product of order.productData) {
+        for (var product of order.orderedProducts) {
             tableOrder += `
             <tbody class="table-group-divider">
                 <tr>

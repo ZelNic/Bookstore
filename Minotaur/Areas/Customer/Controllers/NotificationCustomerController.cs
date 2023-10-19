@@ -1,10 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Minotaur.DataAccess;
+using Minotaur.DataAccess.Repository;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
+using Minotaur.Models.SD;
+using Minotaur.Utility;
 
 namespace Minotaur.Areas.Customer
 {
@@ -12,34 +18,89 @@ namespace Minotaur.Areas.Customer
     [Authorize]
     public class NotificationCustomerController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
-        public NotificationCustomerController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        public NotificationCustomerController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            MinotaurUser? user = await _userManager.GetUserAsync(User);
-            IEnumerable<Notification> notifications = await _db.Notifications.Where(u => u.RecipientId == Guid.Parse(user.Id)).Where(s => s.IsHidden == false).ToListAsync();
-
-            return View(notifications);
+            return View();
         }
 
-        public async Task<IActionResult> Delete(int notificationId)
+        public async Task<IActionResult> GetDataNotification()
         {
-            Notification? notification = await _db.Notifications.FindAsync(notificationId);
-            if (notification != null)
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
+            var notifications = await _unitOfWork.Notifications.GetAllAsync(u => u.RecipientId == Guid.Parse(user.Id));
+            var notHiddenNotifications = notifications.Where(n => n.IsHidden == false)
+                .Select(n => new
+                {
+                    n.Id,
+                    n.OrderId,
+                    SendingTime = n.SendingTime.ToString("dd.MM.yyyy HH:mm"),
+                    n.Text,
+                    n.TypeNotification,
+                });
+
+            if (notHiddenNotifications == null)
             {
-                _db.Notifications.Remove(notification);
-                await _db.SaveChangesAsync();
+                return BadRequest("Уведомлений нет");
             }
 
-            //change
+            return Json(new { data = notHiddenNotifications });
+        }
 
-            return RedirectToAction("Index");
+        [HttpPost]
+        public async Task<IActionResult> HideNotification(string notificationId)
+        {
+            Notification? notification = await _unitOfWork.Notifications.GetAsync(n => n.Id == Guid.Parse(notificationId));
+            if (notification != null)
+            {
+                _unitOfWork.Notifications.Remove(notification);
+                _unitOfWork.Save();
+            }
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendReplyIncompleteOrder(string notificationId, bool isAgree)
+        {
+            Notification? notification = await _unitOfWork.Notifications.GetAsync(n => n.Id == Guid.Parse(notificationId));
+            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == notification.OrderId);
+
+            if (order == null) return BadRequest("Заказ не найден");
+
+            Notification notificationForCustomer = new()
+            {
+                OrderId = order.OrderId,
+                RecipientId = order.UserId,
+                TypeNotification = NotificationSD.SimpleNotification,
+                IsHidden = false,
+                SendingTime = MoscowTime.GetTime(),
+            };
+
+            if (isAgree)
+            {
+                order.OrderStatus = StatusByOrder.BuyerAgreesNeedSend_8;
+                notificationForCustomer.Text = "Ожидается отправка товара";
+            }
+            else
+            {
+                order.OrderStatus = StatusByOrder.BuyerDontAgreesNeedRefunded_9;
+                notificationForCustomer.Text = "Ожидается возврат средств";
+            }
+
+            notification.IsHidden = true;
+            _unitOfWork.Notifications.Update(notification);
+            _unitOfWork.Orders.Update(order);
+            _unitOfWork.Notifications.AddAsync(notificationForCustomer);
+            _unitOfWork.Save();
+
+            return Ok();
         }
     }
 }

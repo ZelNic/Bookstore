@@ -5,12 +5,14 @@ $(document).ready(function () {
 
 let dataOrder;
 
+let BuyerAgreesNeedSend_8 = "Покупатель согласен на получение неполного заказа.Ожидается передача в отдел отправки";
+
 function generateDataOrder() {
 
     const dataOrders = document.getElementById("dataOrder");
 
     $.ajax({
-        url: '/Picker/OrderPicking/GetAssemblyOrders',
+        url: '/Picker/OrderPicking/GetOrders',
         type: 'GET',
         dataType: 'json',
 
@@ -19,7 +21,7 @@ function generateDataOrder() {
             let cardOrder = ``;
 
 
-            for (let order of dataOrder) {
+            for (let [index, order] of dataOrder.entries()) {
                 let productData = ``;
                 let stockData = ``;
 
@@ -68,6 +70,9 @@ function generateDataOrder() {
                                     <label>
                                         Дата и время заказа: ${order.purchaseDate} по МСК
                                     </label>
+                                    <label id="status_${index}">
+                                        Статус заказа: ${order.orderStatus}
+                                    </label>
                                 </div>
                                 <table class="table">
                                     <thead>
@@ -77,7 +82,7 @@ function generateDataOrder() {
                                             <th scope="col">Автор</th>
                                             <th scope="col">Требуемое количество</th>
                                             <th scope="col">Собрано</th>
-                                            <th scrope="col">На складе</th>ббб
+                                            <th scrope="col">На складе</th>
                                         </tr>
                                                                               
                                     </thead>
@@ -86,7 +91,13 @@ function generateDataOrder() {
                                     </tbody>
                                 </table>
                                 <div>
-                                   <button onclick="confirmOrderReadiness('${order.orderId}')" class="btn btn-success">Подтвердить готовность товара</button>
+                                    <div id="waitingAssemblyDiv_${order.orderId}">
+                                        <button onclick="takeOrderOnAssembly('${order.orderId}','${index}')" class="btn btn-success">Взять заказ на сборку</button>
+                                    </div>
+                                    <div id="onAssembly_${order.orderId}" hidden>
+                                        <button onclick="confirmOrderReadiness('${order.orderId}', '${index}')" class="btn btn-success">Подтвердить готовность товара</button>
+                                        <button onclick="cancelAssemblyOrder('${order.orderId}','${index}')" class="btn btn-success">Отменить сборку заказа</button>
+                                    </div>
                                 </div>
                             </div>
                             <hr class="mt-5 mb-5"/>
@@ -100,7 +111,48 @@ function generateDataOrder() {
         error: function (error) {
             Swal.fire({
                 icon: 'error',
+                text: error.responseText,
             })
+        }
+    })
+}
+
+function cancelAssemblyOrder(orderId, index) {
+    $.ajax({
+        url: '/Picker/OrderPicking/CancelAsseblyOrder?orderId=' + orderId,
+        type: 'GET',
+        success: function (response) {
+            let divWaiting = document.getElementById(`waitingAssemblyDiv_${orderId}`);
+            let onAssembly = document.getElementById(`onAssembly_${orderId}`);
+            let labelStatus = document.getElementById(`status_${index}`)
+
+            dataOrder[index].orderStatus = "Одобренный";
+            labelStatus.textContent = `Статус заказа: ${dataOrder[index].orderStatus}`;
+            divWaiting.removeAttribute("hidden");
+            onAssembly.setAttribute("hidden", "true");
+        },
+        error: function (error) {
+            Swal.fire(error.responseText)
+        }
+    })
+}
+
+function takeOrderOnAssembly(orderId, index) {
+    $.ajax({
+        url: '/Picker/OrderPicking/TakeOrderOnAssebly?orderId=' + orderId,
+        type: 'GET',
+        success: function (response) {
+            let divWaiting = document.getElementById(`waitingAssemblyDiv_${orderId}`);
+            let onAssembly = document.getElementById(`onAssembly_${orderId}`);
+            let labelStatus = document.getElementById(`status_${index}`)
+
+            dataOrder[index].orderStatus = "Сборка заказа";
+            labelStatus.textContent = `Статус заказа: ${dataOrder[index].orderStatus}`;
+            divWaiting.setAttribute("hidden", "true");
+            onAssembly.removeAttribute("hidden");
+        },
+        error: function (error) {
+            Swal.fire(error.responseText)
         }
     })
 }
@@ -118,21 +170,21 @@ function addToOrderAssembly(orderId, productId) {
         return;
     }
 
-    product.isChecked = true;
-
     let btnProductChecked = document.getElementById(`selectBtn_${orderId}_${productId}`);
 
-    if (btnProductChecked.classList.contains('bi-square')) {
-        btnProductChecked.classList.remove('bi-square');
-        btnProductChecked.classList.add('bi-check-square');
-    }
-    else {
+    if (product.isChecked == true) {
+        product.isChecked = false;
         btnProductChecked.classList.remove('bi-check-square');
         btnProductChecked.classList.add('bi-square');
     }
+    else {
+        product.isChecked = true;
+        btnProductChecked.classList.remove('bi-square');
+        btnProductChecked.classList.add('bi-check-square');
+    }
 }
 
-function confirmOrderReadiness(orderId) {
+function confirmOrderReadiness(orderId, index) {
 
     const order = dataOrder.find(order => order.orderId === orderId).products;
 
@@ -149,61 +201,91 @@ function confirmOrderReadiness(orderId) {
         if (product.isChecked != true) {
             flagFullReadyOrder = false;
             missingProduct.push({
-                ProductId: product.productId,
+                Id: product.productId,
+                ProductName: product.name,
+                Price: product.price,
                 Count: product.count,
-                ProductName: product.name
             });
         }
     }
+
     jsonMissingProduct = JSON.stringify(missingProduct);
 
-    console.log(jsonMissingProduct);
 
     if (flagFullReadyOrder == true) {
         Swal.fire({
             title: 'Заказ полностью укомплектован',
-            showDenyButton: true,
             showCancelButton: true,
             confirmButtonText: 'Отправить пункт отправки',
-            denyButtonText: `Отмена`,
+            cancelButtonText: `Отмена`,
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire('Оправлено!', '', 'success');
                 $.ajax({
-                    url: '/Picker/OrderPicking/SendCollectedOrder?orderId=' + orderId,
+                    url: '/Picker/OrderPicking/SendCollectedOrder?orderId=' + orderId + '&missingProduct=' + 'Отсутствуют',
                     type: 'POST',
 
                     success: function (response) {
                         Swal.fire('Операция прошла успешно. Передайте заказ в отдел отправки.');
+                        generateDataOrder();
                     },
                     error: function (error) {
-                        Swal.fire(`${error.responseText}`);
+                        Swal.fire(`${error}`);
                     },
                 });
             }
         });
+    }
+    else {
+
+        if (dataOrder[index].missingItems != null) {
+            Swal.fire({
+                title: 'Заказ укомплектован',
+                showCancelButton: true,
+                confirmButtonText: 'Отправить пункт отправки',
+                cancelButtonText: `Отмена`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('Оправлено!', '', 'success');
+                    $.ajax({
+                        url: '/Picker/OrderPicking/SendCollectedOrder?orderId=' + orderId + '&missingProduct=' + jsonMissingProduct,
+                        type: 'POST',
+
+                        success: function (response) {
+                            Swal.fire('Операция прошла успешно. Передайте заказ в отдел отправки.');
+                            generateDataOrder();
+                        },
+                        error: function (error) {
+                            Swal.fire(`${error}`);
+                        },
+                    });
+                }
+            });
+        }
+        else {
+            Swal.fire({
+                title: 'Заказ не укомплентован',
+                text: 'Будет отправлено уведомление пользователю о согласии на получение заказа в некомплектном состоянии.',
+                showDenyButton: true,
+                confirmButtonText: 'Отправить уведомление',
+                denyButtonText: `Отмена`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Picker/OrderPicking/SendCollectedOrder?orderId=' + orderId + '&missingProduct=' + jsonMissingProduct,
+                        type: 'POST',
+                        success: function (response) {
+                            Swal.fire('Уведомление отправлено');
+                            generateDataOrder();
+                        },
+                        error: function (error) {
+                            Swal.fire(`${error.responseText}`);
+                        },
+                    });
+                }
+            });
+        }        
     }
 
-    if (flagFullReadyOrder == false) {
-        Swal.fire({
-            title: 'Заказ не укомплентован',
-            text: 'Будет отправлено уведомлению пользователю на согласие об получение заказа в неукомлентованом состоянии.',
-            showDenyButton: true,
-            confirmButtonText: 'Отправить уведомление',
-            denyButtonText: `Отмена`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/Picker/OrderPicking/SendCollectedOrder?orderId=' + orderId + '&missingProduct=' + jsonMissingProduct,
-                    type: 'POST',
-                    success: function (response) {
-                        Swal.fire('Уведомление отправлено');
-                    },
-                    error: function (error) {
-                        Swal.fire(`${error.responseText}`);
-                    },
-                });
-            }
-        });
-    }
+    
 }

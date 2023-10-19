@@ -52,10 +52,10 @@ namespace Minotaur.Areas.Admin.Controllers
             if (office != null)
             {
                 _unitOfWork.Offices.AddAsync(office);
-                _unitOfWork.SaveAsync();
+                _unitOfWork.Save();
             }
 
             return Ok();
-        }
+        }   
     }
 }

@@ -1,6 +1,4 @@
-﻿using Minotaur.Models.Models;
-
-namespace Minotaur.Models.SD
+﻿namespace Minotaur.Models.SD
 {
     public static class NotificationSD
     {
@@ -17,5 +15,6 @@ namespace Minotaur.Models.SD
 
 
         public const string IncompleteOrderType = "Неполный заказ. Требуется подтверждение.";
+        public const string SimpleNotification = "Простое уведомление";
     }
 }

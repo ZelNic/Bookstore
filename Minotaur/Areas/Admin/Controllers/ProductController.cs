@@ -82,7 +82,7 @@ namespace Minotaur.Areas.Admin.Controllers
                 }
             }
 
-            _unitOfWork.SaveAsync();
+            _unitOfWork.Save();
             return Ok();
         }
 
@@ -94,7 +94,7 @@ namespace Minotaur.Areas.Admin.Controllers
             if (productOnDelete != null)
             {
                 _unitOfWork.Products.Remove(productOnDelete);
-                _unitOfWork.SaveAsync();
+                _unitOfWork.Save();
                 return Ok();
             }
             else

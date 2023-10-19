@@ -63,7 +63,7 @@ namespace Minotaur.Areas.Customer
 
         public async Task<IActionResult> Details(int productId)
         {
-            var product = _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
+            Product product = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
 
             return View(product);
         }
