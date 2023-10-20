@@ -1,0 +1,92 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<MinotaurUser> SignInManager
+@inject UserManager<MinotaurUser> UserManager
+
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    if (User.IsInRole(Roles.Role_Admin))
+    {
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Управление
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="nav-link text-light" asp-area="Admin" asp-controller="Product" asp-action="Index">Товары </a></li>
+                <li><a class="nav-link text-light" asp-area="Admin" asp-controller="Category" asp-action="Index">Категории </a></li>
+                <li><a class="nav-link text-light" asp-area="Admin" asp-controller="Office" asp-action="Office">Офисы </a></li>
+                <li><a class="nav-link text-light" asp-area="Admin" asp-controller="Roles" asp-action="ViewRoles">Сотрудники </a></li>
+            </ul>
+        </div>
+       
+    }
+    if (User.IsInRole(Roles.Role_Worker_Order_Pickup_Point))
+    {
+        <ul class="navbar-nav flex-grow-1">
+            <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.ViewOrderDetails">Проверить состояние</a></li>
+            <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.AcceptOrder">Прием</a></li>
+            <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.IssueOrder">Выдача</a></li>
+        </ul>
+
+        @*<ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item dropdown">
+                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Управление заказами
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark">
+                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.ViewOrderDetails">Проверить состояние</a></li>
+                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.AcceptOrder">Прием</a></li>
+                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.IssueOrder">Выдача</a></li>
+                                </ul>
+                            </li>
+                        </ul>*@
+    }
+    if (User.IsInRole(Roles.Role_Order_Picker))
+    {
+        <ul class="navbar-nav flex-grow-1">
+            <li>
+                <a class="nav-link text-light" asp-area="Picker" asp-controller="OrderPicking" asp-action="Index">Сборка заказов</a>
+            </li>
+        </ul>
+    }
+    if (User.IsInRole(Roles.Role_Stockkeeper))
+    {
+        <ul class="navbar-nav flex-grow-1">
+            <li>
+                <a class="nav-link text-light" asp-area="Stockkeeper" asp-controller="Stock" asp-action="Index">Склад</a>
+            </li>
+        </ul>
+    }
+    if (User.IsInRole(Roles.Role_HR))
+    {
+        <ul class="navbar-nav flex-grow-1">
+            <li>
+                <a class="nav-link text-light" asp-area="HR" asp-controller="Worker" asp-action="Index">Персонал</a>
+            </li>
+        </ul>
+    }
+
+    <ul class="navbar-nav flex-grow-1 justify-content-end">
+        <li>
+            <a class="nav-link text-light" asp-area="Customer" asp-controller="Wishlist" asp-action="Index">
+                <i class="bi bi-bookmark-fill"></i>Отложено
+            </a>
+        </li>
+        <li>
+            <a class="nav-link text-light" asp-area="Customer" asp-controller="ShoppingBasket" asp-action="Index">
+                <i class="bi bi-bag-check-fill"></i>Корзина
+            </a>
+        </li>
+        <li>
+            <a class="nav-link text-light" asp-area="Customer" asp-controller="Orders" asp-action="Index">
+                <i class="bi bi-box-seam"></i>Заказы
+            </a>
+        </li>
+        <li>
+            <a class="nav-link text-light" asp-area="Customer" asp-controller="NotificationCustomer" asp-action="Index">
+                <i class="bi bi-chat-dots-fill"></i> Сообщения
+            </a>
+        </li>
+    </ul>
+}
