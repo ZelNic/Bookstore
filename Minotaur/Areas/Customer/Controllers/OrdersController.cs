@@ -33,7 +33,7 @@ namespace Minotaur.Areas.Customer
         {
             var user = await _userManager.GetUserAsync(User);
 
-            var ordersDB = _unitOfWork.Orders.GetAll(u => u.UserId == Guid.Parse(user.Id)).OrderByDescending(u => u.OrderId);            
+            var ordersDB = _unitOfWork.Orders.GetAll(u => u.UserId == Guid.Parse(user.Id)).OrderByDescending(u => u.OrderId).ToList();            
 
             var formatedOrders = ordersDB.Select(o => new
             {
@@ -42,9 +42,11 @@ namespace Minotaur.Areas.Customer
                 o.ReceiverName,
                 o.ReceiverLastName,
                 o.PhoneNumber,
-                OrderedProducts = JsonConvert.DeserializeObject<IEnumerable<OrderProductData>>(o.OrderedProducts),
+                OrderedProducts = o.OrderedProducts != null ? JsonConvert.DeserializeObject<List<OrderProductData>>(o.OrderedProducts) : null,
+                ShippedProducts = o.ShippedProducts != null ? JsonConvert.DeserializeObject<List<OrderProductData>>(o.ShippedProducts) : null,
                 PurchaseDate = o.PurchaseDate.ToString("dd.MM.yyyy HH:mm"),
                 o.PurchaseAmount,
+                o.RefundAmount,
                 o.City,
                 o.Street,
                 o.HouseNumber,
@@ -53,17 +55,30 @@ namespace Minotaur.Areas.Customer
                 o.OrderPickupPointId,
                 o.OrderStatus,
                 o.TravelHistory
-            });
+            }).ToList();
 
             Dictionary<int, string> prodIdAndName = new();
 
             foreach (var order in formatedOrders)
             {
-                IEnumerable<OrderProductData> opd = order.OrderedProducts;
-                foreach (var productData in opd)
+                if(order.ShippedProducts != null)
                 {
-                    prodIdAndName.TryAdd(productData.Id, _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id).Result.Name);
+                    List<OrderProductData> opd = order.ShippedProducts;
+                    foreach (var productData in opd)
+                    {
+                        prodIdAndName.TryAdd(productData.Id, _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id).Result.Name);
+                    }
                 }
+                else
+                {
+                    List<OrderProductData> opd = order.OrderedProducts;
+                    foreach (var productData in opd)
+                    {
+                        prodIdAndName.TryAdd(productData.Id, _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id).Result.Name);
+                    }
+                }
+
+               
             }
 
             return Json(new { data = formatedOrders, prodIdAndName });

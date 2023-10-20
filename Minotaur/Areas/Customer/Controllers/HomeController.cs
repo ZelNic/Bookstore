@@ -9,6 +9,7 @@ namespace Minotaur.Areas.Customer
 {
     [Area("Customer")]
 
+    
     public class HomeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

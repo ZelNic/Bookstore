@@ -409,6 +409,9 @@ namespace Minotaur.Migrations
                     b.Property<string>("ReceiverName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RefundAmount")
+                        .HasColumnType("int");
+
                     b.Property<string>("Region")
                         .HasColumnType("nvarchar(max)");
 

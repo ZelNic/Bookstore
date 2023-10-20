@@ -1,12 +1,10 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
 using Minotaur.Models.SD;
-using Minotaur.Models.Supporting_Models;
 using Minotaur.Utility;
 using Newtonsoft.Json;
 
@@ -33,9 +31,7 @@ namespace Minotaur.Areas.Picker.Controllers
         {
             var worker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(_userManager.GetUserId(User)));
 
-            string[] requiredOrderTypes = new string[] { StatusByOrder.StatusApproved_1,StatusByOrder.StatusInProcess_2,
-                                                         StatusByOrder.BuyerAgreesNeedSend_8,StatusByOrder.StatusCancelled_5,
-                                                         StatusByOrder.BuyerDontAgreesNeedRefunded_9, StatusByOrder.StatusCancelled_10 };
+            string[] requiredOrderTypes = new string[] { StatusByOrder.StatusApproved_1, StatusByOrder.StatusInProcess_2, StatusByOrder.BuyerAgreesNeedSend_8 };
 
             try
             {
@@ -70,11 +66,10 @@ namespace Minotaur.Areas.Picker.Controllers
 
                 return Json(new { data = assemblyOrders });
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest("Заказов нет");
+                return BadRequest(ex);
             }
-
         }
 
         public async Task<IActionResult> TakeOrderOnAssebly(string orderId)
@@ -106,7 +101,18 @@ namespace Minotaur.Areas.Picker.Controllers
                 var picker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(_userManager.GetUserId(User)));
                 order.OrderStatus = StatusByOrder.StatusApproved_1;
                 order.AssemblyResponsibleWorkerId = picker.WorkerId;
+                order.RefundAmount = order.PurchaseAmount;
 
+                Notification notificationForAdminForRefund = new()
+                {
+                    OrderId = order.OrderId,
+                    RecipientId = Guid.Parse("604c075d-c691-49d6-9d6f-877cfa866e59"),
+                    SenderId = picker.WorkerId,
+                    SendingTime = MoscowTime.GetTime(),
+                    TypeNotification = NotificationSD.Refund,
+                    Text = $"Необходимо осуществить возврат средств в сумме {order.AssemblyResponsibleWorkerId} за заказ под номером: {order.OrderId}."
+                };
+                _unitOfWork.Notifications.AddAsync(notificationForAdminForRefund);
                 _unitOfWork.Orders.Update(order);
                 _unitOfWork.Save();
 
@@ -122,7 +128,7 @@ namespace Minotaur.Areas.Picker.Controllers
         {
             try
             {
-                var order = await _unitOfWork.Orders.GetAsync(i => i.OrderId == Guid.Parse(orderId));
+                Order order = await _unitOfWork.Orders.GetAsync(i => i.OrderId == Guid.Parse(orderId));
                 var picker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(_userManager.GetUserId(User)));
 
                 if (missingProduct == "Отсутствуют")
@@ -139,18 +145,28 @@ namespace Minotaur.Areas.Picker.Controllers
                         SenderId = picker.WorkerId,
                         SendingTime = MoscowTime.GetTime(),
                         TypeNotification = StatusByOrder.StatusShipped_3,
-                        Text = $"Ваша заказ полностью собран и отправлен"
+                        Text = "Ваша заказ полностью собран и отправлен"
                     };
+
+                    if (order.IsCourierDelivery == false)
+                    {
+                        Worker workerPickUpPoin = await _unitOfWork.Workers.GetAsync(w => w.OfficeId == order.OrderPickupPointId);
+
+                        Notification notificationForWorkerPickUpPoint = new()
+                        {
+                            OrderId = order.OrderId,
+                            RecipientId = workerPickUpPoin.UserId,                            
+                            SendingTime = MoscowTime.GetTime(),
+                            TypeNotification = NotificationSD.SimpleNotification,
+                            Text = $"Скоро в пункт будет доставлен заказ {order.OrderId}."
+                        };
+                        _unitOfWork.Notifications.AddAsync(notificationForWorkerPickUpPoint);
+                    }
 
                     _unitOfWork.Notifications.AddAsync(notification);
                 }
                 else if (order.MissingItems == missingProduct)
                 {
-                    order.OrderStatus = StatusByOrder.StatusShipped_3;
-                    order.AssemblyResponsibleWorkerId = picker.WorkerId;
-                    order.ShippedProducts = order.OrderedProducts;
-                    order.MissingItems = missingProduct;
-
                     OrderProductData[]? misProd = JsonConvert.DeserializeObject<OrderProductData[]>(missingProduct);
                     OrderProductData[]? orderedProducts = JsonConvert.DeserializeObject<OrderProductData[]>(order.OrderedProducts);
                     List<OrderProductData>? shippedProducts = new();
@@ -160,13 +176,18 @@ namespace Minotaur.Areas.Picker.Controllers
                         bool isNeedAdd = true;
                         for (int j = 0; j < misProd.Length; j++)
                         {
-                            if (misProd[j].Id == orderedProducts[i].Id)
+                            if (misProd[j].Id == orderedProducts[i].Id && misProd[j].Count != orderedProducts[i].Count)
                             {
                                 int countSend = orderedProducts[i].Count - misProd[j].Count;
                                 if (countSend > 0)
                                 {
-                                    orderedProducts[i].Count = countSend;
-                                    shippedProducts.Add(orderedProducts[i]);
+                                    shippedProducts.Add(new OrderProductData
+                                    {
+                                        Id = orderedProducts[i].Id,
+                                        Count = misProd[j].Count,
+                                        Price = misProd[j].Price,
+                                        ProductName = misProd[j].ProductName,
+                                    });
                                     isNeedAdd = false;
                                     break;
                                 }
@@ -183,6 +204,26 @@ namespace Minotaur.Areas.Picker.Controllers
 
                     order.ShippedProducts = JsonConvert.SerializeObject(shippedProducts);
 
+                    order.OrderStatus = StatusByOrder.StatusShipped_3;
+                    order.AssemblyResponsibleWorkerId = picker.WorkerId;
+
+                    int orderedAmount = orderedProducts.Sum(p => p.Price * p.Count);
+                    int sheppedAmount = shippedProducts.Sum(p => p.Price * p.Count);
+
+                    order.RefundAmount = orderedAmount - sheppedAmount;
+
+                    Notification notificationForAdminForRefund = new()
+                    {
+                        OrderId = order.OrderId,
+                        RecipientId = Guid.Parse("604c075d-c691-49d6-9d6f-877cfa866e59"),
+                        SenderId = picker.WorkerId,
+                        SendingTime = MoscowTime.GetTime(),
+                        TypeNotification = NotificationSD.Refund,
+                        Text = $"Необходимо осуществить возврат средств в сумме {order.RefundAmount} за заказ под номером: {order.OrderId}."
+                    };
+
+                    // TODO: нужно сделать возможность рефанда для админа
+
                     Notification notification = new()
                     {
                         OrderId = order.OrderId,
@@ -193,10 +234,12 @@ namespace Minotaur.Areas.Picker.Controllers
                         Text = $"Ваша заказ полностью собран и отправлен"
                     };
 
+                    _unitOfWork.Notifications.AddAsync(notificationForAdminForRefund);
                     _unitOfWork.Notifications.AddAsync(notification);
                 }
+                else
                 {
-                    var misProd = JsonConvert.DeserializeObject<OrderProductData[]>(missingProduct);
+                    OrderProductData[] misProd = JsonConvert.DeserializeObject<OrderProductData[]>(missingProduct);
 
                     string misProductNameAndCount = "";
                     for (int i = 0; i < misProd.Length; i++)
@@ -209,7 +252,6 @@ namespace Minotaur.Areas.Picker.Controllers
                         {
                             misProductNameAndCount += misProd[i].ProductName + ", " + misProd[i].Count + ".";
                         }
-
                     }
 
                     order.OrderStatus = StatusByOrder.AwaitingConfirmationForIncompleteOrder_7;

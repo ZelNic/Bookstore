@@ -1,11 +1,6 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using Humanizer;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Minotaur.DataAccess;
-using Minotaur.DataAccess.Repository;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
@@ -35,7 +30,7 @@ namespace Minotaur.Areas.Customer
         {
             MinotaurUser? user = await _userManager.GetUserAsync(User);
             var notifications = await _unitOfWork.Notifications.GetAllAsync(u => u.RecipientId == Guid.Parse(user.Id));
-            var notHiddenNotifications = notifications.Where(n => n.IsHidden == false)
+            var notHiddenNotifications = notifications.OrderByDescending(n => n.SendingTime).Where(n => n.IsHidden == false)
                 .Select(n => new
                 {
                     n.Id,
@@ -43,6 +38,7 @@ namespace Minotaur.Areas.Customer
                     SendingTime = n.SendingTime.ToString("dd.MM.yyyy HH:mm"),
                     n.Text,
                     n.TypeNotification,
+                    n.IsHidden,
                 });
 
             if (notHiddenNotifications == null)
@@ -59,7 +55,9 @@ namespace Minotaur.Areas.Customer
             Notification? notification = await _unitOfWork.Notifications.GetAsync(n => n.Id == Guid.Parse(notificationId));
             if (notification != null)
             {
-                _unitOfWork.Notifications.Remove(notification);
+                notification.IsHidden = true;
+
+                _unitOfWork.Notifications.Update(notification);
                 _unitOfWork.Save();
             }
 
@@ -70,9 +68,10 @@ namespace Minotaur.Areas.Customer
         public async Task<IActionResult> SendReplyIncompleteOrder(string notificationId, bool isAgree)
         {
             Notification? notification = await _unitOfWork.Notifications.GetAsync(n => n.Id == Guid.Parse(notificationId));
-            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == notification.OrderId);
+            if (notification == null) { return BadRequest("Уведомление не найдено"); }
 
-            if (order == null) return BadRequest("Заказ не найден");
+            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == notification.OrderId);
+            if (order == null) { _unitOfWork.Notifications.Remove(notification); _unitOfWork.Save();  return BadRequest("Заказ не найден"); }
 
             Notification notificationForCustomer = new()
             {
@@ -92,6 +91,18 @@ namespace Minotaur.Areas.Customer
             {
                 order.OrderStatus = StatusByOrder.BuyerDontAgreesNeedRefunded_9;
                 notificationForCustomer.Text = "Ожидается возврат средств";
+
+                Notification notificationForPicker = new()
+                {
+                    OrderId = order.OrderId,
+                    SenderId = order.UserId,
+                    RecipientId = order.AssemblyResponsibleWorkerId,
+                    TypeNotification = NotificationSD.SimpleNotification,
+                    Text = $"Покупатель отказался от заказа {order.OrderId}.",
+                    SendingTime = MoscowTime.GetTime(),
+                };
+
+                _unitOfWork.Notifications.AddAsync(notificationForPicker);
             }
 
             notification.IsHidden = true;

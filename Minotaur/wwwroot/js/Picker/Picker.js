@@ -5,8 +5,9 @@ $(document).ready(function () {
 
 let dataOrder;
 
-let BuyerAgreesNeedSend_8 = "Покупатель согласен на получение неполного заказа.Ожидается передача в отдел отправки";
-
+const StatusApproved_1 = "Одобренный";
+const StatusInProcess_2 = "Сборка заказа";
+const BuyerAgreesNeedSend_8 = "Покупатель согласен на получение неполного заказа. Ожидается передача в отдел отправки";
 function generateDataOrder() {
 
     const dataOrders = document.getElementById("dataOrder");
@@ -25,6 +26,8 @@ function generateDataOrder() {
                 let productData = ``;
                 let stockData = ``;
 
+                let functionForOrder = ``;
+
                 for (let product of order.products) {
 
                     let stockData = ``;
@@ -39,6 +42,37 @@ function generateDataOrder() {
                         }
                     }
 
+                    switch (order.orderStatus) {
+                        case BuyerAgreesNeedSend_8:
+                            functionForOrder = `
+                             <div id="waitingAssemblyDiv_${order.orderId}">
+                                <button onclick="takeOrderOnAssembly('${order.orderId}','${index}')" class="btn btn-success">Взять заказ на сборку</button>
+                             </div>
+                             <div id="onAssembly_${order.orderId}" hidden>
+                                <button onclick="confirmOrderReadiness('${order.orderId}', '${index}')" class="btn btn-success">Подтвердить готовность товара</button>
+                                <button onclick="cancelAssemblyOrder('${order.orderId}','${index}')" class="btn btn-success">Отменить сборку заказа</button>
+                             </div>`;
+                            break;
+
+                        case StatusApproved_1:
+                            functionForOrder = `
+                             <div id="waitingAssemblyDiv_${order.orderId}">
+                                <button onclick="takeOrderOnAssembly('${order.orderId}','${index}')" class="btn btn-success">Взять заказ на сборку</button>
+                             </div>
+                             <div id="onAssembly_${order.orderId}" hidden>
+                                <button onclick="confirmOrderReadiness('${order.orderId}', '${index}')" class="btn btn-success">Подтвердить готовность товара</button>
+                                <button onclick="cancelAssemblyOrder('${order.orderId}','${index}')" class="btn btn-success">Отменить сборку заказа</button>
+                             </div>`;
+                            break;
+                        case StatusInProcess_2:
+                            functionForOrder = ` 
+                             <div id="onAssembly_${order.orderId}">
+                                <button onclick="confirmOrderReadiness('${order.orderId}', '${index}')" class="btn btn-success">Подтвердить готовность товара</button>
+                                <button onclick="cancelAssemblyOrder('${order.orderId}','${index}')" class="btn btn-success">Отменить сборку заказа</button>
+                             </div>`;
+                            break;
+                    }
+
                     productData +=
                         `
                             <tr>
@@ -47,10 +81,14 @@ function generateDataOrder() {
                                 <td>${product.author}</td>
                                 <td>${product.count}</td>
                                 <td>
-                                    <button onclick="addToOrderAssembly('${order.orderId}', '${product.productId}')" id="selectBtn_${order.orderId}_${product.productId}" class="btn btn-outline-success border-0 bi bi-square"></button>
+                                    <input type="number" value="0" id="inputCount_${order.orderId}_${product.productId}" style="width: 70px; height: 30px;">
+                                </td>
+                                <td>
+                                    <button onclick="addToOrderAssembly('${order.orderId}', '${product.productId}', document.getElementById('inputCount_${order.orderId}_${product.productId}').value)" 
+                                     id="selectBtn_${order.orderId}_${product.productId}" class="btn btn-outline-success border-0 bi bi-square"></button>
                                 </td>
                                 <td> 
-                                   ${stockData}
+                                    ${stockData}
                                 </td>
                             </tr>
                         `;
@@ -80,7 +118,8 @@ function generateDataOrder() {
                                             <th scope="col">Id</th>
                                             <th scope="col">Название</th>
                                             <th scope="col">Автор</th>
-                                            <th scope="col">Требуемое количество</th>
+                                            <th scope="col">Требуемое кол-во</th>
+                                            <th scrope="col">В посылке</th>
                                             <th scope="col">Собрано</th>
                                             <th scrope="col">На складе</th>
                                         </tr>
@@ -91,14 +130,7 @@ function generateDataOrder() {
                                     </tbody>
                                 </table>
                                 <div>
-                                    <div id="waitingAssemblyDiv_${order.orderId}">
-                                        <button onclick="takeOrderOnAssembly('${order.orderId}','${index}')" class="btn btn-success">Взять заказ на сборку</button>
-                                    </div>
-                                    <div id="onAssembly_${order.orderId}" hidden>
-                                        <button onclick="confirmOrderReadiness('${order.orderId}', '${index}')" class="btn btn-success">Подтвердить готовность товара</button>
-                                        <button onclick="cancelAssemblyOrder('${order.orderId}','${index}')" class="btn btn-success">Отменить сборку заказа</button>
-                                    </div>
-                                </div>
+                                   ${functionForOrder}                                
                             </div>
                             <hr class="mt-5 mb-5"/>
                         </div>
@@ -157,7 +189,8 @@ function takeOrderOnAssembly(orderId, index) {
     })
 }
 
-function addToOrderAssembly(orderId, productId) {
+function addToOrderAssembly(orderId, productId, count) {
+
     const order = dataOrder.find(order => order.orderId === orderId).products;
     if (order == null) {
         Swal.fire('Заказ не найден. Товар отметить нельзя.')
@@ -171,6 +204,12 @@ function addToOrderAssembly(orderId, productId) {
     }
 
     let btnProductChecked = document.getElementById(`selectBtn_${orderId}_${productId}`);
+
+    if (count > product.count || count < 0) {
+        let inputCount = document.getElementById(`inputCount_${orderId}_${productId}`);
+        inputCount.value = product.count;
+    }
+
 
     if (product.isChecked == true) {
         product.isChecked = false;
@@ -197,17 +236,21 @@ function confirmOrderReadiness(orderId, index) {
 
     let missingProduct = [];
 
+
     for (let product of order) {
-        if (product.isChecked != true) {
+        let inputCount = document.getElementById(`inputCount_${orderId}_${product.productId}`);
+
+        if (product.isChecked != true || inputCount.value != product.count) {
             flagFullReadyOrder = false;
             missingProduct.push({
                 Id: product.productId,
                 ProductName: product.name,
                 Price: product.price,
-                Count: product.count,
+                Count: inputCount.value,
             });
         }
     }
+
 
     jsonMissingProduct = JSON.stringify(missingProduct);
 
@@ -230,7 +273,7 @@ function confirmOrderReadiness(orderId, index) {
                         generateDataOrder();
                     },
                     error: function (error) {
-                        Swal.fire(`${error}`);
+                        Swal.fire(error.responseText);
                     },
                 });
             }
@@ -256,7 +299,7 @@ function confirmOrderReadiness(orderId, index) {
                             generateDataOrder();
                         },
                         error: function (error) {
-                            Swal.fire(`${error}`);
+                            Swal.fire(error.responseText);
                         },
                     });
                 }
@@ -279,13 +322,11 @@ function confirmOrderReadiness(orderId, index) {
                             generateDataOrder();
                         },
                         error: function (error) {
-                            Swal.fire(`${error.responseText}`);
+                            Swal.fire(error.responseText);
                         },
                     });
                 }
             });
-        }        
+        }
     }
-
-    
 }

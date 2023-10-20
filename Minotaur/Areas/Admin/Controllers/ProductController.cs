@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
@@ -17,6 +16,8 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+
+
 
         public async Task<IActionResult> Index()
         {
@@ -47,7 +48,7 @@ namespace Minotaur.Areas.Admin.Controllers
             {
                 Product = product,
                 CategoriesList = _unitOfWork.Categories.GetAllAsync().Result.ToList()
-            };           
+            };
 
             return View(bookVM);
         }
@@ -58,7 +59,7 @@ namespace Minotaur.Areas.Admin.Controllers
         public async Task<IActionResult> UpdateOrAdd(string dataProduct)
         {
             Product? product = JsonConvert.DeserializeObject<Product>(dataProduct);
-            if(product == null) { return BadRequest("Ошибка в отправленных данных"); }
+            if (product == null) { return BadRequest("Ошибка в отправленных данных"); }
 
             if (product.ProductId == 0)
             {
@@ -66,7 +67,7 @@ namespace Minotaur.Areas.Admin.Controllers
             }
             else
             {
-                var oldVersionBook =  await _unitOfWork.Products.GetAsync(p => p.ProductId == product.ProductId);
+                var oldVersionBook = await _unitOfWork.Products.GetAsync(p => p.ProductId == product.ProductId);
 
                 if (oldVersionBook != null)
                 {
@@ -90,7 +91,7 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int productId)
         {
-            var productOnDelete =  await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
+            var productOnDelete = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
             if (productOnDelete != null)
             {
                 _unitOfWork.Products.Remove(productOnDelete);

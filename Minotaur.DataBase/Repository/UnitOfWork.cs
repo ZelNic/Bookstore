@@ -19,7 +19,7 @@ namespace Minotaur.DataAccess.Repository
         public IOfficesRepository Offices { get; set; }
         public IWorkersRepository Workers { get; set; }
         public IOrganizationalOrderRepository OrganizationalOrders { get; set; }
-
+        //public IBankRepository Bank { get; set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
@@ -37,6 +37,8 @@ namespace Minotaur.DataAccess.Repository
             Offices = new OfficesRepository(_db);
             Workers = new WorkersRepository(_db);
             OrganizationalOrders = new OrganizationalOrdersRepository(_db);
+            //Bank = new BankRepository(_db);
+
         }
 
         public async void Save()

@@ -22,14 +22,23 @@ function getOrders() {
 }
 
 function generateOrderCards() {
-    let countProduct = 0;
-    let sumPrice = 0;
     let html = ``;
 
     for (var order of ordersData) {
 
+        let countProduct = 0;
+        let sumPrice = 0;
         var tableOrder = ``;
-        for (var product of order.orderedProducts) {
+        var showProduct;
+
+        if (order.shippedProducts != null) {
+            showProduct = order.shippedProducts;
+        }
+        else {
+            showProduct = order.orderedProducts;
+        }
+
+        for (var product of showProduct) {
             tableOrder += `
             <tbody class="table-group-divider">
                 <tr>
@@ -37,7 +46,7 @@ function generateOrderCards() {
                     <td id="nameProduct_${product.id}">
                         <a href="/Customer/Home/Details?productId=${product.id}">${productNameData[product.id]}</a>
                     </td>
-                    <td>${product.price}</td>
+                    <td>${product.price} ₽ </td>
                     <td>${product.count}</td>
                 </tr>
             </tbody>
@@ -79,11 +88,12 @@ function generateOrderCards() {
                     </table>
                     <div>
                         <label>Количество товара: ${countProduct}</label>
-                        <label class="m-3">Стоимость: ${sumPrice}</label>
+                        <label class="m-3">Стоимость: ${sumPrice} ₽ </label>
                     </div>
                     <div class="form-group">
                         <label>Оплачено:</label>
-                        <label>${order.purchaseAmount}</label>
+                        <label>${order.purchaseAmount} ₽ </label>
+                        ${order.refundAmount != 0 ? `<label class="bg-warning rounded rounded-3">Сумма возврата: ${order.refundAmount} ₽</label>` : ``}
                     </div>
                     <div>
                         Доставка:

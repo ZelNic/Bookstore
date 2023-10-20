@@ -27,5 +27,6 @@ namespace Minotaur.Models.Models
         [DataType(DataType.PhoneNumber)] public string? PhoneNumber { get; set; }
         public Guid AssemblyResponsibleWorkerId { get; set; }
         public int ConfirmationCode { get; set; }
+        public int RefundAmount { get; set; } = 0;
     }
 }
