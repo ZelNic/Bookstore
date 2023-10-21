@@ -473,6 +473,23 @@ namespace Minotaur.Migrations
                     b.ToTable("StockMagazine");
                 });
 
+            modelBuilder.Entity("Minotaur.Models.Models.RequestTelegram", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Operation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TelegramRequests");
+                });
+
             modelBuilder.Entity("Minotaur.Models.Models.Review", b =>
                 {
                     b.Property<int>("ReviewsId")

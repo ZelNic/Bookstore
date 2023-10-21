@@ -18,7 +18,7 @@ namespace Minotaur.DataAccess.Repository
 
         public void UpdateRange(Office[] offices)
         {
-            _db.UpdateRange(offices);
+            _db.Offices.UpdateRange(offices);
         }
     }
 }

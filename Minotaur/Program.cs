@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,10 @@ using Minotaur.DataAccess.DbInitializer;
 using Minotaur.DataAccess.Repository;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
+using Minotaur.TelegramBot;
 using Minotaur.Utility;
+using Telegram.Bot;
+using Telegram.Bot.Polling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,18 +19,17 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
 builder.Services.AddIdentity<MinotaurUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
-
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<UserManager<MinotaurUser>>();
 builder.Services.AddScoped<SignInManager<MinotaurUser>>();
-
-builder.Services.AddRazorPages();
-builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+builder.Services.AddRazorPages();
 
 builder.Services.ConfigureApplicationCookie(option =>
 {
@@ -36,13 +39,22 @@ builder.Services.ConfigureApplicationCookie(option =>
 });
 
 
+//TELEGRAM BOT
+builder.Services.AddScoped<ITelegramBotClient>(provider =>
+{
+    var botToken = "6504892449:AAGsXjYUqLOSxGxHGgZmwoUFkdcOol-XnsU";
+    return new TelegramBotClient(botToken);
+});
+builder.Services.AddScoped<TelegramBot>();
+
+
 
 var app = builder.Build();
+
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -60,8 +72,10 @@ app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
-app.Run();
 
+LifeTelegramBot(app.Services.GetService<IServiceProvider>());
+
+app.Run();
 
 
 void SeedDatabase()
@@ -72,3 +86,14 @@ void SeedDatabase()
         dbInitializer.Initialize();
     }
 }
+
+
+void LifeTelegramBot(IServiceProvider serviceProvider)
+{
+    using (var scope = serviceProvider.CreateScope())
+    {
+        var telegramBot = scope.ServiceProvider.GetRequiredService<TelegramBot>();
+        telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);
+    }
+}
+

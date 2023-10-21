@@ -15,7 +15,7 @@ namespace Minotaur.DataAccess.Repository
             dbSet = _db.Set<T>();
         }
 
-        public async void AddAsync(T entity)
+        public async Task AddAsync(T entity)
         {
             await dbSet.AddAsync(entity);
         }

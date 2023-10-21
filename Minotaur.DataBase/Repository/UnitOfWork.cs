@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Minotaur.DataAccess.Repository.IRepository;
-using Minotaur.Models.Models;
+﻿using Minotaur.DataAccess.Repository.IRepository;
 
 namespace Minotaur.DataAccess.Repository
 {
@@ -19,6 +17,8 @@ namespace Minotaur.DataAccess.Repository
         public IOfficesRepository Offices { get; set; }
         public IWorkersRepository Workers { get; set; }
         public IOrganizationalOrderRepository OrganizationalOrders { get; set; }
+        public ITelegramRequestsRepository TelegramRequestsRepository { get; set; }
+
         //public IBankRepository Bank { get; set; }
 
         public UnitOfWork(ApplicationDbContext db)
@@ -37,6 +37,7 @@ namespace Minotaur.DataAccess.Repository
             Offices = new OfficesRepository(_db);
             Workers = new WorkersRepository(_db);
             OrganizationalOrders = new OrganizationalOrdersRepository(_db);
+            TelegramRequestsRepository = new TelegramRequestsRepository(_db);
             //Bank = new BankRepository(_db);
 
         }

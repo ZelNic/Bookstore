@@ -31,10 +31,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.10" />
+    <PackageReference Include="Telegram.Bot" Version="19.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Minotaur.DataBase\Minotaur.DataAccess.csproj" />
+    <ProjectReference Include="..\Minotaur.TelegramBot\Minotaur.TelegramBot.csproj" />
     <ProjectReference Include="..\Minotaur.Utility\Minotaur.Utility.csproj" />
   </ItemGroup>
 

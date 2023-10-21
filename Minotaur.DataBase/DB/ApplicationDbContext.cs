@@ -15,7 +15,6 @@ namespace Minotaur.DataAccess
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
             optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.EnableSensitiveDataLogging();
         }
 
         public DbSet<MinotaurUser> MinotaurUsers { get; set; }
@@ -30,6 +29,7 @@ namespace Minotaur.DataAccess
         public DbSet<Office> Offices { get; set; }
         public DbSet<Worker> Workers { get; set; }
         public DbSet<OrganizationalOrder> OrganizationalOrders { get; set; }
+        public DbSet<RequestTelegram> TelegramRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

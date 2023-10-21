@@ -1,6 +1,4 @@
-﻿using Minotaur.Models.Models;
-
-namespace Minotaur.DataAccess.Repository.IRepository
+﻿namespace Minotaur.DataAccess.Repository.IRepository
 {
     public interface IUnitOfWork
     {
@@ -16,6 +14,7 @@ namespace Minotaur.DataAccess.Repository.IRepository
         IOfficesRepository Offices { get; }
         IWorkersRepository Workers { get; }
         IOrganizationalOrderRepository OrganizationalOrders { get; }
+        ITelegramRequestsRepository TelegramRequestsRepository { get; }
         void Save();
     }
 }
