@@ -1,4 +1,3 @@
-using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +6,7 @@ using Minotaur.DataAccess.DbInitializer;
 using Minotaur.DataAccess.Repository;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
-using Minotaur.TelegramBot;
+using Minotaur.TelegramController;
 using Minotaur.Utility;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -39,15 +38,12 @@ builder.Services.ConfigureApplicationCookie(option =>
 });
 
 
-//TELEGRAM BOT
 builder.Services.AddScoped<ITelegramBotClient>(provider =>
 {
-    var botToken = "6504892449:AAGsXjYUqLOSxGxHGgZmwoUFkdcOol-XnsU";
+    var botToken = "6504892449:AAEDmHDwgkFG_Wg6Gywn-5ivRHcePsySn-4";
     return new TelegramBotClient(botToken);
 });
-builder.Services.AddScoped<TelegramBot>();
-
-
+builder.Services.AddTransient<TelegramController>();
 
 var app = builder.Build();
 
@@ -63,7 +59,10 @@ app.UseStaticFiles();
 
 SeedDatabase();
 
+
 app.UseRouting();
+
+
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -78,6 +77,18 @@ LifeTelegramBot(app.Services.GetService<IServiceProvider>());
 app.Run();
 
 
+void LifeTelegramBot(IServiceProvider serviceProvider)
+{
+    var scope = serviceProvider.CreateScope();
+    var telegramBot = scope.ServiceProvider.GetRequiredService<TelegramController>();
+    telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);
+    //using (var scope = serviceProvider.CreateScope())
+    //    {
+    //        var scope = serviceProvider.CreateScope())
+    //        var telegramBot = scope.ServiceProvider.GetRequiredService<TelegramController>();
+    //        telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);
+    //    }
+}
 void SeedDatabase()
 {
     using (var scope = app.Services.CreateScope())
@@ -86,14 +97,3 @@ void SeedDatabase()
         dbInitializer.Initialize();
     }
 }
-
-
-void LifeTelegramBot(IServiceProvider serviceProvider)
-{
-    using (var scope = serviceProvider.CreateScope())
-    {
-        var telegramBot = scope.ServiceProvider.GetRequiredService<TelegramBot>();
-        telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);
-    }
-}
-

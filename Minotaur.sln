@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minotaur.Models", "Minotaur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minotaur.Utility", "Minotaur.Utility\Minotaur.Utility.csproj", "{CE0250F8-78D4-4727-A651-C85DEE2E6304}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.TelegramBot", "Minotaur.TelegramBot\Minotaur.TelegramBot.csproj", "{F1369069-B9AF-4A72-8CA2-79D4D99F9053}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.TelegramBot", "Minotaur.TelegramBot\Minotaur.TelegramBot.csproj", "{860E89E0-12CF-4152-A247-DF53B497FDDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +39,10 @@ Global
 		{CE0250F8-78D4-4727-A651-C85DEE2E6304}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE0250F8-78D4-4727-A651-C85DEE2E6304}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE0250F8-78D4-4727-A651-C85DEE2E6304}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F1369069-B9AF-4A72-8CA2-79D4D99F9053}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1369069-B9AF-4A72-8CA2-79D4D99F9053}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1369069-B9AF-4A72-8CA2-79D4D99F9053}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1369069-B9AF-4A72-8CA2-79D4D99F9053}.Release|Any CPU.Build.0 = Release|Any CPU
+		{860E89E0-12CF-4152-A247-DF53B497FDDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{860E89E0-12CF-4152-A247-DF53B497FDDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{860E89E0-12CF-4152-A247-DF53B497FDDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{860E89E0-12CF-4152-A247-DF53B497FDDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

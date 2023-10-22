@@ -1,4 +1,5 @@
-﻿using Minotaur.DataAccess.Repository.IRepository;
+﻿using Azure.Core;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models.Models;
 
 namespace Minotaur.DataAccess.Repository
@@ -11,14 +12,14 @@ namespace Minotaur.DataAccess.Repository
             _db = db;
         }
 
-        public void Update(RequestTelegram review)
+        public void Update(RequestTelegram request)
         {
-            _db.TelegramRequests.Update(review);
+            _db.TelegramRequests.Update(request);
         }
 
-        public void UpdateRange(RequestTelegram[] reviews)
+        public void UpdateRange(RequestTelegram[] request)
         {
-            _db.TelegramRequests.UpdateRange(reviews);
+            _db.TelegramRequests.UpdateRange(request);
         }
     }
 }

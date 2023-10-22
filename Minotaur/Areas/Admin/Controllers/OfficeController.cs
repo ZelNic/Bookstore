@@ -35,8 +35,8 @@ namespace Minotaur.Areas.Admin.Controllers
 
         public async Task<IActionResult> GetDataForFormNewOffice()
         {
-            string[] officeTypes = Enum.GetValues(typeof(TypesOfOffices)).Cast<TypesOfOffices>().Select(e => Enum.GetName(typeof(TypesOfOffices), e)).ToArray();
-            string[] officeStatus = Enum.GetValues(typeof(OfficeStatus)).Cast<OfficeStatus>().Select(e => Enum.GetName(typeof(OfficeStatus), e)).ToArray();
+            string[]? officeTypes = Enum.GetValues(typeof(TypesOfOffices)).Cast<TypesOfOffices>().Select(e => Enum.GetName(typeof(TypesOfOffices), e)).ToArray();
+            string[]? officeStatus = Enum.GetValues(typeof(OfficeStatus)).Cast<OfficeStatus>().Select(e => Enum.GetName(typeof(OfficeStatus), e)).ToArray();
 
             return Json(new { officeTypes, officeStatus });
         }
@@ -51,7 +51,7 @@ namespace Minotaur.Areas.Admin.Controllers
 
             if (office != null)
             {
-                _unitOfWork.Offices.AddAsync(office);
+                await _unitOfWork.Offices.AddAsync(office);
                 _unitOfWork.Save();
             }
 
