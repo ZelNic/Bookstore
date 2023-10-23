@@ -52,11 +52,22 @@ namespace Minotaur.TelegramController
 
 
         private async Task Bot_OnMessage(Message message)
-        {
-            var isNeedToCheck = await NeedCheckForAction(message);
-            if (isNeedToCheck == false)
+        {          
+            RequestTelegram? request = await _unitOfWork.TelegramRequestsRepository.GetAsync(r => r.ChatId == message.Chat.Id);
+            if (request != null)
             {
-                return;
+                switch (request.Operation)
+                {
+                    case "/orderstatus":
+                        _unitOfWork.TelegramRequestsRepository.Remove(request);
+                        _unitOfWork.Save();
+                        await HandleOrderStatusInput(message.Chat.Id, message.Text); return;
+
+                    default:
+                        _unitOfWork.TelegramRequestsRepository.Remove(request);
+                        _unitOfWork.Save();
+                        return;
+                }
             }
 
             switch (message.Text)
@@ -86,17 +97,13 @@ namespace Minotaur.TelegramController
                     await _botClient.SendTextMessageAsync(message.Chat.Id, "Вызван оператор! Ожидайте.");
                     break;
                 case "/orderstatus":
-
-                    var isNeedToAdd = await NeedCheckForAction(message);
-                    if (isNeedToAdd == true)
+                    await _unitOfWork.TelegramRequestsRepository.AddAsync(new()
                     {
-                        await _unitOfWork.TelegramRequestsRepository.AddAsync(new()
-                        {
-                            ChatId = message.Chat.Id,
-                            Operation = message.Text
-                        });
-                        _unitOfWork.Save();
-                    }
+                        ChatId = message.Chat.Id,
+                        Operation = message.Text
+                    });
+                    _unitOfWork.Save();
+
                     await _botClient.SendTextMessageAsync(message.Chat.Id, "Введите номер заказа:");
                     break;
 
@@ -105,37 +112,40 @@ namespace Minotaur.TelegramController
         }
 
 
-        private async Task<bool> NeedCheckForAction(Message message)
+
+       
+        private async Task HandleOrderStatusInput(long chatId, string messageText)
         {
-            RequestTelegram? request = await _unitOfWork.TelegramRequestsRepository.GetAsync(r => r.ChatId == message.Chat.Id);
-            if (request == null) { return true; }
-
-            switch (request.Operation)
-            {
-                case "/orderstatus":
-                    _unitOfWork.TelegramRequestsRepository.Remove(request);
-                    _unitOfWork.Save();
-                    await HandleOrderStatusInput(message);
-                    return false;
-                default:
-                    _unitOfWork.TelegramRequestsRepository.Remove(request);
-                    _unitOfWork.Save();
-                    return true;
-            }
-
-        }
-
-        private async Task HandleOrderStatusInput(Message message)
-        {
-            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(message.Text));
+            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(messageText));
             if (order != null)
             {
-                await _botClient.SendTextMessageAsync(message.Chat.Id, $"Статус заказа {order.OrderStatus}.");
+                await _botClient.SendTextMessageAsync(chatId, $"Статус заказа - {order.OrderStatus}.");
             }
             else
             {
-                await _botClient.SendTextMessageAsync(message.Chat.Id, $"Заказ не найден.");
+                await _botClient.SendTextMessageAsync(chatId, $"Заказ не найден.");
             }
         }
     }
 }
+
+
+//private async Task<bool> NeedCheckForAction(Message message)
+//{
+//    RequestTelegram? request = await _unitOfWork.TelegramRequestsRepository.GetAsync(r => r.ChatId == message.Chat.Id);
+//    if (request == null) { return true; }
+
+//    switch (request.Operation)
+//    {
+//        case "/orderstatus":
+//            _unitOfWork.TelegramRequestsRepository.Remove(request);
+//            _unitOfWork.Save();
+//            await HandleOrderStatusInput(message);
+//            return false;
+//        default:
+//            _unitOfWork.TelegramRequestsRepository.Remove(request);
+//            _unitOfWork.Save();
+//            return true;
+//    }
+
+//}

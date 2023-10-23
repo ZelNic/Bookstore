@@ -1,6 +1,5 @@
 
 
-
 document.addEventListener("DOMContentLoaded", function () {
     getShoppingBasket();
 });
@@ -13,7 +12,6 @@ let orderingInformation = document.getElementById("orderingInformation");
 let boxSelect = document.getElementById("boxSelect");
 let checkout = document.getElementById("checkout");
 let productArray = [];
-let isSave = false;
 
 function getShoppingBasket() {
 
@@ -57,7 +55,6 @@ function getShoppingBasket() {
         },
         error: function (error) {
             if (shoppingBasket != undefined) {
-                shoppingBasket.innerHTML = `<h1>${error.responseText}</h1>`
                 orderingInformation.innerHTML = ``;
                 checkout.innerHTML = ``;
                 boxSelect.innerHTML = ``;
@@ -123,11 +120,11 @@ function generateCardProduct() {
 
 function showBtnSaveChange() {
     let btnIsSave = document.getElementById("isSave");
-    if (isSave == false) {
-        btnIsSave.setAttribute('hidden', '');
+    if (btnIsSave.hasAttribute('hidden')) {
+        btnIsSave.removeAttribute('hidden');
     }
     else {
-        btnIsSave.removeAttribute('hidden');
+        btnIsSave.setAttribute('hidden', 'true');
     }
 }
 function showTotal() {
@@ -149,7 +146,10 @@ function doCheckout() {
             window.location.href = '/Purchase/Purchase/FillDeliveryDate';
         },
         error: function (error) {
-            console.log();
+            Swal.fire({
+                icon: 'error',
+                text: error.responseText,
+            })
         }
     });
 }
@@ -227,13 +227,10 @@ function removeFromShoppingBasket(event, productId) {
 function changeCountProduct(event, key, operation, count = 1) {
 
     if (parseInt(count) == 0) {
-        removeFromShoppingBasket(event, dataShoppingBasket[key].productId);
-        isSave = false;
+        removeFromShoppingBasket(event, dataShoppingBasket[key].productId);        
         showBtnSaveChange();
         return;
     }
-
-    isSave = true;
     showBtnSaveChange();
 
     let indicateCountProduct = document.getElementById(`countProduct_${key}`);
@@ -245,7 +242,6 @@ function changeCountProduct(event, key, operation, count = 1) {
             countProduct--;
             totalPrice -= dataShoppingBasket[key].price
             if (dataShoppingBasket[key].count <= 0) {
-                isSave = false;
                 showBtnSaveChange();
                 removeFromShoppingBasket(event, dataShoppingBasket[key].productId)
             }
@@ -299,13 +295,42 @@ function confirmChangeCount(event) {
         type: 'POST',
         data: productData,
         success: function (response) {
-            isSave = false;
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: 'Сохранено'
+            })
             showBtnSaveChange();
             getShoppingBasket();
         },
         error: function (error) {
-            getShoppingBasket();
-            reject(error);
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'error',
+                title: 'Сохранить изменения не получилось'
+            })
         }
     });
 }

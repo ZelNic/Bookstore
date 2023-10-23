@@ -28,9 +28,6 @@ function getWishList() {
                     </div>
                 </div>
             `;
-        },
-        error: function (error) {          
-            divWishList.innerHTML = `<h1>${error.responseText}</h1>`;
         }
     });
 }
@@ -76,7 +73,7 @@ function generateHTML(wishList) {
 function addToWishlist(event, id) {
     event.preventDefault();
     $.ajax({
-        url: '/Customer/WishList/AddWishList' + "?newProductId=" + id,
+        url: '/Customer/WishList/AddWishList?newProductId=' + id,
         type: 'POST',
         data: id,
         success: function (response) {
@@ -85,6 +82,22 @@ function addToWishlist(event, id) {
             getWishList();
         },
         error: function (error) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'error',
+                title: error.responseText
+            })
         }
     });
 }
@@ -104,7 +117,22 @@ function removeFromWishlist(event, id, isFromWishlist = false) {
             getWishList();
         },
         error: function (error) {
-            reject(error);
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'error',
+                title: error.responseText
+            })
         }
     });
 }

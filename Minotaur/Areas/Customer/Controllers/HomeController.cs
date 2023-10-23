@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using DocumentFormat.OpenXml.Office2010.PowerPoint;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
-using Minotaur.Models.Models;
 using System.Diagnostics;
+using Telegram.Bot.Types;
 
 namespace Minotaur.Areas.Customer
 {
     [Area("Customer")]
-
-    
     public class HomeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -21,52 +23,102 @@ namespace Minotaur.Areas.Customer
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            ProductVM productVM = await GetProductsVM();
-            return View(productVM);
+            return View();
         }
 
-        public async Task<ProductVM> GetProductsVM()
+        public async Task<IActionResult> GetProductsData(int numberPage = 1)
         {
-            List<Product>? productsList = _unitOfWork.Products.GetAllAsync().Result.ToList();
-            List<Category>? categoriesList = _unitOfWork.Categories.GetAllAsync().Result.ToList();
-            WishList? wishLists = null;
-            ShoppingBasketClient? shoppingBasketClient = null;
+            int countProductOnPage = 6;
 
-            MinotaurUser? user = await _userManager.GetUserAsync(User);
+            var productsAll = await _unitOfWork.Products.GetAllAsync();
+            int countRecords = productsAll.Count();
+
+            int totalPages = (int)Math.Ceiling((float)countRecords / countProductOnPage);
+
+            var productData = productsAll.Skip((numberPage - 1) * countProductOnPage).Take(countProductOnPage)
+                .Join(_unitOfWork.Categories.GetAll(), p => p.Category, c => c.Id, (p, c) => new
+                {
+                    p.ProductId,
+                    p.ImageURL,
+                    p.Name,
+                    p.Author,
+                    p.Price,
+                    Category = c.Name,
+                    isInWishList = false,
+                    isInShoppingBasket = false
+                }).ToList();
+
+            var user = await GetDataByUser();
 
             if (user != null)
             {
-                wishLists = await _unitOfWork.WishLists.GetAsync(u => u.UserId == user.Id);
-                ShoppingBasket? sb = _unitOfWork.ShoppingBaskets.GetAllAsync(u => u.UserId == Guid.Parse(user.Id)).Result.Where(n => n.IsPurchased == false).FirstOrDefault();
-                if (sb != null)
+                var productInWL = await GetDataByWishlistUser(user.Id);
+                var productInSB = await GetDataByShoppingBasketUser(user.Id);
+
+                productData = productData.Select(product => new
                 {
-                    shoppingBasketClient = new()
-                    {
-                        Id = sb.UserId,
-                        ProductIdAndCount = ShoppingBasketController.ParseProductData(sb.ProductIdAndCount)
-                    };
-                }
+                    product.ProductId,
+                    product.ImageURL,
+                    product.Name,
+                    product.Author,
+                    product.Price,
+                    product.Category,
+                    isInWishList = productInWL.Contains(product.ProductId),
+                    isInShoppingBasket = productInSB.Contains(product.ProductId),
+                }).ToList();
             }
 
-            ProductVM bookVM = new()
-            {
-                User = user?.Id,
-                ProductsList = productsList,
-                CategoriesList = categoriesList,
-                WishList = wishLists,
-                ShoppingBasket = shoppingBasketClient
-            };
+            return Json(new { data = productData, totalPages });
+        }
 
-            return bookVM;
+        private async Task<List<int>> GetDataByWishlistUser(string userId)
+        {
+            List<int> productInWL = new();
+
+            var wishList = await _unitOfWork.WishLists.GetAsync(w => w.UserId == userId);
+
+            if (wishList != null)
+            {
+                productInWL = wishList.ProductId.Split('|').Select(int.Parse).ToList();
+            }
+
+            return productInWL;
+        }
+
+        private async Task<List<int>> GetDataByShoppingBasketUser(string userId)
+        {
+            List<int> productInSB = new();
+            var shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAllAsync(w => w.UserId == Guid.Parse(userId));
+            var activeSB = shoppingBasket.Where(s => s.IsPurchased == false).FirstOrDefault();
+            if (activeSB != null)
+            {
+                productInSB = ShoppingBasketController.ParseProductData(activeSB.ProductIdAndCount).Keys.ToList();
+            }
+
+            return productInSB;
+        }
+
+        private async Task<MinotaurUser> GetDataByUser()
+        {
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
+            return user;
         }
 
         public async Task<IActionResult> Details(int productId)
         {
-            Product product = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
+            var product = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
 
-            return View(product);
+            var user = await GetDataByUser();
+            var productInWL = await GetDataByWishlistUser(user.Id);
+            var productInSB = await GetDataByShoppingBasketUser(user.Id);
+
+            if (product != null)
+            {
+                return View(product);
+            }
+            return BadRequest("Страница продукта не найдена");
         }
 
 
@@ -92,4 +144,4 @@ namespace Minotaur.Areas.Customer
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
-}
+};

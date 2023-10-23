@@ -28,26 +28,34 @@ namespace Minotaur.Areas.Customer
 
         public async Task<IActionResult> GetWishList()
         {
-            MinotaurUser user = await _userManager.GetUserAsync(User);
+            try
+            {
+                MinotaurUser user = await _userManager.GetUserAsync(User);
 
-            WishList? wishList = await _db.WishLists.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
-            if (wishList == null) { return BadRequest("Список желаний пуст"); }
+                WishList? wishList = await _db.WishLists.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+                if (wishList == null) { return BadRequest("Список желаний пуст"); }
 
-            List<int>? listId = wishList.ProductId.Split('|').Select(int.Parse).ToList();
+                List<int>? listId = wishList.ProductId.Split('|').Select(int.Parse).ToList();
 
-            var wishListJson = await _db.Products
-                .Where(u => listId.Contains(u.ProductId))
-                .Join(_db.Categories, b => b.Category, c => c.Id, (b, c) => new
-                {
-                    image = b.ImageURL,
-                    nameProduct = b.Name,
-                    author = b.Author,
-                    category = c.Name,
-                    price = b.Price,
-                    productId = b.ProductId
-                }).ToListAsync();
+                var wishListJson = await _db.Products
+                    .Where(u => listId.Contains(u.ProductId))
+                    .Join(_db.Categories, b => b.Category, c => c.Id, (b, c) => new
+                    {
+                        image = b.ImageURL,
+                        nameProduct = b.Name,
+                        author = b.Author,
+                        category = c.Name,
+                        price = b.Price,
+                        productId = b.ProductId
+                    }).ToListAsync();
 
-            return Json(new { data = wishListJson });
+                return Json(new { data = wishListJson });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
         }
 
 
