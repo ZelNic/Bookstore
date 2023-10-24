@@ -13,7 +13,7 @@ function SendNotification(url) {
         if (result.isConfirmed) 
         {
             $.ajax({
-                url: url,
+                url: "/",
                 type: 'POST'
             })
 

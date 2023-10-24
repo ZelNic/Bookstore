@@ -1,5 +1,4 @@
-﻿
-document.addEventListener("DOMContentLoaded", function () {
+﻿$(document).ready(function () {
     getWishList();
 });
 
@@ -7,10 +6,6 @@ let wishList;
 
 function getWishList() {
     let divWishList = document.getElementById("wishList");
-
-    if (divWishList === undefined) {
-        retutn;
-    }
 
     $.ajax({
         url: '/Customer/WishList/GetWishList',
@@ -23,15 +18,18 @@ function getWishList() {
                 <div class="row row-cols-2">
                     <div class="container col-10">
                         <div class="row row-cols-2 row-cols-md-6 mb-5">
-                        ${generateHTML(wishList)}
+                        ${generateCardProducts(wishList)}
                         </div>
                     </div>
                 </div>
             `;
+        },
+        error: function (error) {
+            divWishList.innerHTML = `<h1>${error.responseText}<h1>`;
         }
     });
 }
-function generateHTML(wishList) {
+function generateCardProducts(wishList) {
 
     let html = "";
 
@@ -57,8 +55,8 @@ function generateHTML(wishList) {
                             </div>
                             <hr />
                             <div class="mx-auto pb-1">
-                                 <button onclick="removeFromWishlist(event, ${wishList[key].productId}, true)" type="submit" class="btn btn-outline-danger border-0 bi bi-x-circle"></button>
-                                 <button onclick="addToShoppingBasket(event, ${wishList[key].productId})" type="submit" class="btn btn-outline-success border-0 bi bi-bag-plus"></button>
+                                 <button onclick="removeFromWishlist(${wishList[key].productId}, true)" type="submit" class="btn btn-outline-danger border-0 bi bi-x-circle"></button>
+                                 <button onclick="addToShoppingBasket(${wishList[key].productId})" type="submit" class="btn btn-outline-success border-0 bi bi-bag-plus"></button>
                             </div>                            
                         </div>
                     </div>
@@ -68,17 +66,16 @@ function generateHTML(wishList) {
     return html;
 }
 
-
-
-function addToWishlist(event, id) {
-    event.preventDefault();
+function removeFromWishlist(id, isFromWishlist = false) {
     $.ajax({
-        url: '/Customer/WishList/AddWishList?newProductId=' + id,
+        url: '/Customer/WishList/RemoveFromWishList' + "?productId=" + id,
         type: 'POST',
         data: id,
         success: function (response) {
-            var btnWishList = document.getElementById(`btnWishList_${id}`);
-            btnWishList.innerHTML = `<button type="submit" onclick="removeFromWishlist(event,${id})" class="btn btn-outline-danger border-0 bi-heart-fill" style="width: 56px; height: 40px;"></button>`;
+            if (isFromWishlist == false) {
+                var btnWishList = document.getElementById(`btnWishList_${id}`);
+                btnWishList.innerHTML = `<button type="submit" onclick="addToWishlist(${id})" class="btn border-0 bi-heart" style="width: 56px; height: 40px;"></button>`;
+            }
             getWishList();
         },
         error: function (error) {
@@ -102,19 +99,28 @@ function addToWishlist(event, id) {
     });
 }
 
-function removeFromWishlist(event, id, isFromWishlist = false) {
-    event.preventDefault();
-
+function addToShoppingBasket(id) {
     $.ajax({
-        url: '/Customer/WishList/RemoveFromWishList' + "?productId=" + id,
+        url: '/Customer/ShoppingBasket/AddToBasketProduct?productId=' + id,
         type: 'POST',
         data: id,
         success: function (response) {
-            if (isFromWishlist == false) {
-                var btnWishList = document.getElementById(`btnWishList_${id}`);
-                btnWishList.innerHTML = `<button type="submit" onclick="addToWishlist(event,${id})" class="btn border-0 bi-heart" style="width: 56px; height: 40px;"></button>`;
-            }
-            getWishList();
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: "Товар добавлен в корзину"
+            })
         },
         error: function (error) {
             const Toast = Swal.mixin({

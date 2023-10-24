@@ -67,7 +67,7 @@ function getOrderPickupPoint(callback) {
         success: function (response) {
             arrayPickupPoints = response.data;
 
-            let optionPickUp;
+            let optionPickUp = '<option value="" selected>Выбрать</option>;'
 
             for (var pickupPoint of arrayPickupPoints) {
 
@@ -223,9 +223,8 @@ function setTypeDelivery(type) {
         deliveryData.innerHTML = `
                   <div class="mt-2">
                         <label>Выберите пункт выдачи</label>
-                        <select id="orderPickupPoint" class="rounded" onchange="setOrderPickupPoint(document.getElementById('orderPickupPoint').value); activeBtnPayment(true)" required>
-                            <option value="" selected disabled>Выбрать</option>
-                            ${getOrderPickupPoint(function (options) { document.getElementById('orderPickupPoint').innerHTML = options; })}
+                        <select id="orderPickupPoint" class="rounded" onchange="setOrderPickupPoint(this.value); activeBtnPayment(true)" required>
+                        ${getOrderPickupPoint(function (options) { document.getElementById('orderPickupPoint').innerHTML = options; })}
                         </select>
                   </div>
                   <hr />`;

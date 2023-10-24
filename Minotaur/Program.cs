@@ -81,13 +81,7 @@ void LifeTelegramBot(IServiceProvider serviceProvider)
 {
     var scope = serviceProvider.CreateScope();
     var telegramBot = scope.ServiceProvider.GetRequiredService<TelegramController>();
-    telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);
-    //using (var scope = serviceProvider.CreateScope())
-    //    {
-    //        var scope = serviceProvider.CreateScope())
-    //        var telegramBot = scope.ServiceProvider.GetRequiredService<TelegramController>();
-    //        telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);
-    //    }
+    telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);   
 }
 void SeedDatabase()
 {

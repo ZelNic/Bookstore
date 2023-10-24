@@ -104,7 +104,7 @@ namespace Minotaur.Areas.Customer
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBasket(int productId, bool isFromWishList = false)
+        public async Task<IActionResult> AddToBasketProduct(int productId)
         {
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
@@ -148,13 +148,15 @@ namespace Minotaur.Areas.Customer
             return Ok();
         }
 
+
+
         [HttpPost]
         public async Task<IActionResult> RemoveFromBasket(string productsId)
         {
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
             ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAll(u => u.UserId == Guid.Parse(user.Id)).Where(n => n.IsPurchased == false).FirstOrDefault();
-            if (shoppingBasket == null) { return BadRequest(); }
+            if (shoppingBasket == null) { return BadRequest("Пустая корзина"); }
 
             List<int> listProductsId = productsId.Split(',').Select(int.Parse).ToList();
 
@@ -172,7 +174,7 @@ namespace Minotaur.Areas.Customer
             {
                 _unitOfWork.ShoppingBaskets.Remove(shoppingBasket);
                 _unitOfWork.Save();
-                return BadRequest(new { error = "Пустая корзина" }); ;
+                return BadRequest("Пустая корзина");
             }
             else
             {

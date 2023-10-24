@@ -1,13 +1,8 @@
-﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using DocumentFormat.OpenXml.Office2010.PowerPoint;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using System.Diagnostics;
-using Telegram.Bot.Types;
 
 namespace Minotaur.Areas.Customer
 {
@@ -70,7 +65,7 @@ namespace Minotaur.Areas.Customer
                 }).ToList();
             }
 
-            return Json(new { data = productData, totalPages });
+            return Json(new { data = productData, totalPages, user?.Id });
         }
 
         private async Task<List<int>> GetDataByWishlistUser(string userId)
@@ -110,15 +105,8 @@ namespace Minotaur.Areas.Customer
         {
             var product = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
 
-            var user = await GetDataByUser();
-            var productInWL = await GetDataByWishlistUser(user.Id);
-            var productInSB = await GetDataByShoppingBasketUser(user.Id);
 
-            if (product != null)
-            {
-                return View(product);
-            }
-            return BadRequest("Страница продукта не найдена");
+            return View(product);
         }
 
 

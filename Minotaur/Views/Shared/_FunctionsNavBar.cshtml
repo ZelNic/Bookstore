@@ -9,7 +9,7 @@
     if (User.IsInRole(Roles.Role_Admin))
     {
         <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-secondary dropdown-toggle mt-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Управление
             </button>
             <ul class="dropdown-menu dropdown-menu-dark">
@@ -19,28 +19,13 @@
                 <li><a class="nav-link text-light" asp-area="Admin" asp-controller="Roles" asp-action="ViewRoles">Сотрудники </a></li>
             </ul>
         </div>
-       
+
     }
     if (User.IsInRole(Roles.Role_Worker_Order_Pickup_Point))
     {
         <ul class="navbar-nav flex-grow-1">
-            <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.ViewOrderDetails">Проверить состояние</a></li>
-            <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.AcceptOrder">Прием</a></li>
-            <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.IssueOrder">Выдача</a></li>
+            <li><a class="nav-link text-light" asp-area="PickUp" asp-controller="Order" asp-action="Index">Управление заказами</a></li>
         </ul>
-
-        @*<ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item dropdown">
-                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Управление заказами
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-dark">
-                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.ViewOrderDetails">Проверить состояние</a></li>
-                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.AcceptOrder">Прием</a></li>
-                                    <li><a class="nav-link text-light" asp-area="WorkerOrderPickupPoint" asp-controller="OrderWorker" asp-action="Order" asp-route-operation="@OperationOrderPickUp.IssueOrder">Выдача</a></li>
-                                </ul>
-                            </li>
-                        </ul>*@
     }
     if (User.IsInRole(Roles.Role_Order_Picker))
     {

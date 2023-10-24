@@ -1,25 +1,17 @@
-﻿<div class="mb-5 pb-5">
-    <div id="productCards" class="row mb-1">       
+﻿<div class="py-5">
+    <div class="mt-0 pt-0 mb-5 pb-5">
+        <div id="productCards" class="row justify-content-center">
+        </div>
+
+        <hr />
+        <div id="numberPages"></div>
     </div>
-    <hr />
-    <div id="numberPages"></div>
 </div>
 
 
-
-
-
 @section Scripts{
-
     <script src="~/js/Customer/Home.js"></script>
-
-    @if ((User.Identity.IsAuthenticated != null))
-    {
-        <script src="~/js/Customer/ShoppingBasket.js"></script>
-        <script src="~/js/Customer/WishList.js"></script>
-    }
 }
-
 
 
 

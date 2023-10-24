@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using Minotaur.DataAccess;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
 
@@ -13,11 +12,11 @@ namespace Minotaur.Areas.Customer
     [Authorize]
     public class WishListController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
-        public WishListController(ApplicationDbContext db, UserManager<MinotaurUser> userManager)
+        public WishListController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
@@ -28,45 +27,39 @@ namespace Minotaur.Areas.Customer
 
         public async Task<IActionResult> GetWishList()
         {
-            try
+            MinotaurUser user = await _userManager.GetUserAsync(User);
+
+            WishList? wishList = await _unitOfWork.WishLists.GetAsync(u => u.UserId == user.Id);
+            if (wishList == null) { return BadRequest("Список желаний пуст"); }
+
+            List<int>? listId = wishList.ProductId.Split('|').Select(int.Parse).ToList();
+
+            var product = await _unitOfWork.Products.GetAllAsync(u => listId.Contains(u.ProductId));
+
+            var wishListJson = product.Join(_unitOfWork.Categories.GetAll(), b => b.Category, c => c.Id, (b, c) => new
             {
-                MinotaurUser user = await _userManager.GetUserAsync(User);
+                image = b.ImageURL,
+                nameProduct = b.Name,
+                author = b.Author,
+                category = c.Name,
+                price = b.Price,
+                productId = b.ProductId
+            }).ToList();
 
-                WishList? wishList = await _db.WishLists.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
-                if (wishList == null) { return BadRequest("Список желаний пуст"); }
+            return Json(new { data = wishListJson });
 
-                List<int>? listId = wishList.ProductId.Split('|').Select(int.Parse).ToList();
-
-                var wishListJson = await _db.Products
-                    .Where(u => listId.Contains(u.ProductId))
-                    .Join(_db.Categories, b => b.Category, c => c.Id, (b, c) => new
-                    {
-                        image = b.ImageURL,
-                        nameProduct = b.Name,
-                        author = b.Author,
-                        category = c.Name,
-                        price = b.Price,
-                        productId = b.ProductId
-                    }).ToListAsync();
-
-                return Json(new { data = wishListJson });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-           
         }
 
 
         [HttpPost]
         public async Task<IActionResult> AddWishList(string newProductId)
         {
-            MinotaurUser user = await _userManager.GetUserAsync(User);
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
+            if (user == null) { return BadRequest("Необходимо войти в профиль"); }
 
-            WishList? wishList = await _db.WishLists.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+            WishList? wishList = await _unitOfWork.WishLists.GetAsync(u => u.UserId == user.Id);
 
-            List<int> listNewIdProducts = newProductId.Split('|').Select(int.Parse).ToList();
+            List<int> listNewIdProducts = newProductId.Split(',').Select(int.Parse).ToList();
 
             if (wishList != null)
             {
@@ -84,7 +77,7 @@ namespace Minotaur.Areas.Customer
                     }
                 }
 
-                _db.WishLists.Update(wishList);
+                _unitOfWork.WishLists.Update(wishList);
             }
             else
             {
@@ -94,10 +87,10 @@ namespace Minotaur.Areas.Customer
                     UserId = user.Id,
                 };
 
-                await _db.WishLists.AddAsync(newProductInWishList);
+                await _unitOfWork.WishLists.AddAsync(newProductInWishList);
             }
 
-            await _db.SaveChangesAsync();
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -107,9 +100,9 @@ namespace Minotaur.Areas.Customer
         {
             MinotaurUser user = await _userManager.GetUserAsync(User);
 
-            WishList? wishList = _db.WishLists.Where(i => i.UserId == user.Id).FirstOrDefault();
+            WishList? wishList = await _unitOfWork.WishLists.GetAsync(i => i.UserId == user.Id);
             if (wishList == null)
-                return NotFound();
+                return BadRequest("Список желаемого пуст");
 
             List<string> listId = wishList.ProductId.Split('|').ToList();
             listId.Remove(productId.ToString());
@@ -117,14 +110,14 @@ namespace Minotaur.Areas.Customer
 
             if (string.IsNullOrWhiteSpace(wishList.ProductId))
             {
-                _db.WishLists.Remove(wishList);
+                _unitOfWork.WishLists.Remove(wishList);
             }
             else
             {
-                _db.WishLists.Update(wishList);
+                _unitOfWork.WishLists.Update(wishList);
             }
 
-            await _db.SaveChangesAsync();
+            _unitOfWork.Save();
 
             return Ok();
         }
