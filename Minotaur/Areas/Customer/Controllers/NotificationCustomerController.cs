@@ -84,12 +84,12 @@ namespace Minotaur.Areas.Customer
 
             if (isAgree)
             {
-                order.OrderStatus = StatusByOrder.BuyerAgreesNeedSend_8;
+                order.OrderStatus = StatusByOrder.BuyerAgreesNeedSend;
                 notificationForCustomer.Text = "Ожидается отправка товара";
             }
             else
             {
-                order.OrderStatus = StatusByOrder.BuyerDontAgreesNeedRefunded_9;
+                order.OrderStatus = StatusByOrder.BuyerDontAgreesNeedRefunded;
                 notificationForCustomer.Text = "Ожидается возврат средств";
 
                 Notification notificationForPicker = new()

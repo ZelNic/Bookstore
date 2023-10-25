@@ -6,8 +6,11 @@ using Minotaur.DataAccess.DbInitializer;
 using Minotaur.DataAccess.Repository;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
+using Minotaur.Scheduler;
 using Minotaur.TelegramController;
 using Minotaur.Utility;
+using Quartz.Impl;
+using Quartz;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 
@@ -28,6 +31,7 @@ builder.Services.AddScoped<SignInManager<MinotaurUser>>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 
+
 builder.Services.AddRazorPages();
 
 builder.Services.ConfigureApplicationCookie(option =>
@@ -45,8 +49,22 @@ builder.Services.AddScoped<ITelegramBotClient>(provider =>
 });
 builder.Services.AddTransient<TelegramController>();
 
-var app = builder.Build();
 
+builder.Services.AddSingleton<IScheduler>(provider =>
+{
+    var schedulerFactory = new StdSchedulerFactory();
+    return schedulerFactory.GetScheduler().GetAwaiter().GetResult();
+});
+
+builder.Services.AddSingleton<QuartzHostedService>();
+builder.Services.AddSingleton(provider =>
+{
+    var unitOfWork = provider.GetRequiredService<IUnitOfWork>();
+    return new ConfirmationCodeHandler(unitOfWork);
+});
+
+
+var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {

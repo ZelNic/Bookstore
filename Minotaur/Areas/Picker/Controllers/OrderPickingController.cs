@@ -31,7 +31,7 @@ namespace Minotaur.Areas.Picker.Controllers
         {
             var worker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(_userManager.GetUserId(User)));
 
-            string[] requiredOrderTypes = new string[] { StatusByOrder.StatusApproved_1, StatusByOrder.StatusInProcess_2, StatusByOrder.BuyerAgreesNeedSend_8 };
+            string[] requiredOrderTypes = new string[] { StatusByOrder.Approved, StatusByOrder.InProcess, StatusByOrder.BuyerAgreesNeedSend };
 
             try
             {
@@ -78,7 +78,7 @@ namespace Minotaur.Areas.Picker.Controllers
             {
                 var order = await _unitOfWork.Orders.GetAsync(i => i.OrderId == Guid.Parse(orderId));
                 var picker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(_userManager.GetUserId(User)));
-                order.OrderStatus = StatusByOrder.StatusInProcess_2;
+                order.OrderStatus = StatusByOrder.InProcess;
                 order.AssemblyResponsibleWorkerId = picker.WorkerId;
 
                 _unitOfWork.Orders.Update(order);
@@ -99,7 +99,7 @@ namespace Minotaur.Areas.Picker.Controllers
             {
                 var order = await _unitOfWork.Orders.GetAsync(i => i.OrderId == Guid.Parse(orderId));
                 var picker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(_userManager.GetUserId(User)));
-                order.OrderStatus = StatusByOrder.StatusApproved_1;
+                order.OrderStatus = StatusByOrder.Approved;
                 order.AssemblyResponsibleWorkerId = picker.WorkerId;
                 order.RefundAmount = order.PurchaseAmount;
 
@@ -133,7 +133,7 @@ namespace Minotaur.Areas.Picker.Controllers
 
                 if (missingProduct == "Отсутствуют")
                 {
-                    order.OrderStatus = StatusByOrder.StatusShipped_3;
+                    order.OrderStatus = StatusByOrder.Shipped;
                     order.AssemblyResponsibleWorkerId = picker.WorkerId;
                     order.ShippedProducts = order.OrderedProducts;
                     order.MissingItems = missingProduct;
@@ -144,7 +144,7 @@ namespace Minotaur.Areas.Picker.Controllers
                         RecipientId = order.UserId,
                         SenderId = picker.WorkerId,
                         SendingTime = MoscowTime.GetTime(),
-                        TypeNotification = StatusByOrder.StatusShipped_3,
+                        TypeNotification = StatusByOrder.Shipped,
                         Text = "Ваша заказ полностью собран и отправлен"
                     };
 
@@ -204,7 +204,7 @@ namespace Minotaur.Areas.Picker.Controllers
 
                     order.ShippedProducts = JsonConvert.SerializeObject(shippedProducts);
 
-                    order.OrderStatus = StatusByOrder.StatusShipped_3;
+                    order.OrderStatus = StatusByOrder.Shipped;
                     order.AssemblyResponsibleWorkerId = picker.WorkerId;
 
                     int orderedAmount = orderedProducts.Sum(p => p.Price * p.Count);
@@ -230,7 +230,7 @@ namespace Minotaur.Areas.Picker.Controllers
                         RecipientId = order.UserId,
                         SenderId = picker.WorkerId,
                         SendingTime = MoscowTime.GetTime(),
-                        TypeNotification = StatusByOrder.StatusShipped_3,
+                        TypeNotification = StatusByOrder.Shipped,
                         Text = $"Ваша заказ полностью собран и отправлен"
                     };
 
@@ -254,7 +254,7 @@ namespace Minotaur.Areas.Picker.Controllers
                         }
                     }
 
-                    order.OrderStatus = StatusByOrder.AwaitingConfirmationForIncompleteOrder_7;
+                    order.OrderStatus = StatusByOrder.AwaitingConfirmationForIncompleteOrder;
                     order.MissingItems = missingProduct;
 
                     Notification notification = new()

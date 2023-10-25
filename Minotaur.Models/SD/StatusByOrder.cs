@@ -1,21 +1,20 @@
-﻿using Humanizer;
-
-namespace Minotaur.Models.SD
+﻿namespace Minotaur.Models.SD
 {
     public static class StatusByOrder
     {
-        public const string StatusPending_0 = "В ожидании";
-        public const string StatusApproved_1 = "Одобренный";
-        public const string StatusInProcess_2 = "Сборка заказа";
-        public const string StatusShipped_3 = "Отправленный";
-        public const string StatusDelivered_4 = "Доставлен";
-        public const string StatusCancelled_5 = "Отменено";
-        public const string StatusRefunded_6 = "Возмещено";
+        public const string Pending = "В ожидании";
+        public const string Approved = "Одобренный";
+        public const string InProcess = "Сборка заказа";
+        public const string Shipped = "Отправленный";
+        public const string Delivered = "Доставлен";
+        public const string Cancelled = "Отменено";
+        public const string Refunded = "Возмещено";
+        public const string DeliveredToPickUp = "Доставлен в пункт выдачи";
 
-        public const string AwaitingConfirmationForIncompleteOrder_7 = "Ожидает согласия от покупателя на отправку неполного заказа";
-        public const string BuyerAgreesNeedSend_8 = "Покупатель согласен на получение неполного заказа. Ожидается передача в отдел отправки";
-        public const string BuyerDontAgreesNeedRefunded_9 = "Покупатель не согласен на получение неполного заказа. Ожидается возврат средств";
-        public const string StatusCancelled_10 = "Заказ отменен, ожидается возврат средств";
+        public const string AwaitingConfirmationForIncompleteOrder = "Ожидает согласия от покупателя на отправку неполного заказа";
+        public const string BuyerAgreesNeedSend = "Покупатель согласен на получение неполного заказа. Ожидается передача в отдел отправки";
+        public const string BuyerDontAgreesNeedRefunded = "Покупатель не согласен на получение неполного заказа. Ожидается возврат средств";
+        public const string StatusCancelled = "Заказ отменен, ожидается возврат средств";
 
 
         public const string PaymentStatusPending = "В ожидании";

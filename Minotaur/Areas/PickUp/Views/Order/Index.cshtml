@@ -3,11 +3,19 @@
         <h3>Пункт выдачи</h3>
     </div>
     <div>
-        <input id="" class="form-control me-sm-1 bg-light" type="search" value="" name="searchOrderId" placeholder="Введите номер заказа">
-        <button onclick="findOrder()" class="btn btn-dark my-4 my-sm-0 bi bi-search"></button>
+        <script>
+            function handleKeyDown(event) {
+                if (event.key === "Enter") {
+                    findOrder();
+                }
+            }
+        </script>
+        <div class="d-flex">
+            <input id="orderSearchString" class="form-control me-sm-1 bg-light col-10" type="search" value="" name="searchOrderId" placeholder="Введите номер заказа" onkeydown="handleKeyDown(event)">
+            <button onclick="findOrder()" class="btn btn-dark my-4 my-sm-0 bi bi-search"></button>
+        </div>
     </div>
-    <div id="orderData"> 
-
+    <div id="orderData">
     </div>
 </div>
 
@@ -15,9 +23,8 @@
 
 
 
-
 @section Scripts{
-    <script src="~/js/WorkerOrderPickUp/OrderPickUp.js"></script>
+    <script src="~/js/PickUp/OrderPickUp.js"></script>
     }
 
 

@@ -42,7 +42,7 @@ namespace Minotaur.Areas.Purchase
                 UserId = Guid.Parse(user.Id),
                 ReceiverName = user.FirstName,
                 ReceiverLastName = user.LastName,
-                OrderStatus = StatusByOrder.StatusPending_0,
+                OrderStatus = StatusByOrder.Pending,
                 Region = user.Region,
                 City = user.City,
                 Street = user.Street,
@@ -143,7 +143,7 @@ namespace Minotaur.Areas.Purchase
                 if (admin != null)
                 {
                     order.OrderedProducts = prodDataJson;
-                    order.OrderStatus = StatusByOrder.StatusApproved_1;
+                    order.OrderStatus = StatusByOrder.Approved;
                     order.PurchaseDate = MoscowTime.GetTime();
 
 
