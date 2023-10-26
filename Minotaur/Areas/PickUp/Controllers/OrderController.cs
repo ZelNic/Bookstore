@@ -22,11 +22,7 @@ namespace Minotaur.Areas.PickUp
             _userManager = userManager;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
+        public IActionResult Index() => View();
 
         [HttpGet]
         public async Task<IActionResult> GetDataByOrder(string id)
@@ -89,17 +85,16 @@ namespace Minotaur.Areas.PickUp
 
                 return Ok();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> SendConfirmationCode(string orderId)
+        public async Task<IActionResult> SendConfirmationCode(string id)
         {
-            var order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(orderId));
+            var order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(id));
 
             if (order == null)
             {
@@ -110,16 +105,16 @@ namespace Minotaur.Areas.PickUp
 
             Random random = new();
             int confirmationСode = random.Next(100000, 999999);
-                        
+
             var user = await _userManager.GetUserAsync(User);
             Worker? workerOrderPUp = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(user.Id));
 
 
             Notification notification = new()
             {
-                OrderId = Guid.Parse(orderId),
-                RecipientId = workerOrderPUp.WorkerId,
-                SenderId = order.UserId,
+                OrderId = Guid.Parse(id),
+                RecipientId = order.UserId,
+                SenderId = workerOrderPUp.WorkerId,
                 SendingTime = MoscowTime.GetTime(),
                 Text = $"Код выдачи заказа: {confirmationСode}. Сообщите оператору код выдачи для получения заказа.",
             };
@@ -132,9 +127,9 @@ namespace Minotaur.Areas.PickUp
             return Ok();
         }
 
-        public async Task<IActionResult> CheckVerificationCode(string orderId, int confirmationCode)
+        public async Task<IActionResult> CheckVerificationCode(string id, int confirmationCode)
         {
-            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(orderId));
+            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(id));
 
             if (order == null)
             {
@@ -145,6 +140,22 @@ namespace Minotaur.Areas.PickUp
             {
                 order.ConfirmationCode = 0;
                 order.OrderStatus = StatusByOrder.Delivered;
+
+                var user = await _userManager.GetUserAsync(User);
+                var workerPickUp = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(user.Id));
+
+
+                Notification notification = new()
+                {
+                    OrderId = Guid.Parse(id),
+                    RecipientId = order.UserId,
+                    SenderId = workerPickUp.WorkerId,
+                    Text = $"Заказ {id} выдан получателю.",
+                    SendingTime = MoscowTime.GetTime(),
+                    TypeNotification = NotificationSD.SimpleNotification,
+                };
+
+                await _unitOfWork.Notifications.AddAsync(notification) ;
                 _unitOfWork.Orders.Update(order);
                 _unitOfWork.Save();
                 return Ok();

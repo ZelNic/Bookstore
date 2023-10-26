@@ -35,7 +35,7 @@ function findOrder() {
 
 }
 function generateCardOrder() {
-    let divOrderData = document.getElementById("orderData");  
+    let divOrderData = document.getElementById("orderData");
 
     let countProduct = 0;
 
@@ -129,13 +129,10 @@ function generateCardOrder() {
 }
 
 function confirmOrderArrival(id) {
-
-    console.log(id);
-
     $.ajax({
         url: `/PickUp/Order/ConfirmOrderArrival?id=${id}`,
         method: 'POST',
-       
+
         success: function (response) {
             const Toast = Swal.mixin({
                 toast: true,
@@ -177,7 +174,7 @@ function confirmOrderArrival(id) {
 
 function sendConfirmationCode(id) {
     $.ajax({
-        url: `/PickUp/Order/ConfirmOrderArrival?id=${id}`,
+        url: `/PickUp/Order/SendConfirmationCode?id=${id}`,
         method: 'POST',
 
         success: function (response) {
@@ -195,7 +192,7 @@ function sendConfirmationCode(id) {
 
             Toast.fire({
                 icon: 'success',
-                title: 'Уведомление отправлено получателю'
+                title: 'Код отправлен получателю'
             })
         },
         error: function (error) {
@@ -219,46 +216,55 @@ function sendConfirmationCode(id) {
     });
 }
 
-function enterConfirmationCode(id) {
-    $.ajax({
-        url: `/PickUp/Order/ConfirmOrderArrival?${id}`,
-        method: 'POST',
+async function enterConfirmationCode(id) {
+    const { value: code } = await Swal.fire({
+        title: 'Введите код получения',
+        input: 'number',
+        inputPlaceholder: 'Код получения'
+    })
 
-        success: function (response) {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
+    if (code) {
+        $.ajax({
+            url: `/PickUp/Order/CheckVerificationCode?id=${id}&confirmationCode=${code}`,
+            method: 'POST',
 
-            Toast.fire({
-                icon: 'success',
-                title: 'Уведомление отправлено получателю'
-            })
-        },
-        error: function (error) {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
+            success: function (response) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
 
-            Toast.fire({
-                icon: 'error',
-                title: error.responseText
-            })
-        }
-    });
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Код верный. Заказ завершен.'
+                })
+            },
+            error: function (error) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+                Toast.fire({
+                    icon: 'error',
+                    title: error.responseText
+                })
+            }
+        });
+    }
+   
 }

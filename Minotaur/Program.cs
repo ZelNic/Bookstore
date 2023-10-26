@@ -6,10 +6,8 @@ using Minotaur.DataAccess.DbInitializer;
 using Minotaur.DataAccess.Repository;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
-using Minotaur.Scheduler;
 using Minotaur.TelegramController;
 using Minotaur.Utility;
-using Quartz.Impl;
 using Quartz;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -50,18 +48,19 @@ builder.Services.AddScoped<ITelegramBotClient>(provider =>
 builder.Services.AddTransient<TelegramController>();
 
 
-builder.Services.AddSingleton<IScheduler>(provider =>
-{
-    var schedulerFactory = new StdSchedulerFactory();
-    return schedulerFactory.GetScheduler().GetAwaiter().GetResult();
-});
+//TODO: обдумать целесобразность внедения системы почасовой смены кода получения заказа
+//builder.Services.AddSingleton<IScheduler>(provider =>
+//{
+//    var schedulerFactory = new StdSchedulerFactory();
+//    return schedulerFactory.GetScheduler().GetAwaiter().GetResult();
+//});
 
-builder.Services.AddSingleton<QuartzHostedService>();
-builder.Services.AddSingleton(provider =>
-{
-    var unitOfWork = provider.GetRequiredService<IUnitOfWork>();
-    return new ConfirmationCodeHandler(unitOfWork);
-});
+//builder.Services.AddSingleton<QuartzHostedService>();
+//builder.Services.AddSingleton(provider =>
+//{
+//    var unitOfWork = provider.GetRequiredService<IUnitOfWork>();
+//    return new ConfirmationCodeHandler(unitOfWork);
+//});
 
 
 var app = builder.Build();
@@ -99,7 +98,7 @@ void LifeTelegramBot(IServiceProvider serviceProvider)
 {
     var scope = serviceProvider.CreateScope();
     var telegramBot = scope.ServiceProvider.GetRequiredService<TelegramController>();
-    telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);   
+    telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);
 }
 void SeedDatabase()
 {

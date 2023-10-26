@@ -150,12 +150,13 @@ namespace Minotaur.Areas.Picker.Controllers
 
                     if (order.IsCourierDelivery == false)
                     {
-                        Worker workerPickUpPoin = await _unitOfWork.Workers.GetAsync(w => w.OfficeId == order.OrderPickupPointId);
+                        var workerPickUpPoin = await _unitOfWork.Workers.GetAllAsync(w => w.OfficeId == order.OrderPickupPointId);
 
                         Notification notificationForWorkerPickUpPoint = new()
                         {
                             OrderId = order.OrderId,
-                            RecipientId = workerPickUpPoin.UserId,                            
+                            RecipientId = workerPickUpPoin.FirstOrDefault().UserId,        
+                            SenderId = picker.WorkerId,
                             SendingTime = MoscowTime.GetTime(),
                             TypeNotification = NotificationSD.SimpleNotification,
                             Text = $"Скоро в пункт будет доставлен заказ {order.OrderId}."

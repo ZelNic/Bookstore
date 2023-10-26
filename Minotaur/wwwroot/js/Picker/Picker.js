@@ -96,7 +96,7 @@ function generateDataOrder() {
 
                 cardOrder +=
                     `
-                          <div class="container m-4">
+                          <div class="mt-4 mb-4">
                             <div class="form-group border border-1 rounded rounded-1 p-4">
                                 <div class="d-inline-flex align-items-center">
                                     <span class="mr-3">Номер заказа: </span>
@@ -251,8 +251,10 @@ function confirmOrderReadiness(orderId, index) {
         }
     }
 
-
-    jsonMissingProduct = JSON.stringify(missingProduct);
+    let jsonMissingProduct;
+    if (missingProduct.length > 0) {
+        jsonMissingProduct = JSON.stringify(missingProduct);
+    }
 
 
     if (flagFullReadyOrder == true) {
@@ -265,7 +267,7 @@ function confirmOrderReadiness(orderId, index) {
             if (result.isConfirmed) {
                 Swal.fire('Оправлено!', '', 'success');
                 $.ajax({
-                    url: '/Picker/OrderPicking/SendCollectedOrder?orderId=' + orderId + '&missingProduct=' + 'Отсутствуют',
+                    url: `/Picker/OrderPicking/SendCollectedOrder?orderId=${orderId}&missingProduct=Отсутствуют`,
                     type: 'POST',
 
                     success: function (response) {
