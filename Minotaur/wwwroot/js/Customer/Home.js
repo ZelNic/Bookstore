@@ -62,7 +62,7 @@ function generateProductsCard() {
                         <div class="col-lg-2 col-sm-1">
                             <div class="col-10">
                                 <div class="card card-deck shadow h-100 w-300">
-                                    <img src="${product.imageURL}" class="card-img-top img-fluid" style="width: 100%; height: 25em" />
+                                    <img src="${product.imageURL}" class="card-img-top img-fluid" style="width: 100%; height: 100%" />
                                     <div class="card-body d-flex flex-column">
                                         <div class="card-body mt-auto mt-2">
                                             <div>
@@ -110,29 +110,12 @@ function goToShoppingBasket() {
 }
 
 function getDetails(productId) {
+
     $.ajax({
-        url: '/customer/home/details?productId=' + productId,
+        url: `/Customer/Home/Details?id=${productId}`,
         method: 'get',
         success: function (response) {
-            window.location.href = '/customer/home/details?productId=' + productId
-        },
-        error: function (error) {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
-
-            Toast.fire({
-                icon: 'error',
-                title: error.responseText,
-            })
+            window.location.href = `/Customer/Home/Details?id=${productId}`
         }
     });
 }

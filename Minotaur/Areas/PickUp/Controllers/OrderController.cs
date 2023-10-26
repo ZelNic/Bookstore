@@ -139,7 +139,7 @@ namespace Minotaur.Areas.PickUp
             if (order.ConfirmationCode == confirmationCode)
             {
                 order.ConfirmationCode = 0;
-                order.OrderStatus = StatusByOrder.Delivered;
+                order.OrderStatus = StatusByOrder.Сompleted;
 
                 var user = await _userManager.GetUserAsync(User);
                 var workerPickUp = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(user.Id));

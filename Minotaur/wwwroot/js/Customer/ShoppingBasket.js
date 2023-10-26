@@ -80,6 +80,10 @@ function generateCardProducts() {
                             <div class="text-center fs-5">
                                 ${dataShoppingBasket[key].price} ₽
                             </div>
+                            <div>
+                            <button nclick="removeFromShoppingBasket(${dataShoppingBasket[key].id})" class="btn btn-outline-danger border-0 bi bi-x-circle"></button>
+                            <button id="selector_${dataShoppingBasket[key].id}" onclick="selectProduct(${key},${dataShoppingBasket[key].id}, ${true})" class="btn btn-outline-secondary border-0 bi bi-check-circle"></button>
+                            </div>
                             <hr />
                             <div class="mx-auto pb-1">
                                 <button onclick="changeCountProduct(${key}, 'minus')" type="submit" class="btn bi bi-dash-circle opacity-100"></button>
@@ -207,7 +211,6 @@ function removeFromShoppingBasket(productId) {
             activeSelectBox();
         }
     });
-
 }
 function changeCountProduct(key, operation, count = 1) {
 

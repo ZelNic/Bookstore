@@ -1,4 +1,9 @@
-﻿@model Product
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<MinotaurUser> SignInManager
+@inject UserManager<MinotaurUser> UserManager
+
+@model Product
 
 <div class="container">
     <div id="productData">
@@ -9,7 +14,7 @@
             <div class="col-3">
                 <img src="@Model.ImageURL" alt="Image" class="rounded rounded-1 col-12" />
             </div>
-            <div class="col-3 bg-body-tertiary rounded rounded-1">
+            <div class="col-2 p-1 bg-body-tertiary rounded rounded-1">
                 <div>
                     Автор: @Model.Author
                 </div>
@@ -17,22 +22,48 @@
                     Издательство: Piter
                 </div>
                 <div>
-                    ISBN: @Model.ISBN
+                    ISBN:@Model.ISBN
                 </div>
                 <div>
                     Id товара: @Model.ProductId
                 </div>
-                <hr class="col-8 mt-1 mb-1" />
+                <hr class="col-12 mt-1 mb-1" />
                 <div>
-                    <div id="btnWishList_@Model.ProductId">
-                        <button type="submit" onclick="addToWishlist(event,@Model.ProductId)" class="btn btn-warning border-0 btn bi-heart mt-1 mb-2" style="width: 56px; height: 40px;">
+                    @if (User.Identity?.IsAuthenticated != null)
+                    {
+                        <div id="btnWishList_@Model.ProductId">
+                            @if (ViewBag.inWishlist == false)
+                            {
+                            <button onclick="addToWishlist(@Model.ProductId)" class="btn btn-outline-danger border-1 btn bi-heart mt-1 mb-2" style="width: 100%; height: 40px;">
+                            </button>
+                            }
+                            else
+                            {
+                            <button onclick="removeFromWishlist(@Model.ProductId)" class="btn btn-outline-danger border-1 btn bi bi-heart-fill mt-1 mb-2" style="width:100%; height: 40px;">
+                            </button>
+                            }
+                        </div>
+
+                        <div id="btnShoppingBasket_@Model.ProductId">
+                            @if (ViewBag.inBasket == false)
+                            {
+                                <button onclick="addToShoppingBasket(@Model.ProductId)" class="btn btn-outline-success border-1 bi bi-bag" style="width: 100%; height: 40px;">
+                                </button>
+                            }
+                            else
+                            {
+                                <button onclick="removeFromShoppingBasket(@Model.ProductId)" class="btn btn-outline-success border-1 bi bi-bag-check-fill" style="width:100%; height: 40px;">
+                                </button>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <button onclick="informAboutNeedToLogin()" class="btn btn-outline-danger border-1 btn bi-heart mt-1 mb-2" style="width: 100%; height: 40px;">
                         </button>
-                    </div>
-                    <div id="btnShoppingBasket_@Model.ProductId">
-                        <button type="submit" onclick="addToShoppingBasket(event,@Model.ProductId)"
-                                class="btn btn-success border-0 bi bi-cart" style="width: 56px; height: 40px;">
+                        <button onclick="informAboutNeedToLogin()" class="btn btn-outline-success border-1 bi bi-bag-check-fill" style="width:100%; height: 40px;">
                         </button>
-                    </div>
+                    }                   
                 </div>
             </div>
             <div class="col-5">
@@ -70,11 +101,8 @@
         <hr />
     </div>
 </div>
-    </div>
-</div>
+
 
 @section Scripts{
-    <script src="~/js/Customer/ShoppingBasket.js"></script>
-    <script src="~/js/Customer/WishList.js"></script>
     <script src="~/js/Customer/Details.js"></script>
-                    }
+}

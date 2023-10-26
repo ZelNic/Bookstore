@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using System.Diagnostics;
+using Telegram.Bot.Types;
 
 namespace Minotaur.Areas.Customer
 {
@@ -101,14 +104,26 @@ namespace Minotaur.Areas.Customer
             return user;
         }
 
-        public async Task<IActionResult> Details(int productId)
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
         {
-            var product = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
+            var product = await _unitOfWork.Products.GetAsync(p => p.ProductId == id);
 
+            var user = await _userManager.GetUserAsync(User);
+
+            List<int> wishlist = new();
+            List<int> shoppingBasket = new();
+
+            if (user != null)
+            {
+                wishlist = await GetDataByWishlistUser(user.Id);
+                shoppingBasket = await GetDataByShoppingBasketUser(user.Id);
+            }
+            ViewBag.inWishlist = wishlist.Contains(id);
+            ViewBag.inBasket = shoppingBasket.Contains(id);
 
             return View(product);
         }
-
 
         public async Task<IActionResult> Search(string? searchString)
         {
@@ -116,7 +131,7 @@ namespace Minotaur.Areas.Customer
             {
                 return RedirectToAction("Index");
             }
-            List<Product> products = _unitOfWork.Products.GetAllAsync(product => product.Name.Contains(searchString.ToLower())).Result.ToList();
+            var products = await _unitOfWork.Products.GetAllAsync(product => product.Name.Contains(searchString.ToLower()));
 
             return View(products);
         }
