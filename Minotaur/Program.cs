@@ -17,20 +17,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")).EnableSensitiveDataLogging());
 
 
 builder.Services.AddIdentity<MinotaurUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
-builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddRazorPages();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<UserManager<MinotaurUser>>();
 builder.Services.AddScoped<SignInManager<MinotaurUser>>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 
 
-builder.Services.AddRazorPages();
 
 builder.Services.ConfigureApplicationCookie(option =>
 {
@@ -48,7 +48,7 @@ builder.Services.AddScoped<ITelegramBotClient>(provider =>
 builder.Services.AddTransient<TelegramController>();
 
 
-//TODO: обдумать целесобразность внедения системы почасовой смены кода получения заказа
+//TODO: РѕР±РґСѓРјР°С‚СЊ С†РµР»РµСЃРѕР±СЂР°Р·РЅРѕСЃС‚СЊ РІРЅРµРґРµРЅРёСЏ СЃРёСЃС‚РµРјС‹ РїРѕС‡Р°СЃРѕРІРѕР№ СЃРјРµРЅС‹ РєРѕРґР° РїРѕР»СѓС‡РµРЅРёСЏ Р·Р°РєР°Р·Р°
 //builder.Services.AddSingleton<IScheduler>(provider =>
 //{
 //    var schedulerFactory = new StdSchedulerFactory();
@@ -98,7 +98,7 @@ void LifeTelegramBot(IServiceProvider serviceProvider)
 {
     var scope = serviceProvider.CreateScope();
     var telegramBot = scope.ServiceProvider.GetRequiredService<TelegramController>();
-    telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);
+    Task start = telegramBot.StartReceiving<IUpdateHandler>(null, CancellationToken.None);
 }
 void SeedDatabase()
 {

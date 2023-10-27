@@ -1,24 +1,14 @@
 ﻿
-function changeFunctionButtonWishlist(id) {
-     let btnWishlist = document.getElementById(`btnWishList_${id}`);
+function changeFunctionButtonWishlist(id, isAdd) {
+    let btnWishlist = document.getElementById(`btnWishList_${id}`);
 
-            btnWishlist.addEventListener('click', function () {
-                if (btnWishlist.getAttribute('onclick') === `addToWishlist(${id})`) {
-                    btnWishlist.removeAttribute('onclick');
-                    btnWishlist.addEventListener('click', function () {
-                        removeFromWishlist(id);
-                    });
-                    btnWishlist.classList.remove('bi-heart');
-                    btnWishlist.classList.add('bi-heart-fill');
-                } else {
-                    btnWishlist.removeAttribute('onclick');
-                    btnWishlist.addEventListener('click', function () {
-                        addToWishlist(id);
-                    });
-                    btnWishlist.classList.remove('bi-heart-fill');
-                    btnWishlist.classList.add('bi-heart');
-                }
-            });
+    if (isAdd == true) {
+        btnWishlist.innerHTML = `<button onclick = "removeFromWishlist(${id})" class="btn btn-outline-danger border-1 btn bi bi-heart-fill mt-1 mb-2" style = "width:100%; height: 40px;"></button >`;
+    }
+    else {
+        btnWishlist.innerHTML = `
+        <button onclick="addToWishlist(${id})" class="btn btn-outline-danger border-1 btn bi-heart mt-1 mb-2" style="width: 100%; height: 40px;"></button>`;
+    }
 }
 
 function addToWishlist(id) {
@@ -27,7 +17,7 @@ function addToWishlist(id) {
         type: 'POST',
         success: function (response) {
 
-            changeFunctionButtonWishlist(id);
+            changeFunctionButtonWishlist(id, true);
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -72,7 +62,23 @@ function removeFromWishlist(id) {
         type: 'POST',
         data: id,
         success: function (response) {
-            changeFunctionButtonWishlist(id);
+            changeFunctionButtonWishlist(id, false);
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: 'Товар убран из списка желаемого'
+            })
         },
         error: function (error) {
             const Toast = Swal.mixin({
@@ -95,26 +101,18 @@ function removeFromWishlist(id) {
     });
 }
 
-function changeFunctionButtonShoppingBasket(id) {
+function changeFunctionButtonShoppingBasket(id, isAdd) {
     let btnShoppingBasket = document.getElementById(`btnShoppingBasket_${id}`);
 
-    btnShoppingBasket.addEventListener('click', function () {
-        if (btnShoppingBasket.getAttribute('onclick') === `addToShoppingBasket(${id})`) {
-            btnShoppingBasket.removeAttribute('onclick');
-            btnShoppingBasket.addEventListener('click', function () {
-                removeFromWishlist(id);
-            });
-            btnShoppingBasket.classList.remove('bi bi-bag');
-            btnShoppingBasket.classList.add('bi bi-bag-check-fill');
-        } else {
-            btnShoppingBasket.removeAttribute('onclick');
-            btnShoppingBasket.addEventListener('click', function () {
-                addToShoppingBasket(id);
-            });
-            btnShoppingBasket.classList.remove('bi bi-bag-check-fill');
-            btnShoppingBasket.classList.add('bi bi-bag');
-        }
-    });
+    if (isAdd == true) {
+        btnShoppingBasket.innerHTML = ` 
+        <button onclick = "removeFromShoppingBasket(${id})" class="btn btn-outline-success border-1 bi bi-bag-check-fill mt-1 mb-2" style = "width:100%; height: 40px;"></button >
+        `;
+    }
+    else {
+        btnShoppingBasket.innerHTML = `
+       <button onclick="addToShoppingBasket(${id})" class="btn btn-outline-success border-1 btn bi bi-bag mt-1 mb-2" style="width: 100%; height: 40px;"></button>`;
+    }    
 }
 
 
@@ -125,7 +123,7 @@ function addToShoppingBasket(id) {
         data: id,
         success: function (response) {
 
-            changeFunctionButtonShoppingBasket(id);
+            changeFunctionButtonShoppingBasket(id, true);
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -172,7 +170,7 @@ function removeFromShoppingBasket(id) {
         data: id,
 
         success: function (responce) {
-            changeFunctionButtonShoppingBasket(id);
+            changeFunctionButtonShoppingBasket(id, false);
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -188,7 +186,8 @@ function removeFromShoppingBasket(id) {
 
             Toast.fire({
                 icon: 'success',
-                title: "Товар убран из корзины"})
+                title: "Товар убран из корзины"
+            })
         },
         error: function (error) {
             const Toast = Swal.mixin({
@@ -217,7 +216,7 @@ function informAboutNeedToLogin() {
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
-        timer: 3000,
+        timer: 1000,
         timerProgressBar: true,
         didOpen: (toast) => {
             toast.addEventListener('mouseenter', Swal.stopTimer)

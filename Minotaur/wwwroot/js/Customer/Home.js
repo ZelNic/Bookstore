@@ -59,10 +59,10 @@ function generateProductsCard() {
         }
 
         cardsProduct += `   
-                        <div class="col-lg-2 col-sm-1">
+                        <div class="col-lg-2 col-sm-1 px-3">
                             <div class="col-10">
-                                <div class="card card-deck shadow h-100 w-300">
-                                    <img src="${product.imageURL}" class="card-img-top img-fluid" style="width: 100%; height: 100%" />
+                                <div class="card card-deck shadow h-100">
+                                    <img src="${product.imageURL}" class="card-img-top img-fluid" style="object-fit: cover;" />
                                     <div class="card-body d-flex flex-column">
                                         <div class="card-body mt-auto mt-2">
                                             <div>
@@ -79,7 +79,7 @@ function generateProductsCard() {
                                                 ${product.price} ₽
                                             </div>
                                         </div>
-                                        <div class="card-footer bg-transparent mx-auto mt-auto p-1 ">
+                                        <div class="card-footer bg-transparent mx-auto mt-auto p-1">
                                             <div>
                                                 <button onclick="getDetails(${product.productId})" class="btn btn-outline-primary border-0 bi bi-three-dots"></button>
                                                 ${cardBtn}

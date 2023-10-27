@@ -17,5 +17,6 @@
         public const string Refund = "Возврат средств";
         public const string IncompleteOrderType = "Неполный заказ. Требуется подтверждение.";
         public const string SimpleNotification = "Простое уведомление";
+        public const string ErrorNotification = "Уведомление об ошибке";
     }
 }

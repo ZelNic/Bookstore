@@ -52,14 +52,14 @@ namespace Minotaur.Areas.Customer
 
 
         [HttpPost]
-        public async Task<IActionResult> AddWishList(string newProductId)
+        public async Task<IActionResult> AddWishList(string productIds)
         {
             MinotaurUser? user = await _userManager.GetUserAsync(User);
             if (user == null) { return BadRequest("Необходимо войти в профиль"); }
 
             WishList? wishList = await _unitOfWork.WishLists.GetAsync(u => u.UserId == user.Id);
 
-            List<int> listNewIdProducts = newProductId.Split(',').Select(int.Parse).ToList();
+            List<int> listNewIdProducts = productIds.Split(',').Select(int.Parse).ToList();
 
             if (wishList != null)
             {
@@ -67,14 +67,8 @@ namespace Minotaur.Areas.Customer
 
                 for (int i = 0; i < listNewIdProducts.Count; i++)
                 {
-                    if (oldProductList.Contains(listNewIdProducts[i]))
-                    {
-                        listNewIdProducts.Remove(oldProductList[i]);
-                    }
-                    else
-                    {
+                    if (!oldProductList.Contains(listNewIdProducts[i]))
                         wishList.ProductId += "|" + listNewIdProducts[i].ToString();
-                    }
                 }
 
                 _unitOfWork.WishLists.Update(wishList);

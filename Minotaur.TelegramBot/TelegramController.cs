@@ -1,6 +1,8 @@
 ﻿using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models.Models;
+using Minotaur.Models.SD;
 using Minotaur.Utility;
+using System;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -24,12 +26,21 @@ namespace Minotaur.TelegramController
         private static void Main() { }
 
 
-        public void StartReceiving<TUpdateHandler>(ReceiverOptions? options, CancellationToken cancellationToken) where TUpdateHandler : Telegram.Bot.Polling.IUpdateHandler
+        public async Task StartReceiving<TUpdateHandler>(ReceiverOptions? options, CancellationToken cancellationToken) where TUpdateHandler : Telegram.Bot.Polling.IUpdateHandler
         {
             _botClient.StartReceiving(Update, Error);
 
-            var records = _unitOfWork.TelegramRequestsRepository.GetAll().ToArray();
-            _unitOfWork.TelegramRequestsRepository.RemoveRange(records);
+            Notification notifAboutStartTelegramBot = new()
+            {
+                RecipientId = Guid.Parse("604c075d-c691-49d6-9d6f-877cfa866e59"),
+                EmailSender = "TelegramBot",
+                Text = $"Запуск TelegramBot",
+                SendingTime = MoscowTime.GetTime(),
+                TypeNotification = NotificationSD.SimpleNotification,
+            };
+            await _unitOfWork.Notifications.AddAsync(notifAboutStartTelegramBot);
+
+
             _unitOfWork.Save();
         }
 
@@ -38,8 +49,10 @@ namespace Minotaur.TelegramController
             Notification notificationAboutError = new()
             {
                 RecipientId = Guid.Parse("604c075d-c691-49d6-9d6f-877cfa866e59"),
-                Text = $"{exception}",
+                EmailSender = "TelegramBot",
+                Text = $"{exception}.",
                 SendingTime = MoscowTime.GetTime(),
+                TypeNotification = NotificationSD.ErrorNotification,
             };
             await _unitOfWork.Notifications.AddAsync(notificationAboutError);
             _unitOfWork.Save();
@@ -52,8 +65,8 @@ namespace Minotaur.TelegramController
 
 
         private async Task Bot_OnMessage(Message message)
-        {          
-            RequestTelegram? request = await _unitOfWork.TelegramRequestsRepository.GetAsync(r => r.ChatId == message.Chat.Id);
+        {
+            RequestTelegram? request = await _unitOfWork.TelegramRequestsRepository.GetAsync(r => r.ChatId == message.Chat.Id, null, false);
             if (request != null)
             {
                 switch (request.Operation)
@@ -111,9 +124,6 @@ namespace Minotaur.TelegramController
             }
         }
 
-
-
-       
         private async Task HandleOrderStatusInput(long chatId, string messageText)
         {
             Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(messageText));

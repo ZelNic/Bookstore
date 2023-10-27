@@ -4,16 +4,62 @@ let divNotifData;
 
 const NotificationIncompleteOrderType = "Неполный заказ. Требуется подтверждение.";
 const Refund = "Возврат средств";
-const OrderArrived_5 = "Заказ прибыл в пункт выдачи.";
+const OrderArrived = "Заказ прибыл в пункт выдачи.";
+const ErrorNotification = "Уведомление об ошибке";
+
 $(document).ready(function () {
     getDataNotification();
 });
+
+function hideAllNotifications() {
+    $.ajax({
+        url: '/Customer/Notification/HideAllNotifications',
+        method: 'POST',
+        success: function (response) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+            Toast.fire({
+                icon: 'success',
+                title: 'Все уведомления успешно скрыты'
+            })
+            getDataNotification();
+        },
+        error: function (error) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+            Toast.fire({
+                icon: 'error',
+                title: 'Не удалось скрыть все уведомления'
+            })
+            getDataNotification();
+
+        },
+    });
+}
 
 
 function getDataNotification() {
     divNotifData = document.getElementById("notificationData");
     $.ajax({
-        url: '/Customer/NotificationCustomer/GetDataNotification',
+        url: '/Customer/Notification/GetDataNotification',
         method: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -30,6 +76,7 @@ function generateCardNotitfications() {
     for (let notification of notificationData) {
 
         let functionForNotification = ``
+        let colorForNotification = ``;
 
         switch (notification.typeNotification) {
             case NotificationIncompleteOrderType:
@@ -38,17 +85,25 @@ function generateCardNotitfications() {
                     <button onclick ="answerOrder('${notification.id}', true)" class="btn btn-sm btn-success bi bi-check-square-fill"> Согласие</button >
                     <button onclick="goToOrder()" class="btn btn-sm btn-warning">Перейти к заказу</button>`
                 break;
-            case OrderArrived_5:
+            case OrderArrived:
                 functionForNotification = `
                     <button onclick="hiddenNotification('${notification.id}')" class="btn btn-sm btn-secondary bi bi-x-square"></button>
-                    <button onclick="goToOrder()" class="btn btn-sm btn-warning">Перейти к заказу</button>`
+                    <button onclick="goToOrder()" class="btn btn-sm btn-primary">Перейти к заказу</button>`
                 break;
             case Refund:
                 functionForNotification = `<button onclick="refund('${notification.id}')" class="btn btn-sm btn-warning">Осуществить возврат средств</button>`;
+                colorForNotification = `text-bg-warning`;
+                break;
+            case ErrorNotification:
+                functionForNotification = `<button onclick="hiddenNotification('${notification.id}')" class="btn btn-sm btn-secondary bi bi-x-square"></button>`;
+                colorForNotification = `text-bg-danger`;
                 break;
             default:
                 functionForNotification = `<button onclick="hiddenNotification('${notification.id}')" class="btn btn-sm btn-secondary bi bi-x-square"></button>`;
+                colorForNotification = `text-bg-success`;
         }
+
+
 
         cardsNotification += `
         <div id="cardNotification_${notification.id}" class="border border-1 rounded rounded-1 p-3 col-7 m-2">
@@ -59,7 +114,7 @@ function generateCardNotitfications() {
             </style>
             <div class="d-inline-flex align-items-center position-relative">
                 <label class="">Номер заказа: </label>
-                <div class="rouden rounded-1 text-bg-primary col-auto mr">
+                <div class="rouden rounded-1 ${colorForNotification} col-auto mr">
                     ${notification.orderId}
                 </div>
                 <div class="rouden rounded-1 text-bg-warning col-auto">
@@ -117,7 +172,7 @@ function goToOrder() {
 }
 function answerOrder(notificationId, answer) {
     $.ajax({
-        url: '/Customer/NotificationCustomer/SendReplyIncompleteOrder?notificationId=' + notificationId + "&isAgree=" + answer,
+        url: '/Customer/Notification/SendReplyIncompleteOrder?notificationId=' + notificationId + "&isAgree=" + answer,
         method: 'POST',
         success: function (response) {
             const Toast = Swal.mixin({
@@ -150,7 +205,7 @@ function answerOrder(notificationId, answer) {
 }
 function hiddenNotification(notificationId) {
     $.ajax({
-        url: '/Customer/NotificationCustomer/HideNotification?notificationId=' + notificationId,
+        url: '/Customer/Notification/HideNotification?notificationId=' + notificationId,
         method: 'POST',
         success: function (response) {
 

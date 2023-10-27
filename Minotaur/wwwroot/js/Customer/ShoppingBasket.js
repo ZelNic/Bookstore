@@ -57,39 +57,38 @@ function generateCardProducts() {
 
     let html = "";
 
-    for (let key in dataShoppingBasket) {
+    for (let [index, product] of dataShoppingBasket.entries()) {
 
-        totalPrice += dataShoppingBasket[key].price * dataShoppingBasket[key].count;
-        countProduct += dataShoppingBasket[key].count;
-
+        totalPrice += product.price * product.count;
+        countProduct += product.count;
 
         html += ` <div class="mb-3" >
                     <div class="card card-subtitle h-100 shadow pt-1 border-0 m-0 p-0">
-                        <img src="${dataShoppingBasket[key].image}" class="card-img-top mx-auto rounded-1" alt="Product Image" style="object-fit: cover; width: 70%;" />
+                        <img src="${product.image}" class="card-img-top mx-auto rounded-1" alt="Product Image" style="object-fit: cover; width: 70%;" />
                         <div class="card-body mt-0 pb-0">
                             <div class="fs-6">
-                                ${dataShoppingBasket[key].nameProduct}
+                                ${product.nameProduct}
                             </div>
                         </div>
                         <div class="card card-footer bg-transparent border-0">
                             <hr />
                             <div class="text-center">
-                                ${dataShoppingBasket[key].author}
+                                ${product.author}
                             </div>
                             <hr />
                             <div class="text-center fs-5">
-                                ${dataShoppingBasket[key].price} ₽
+                                ${product.price} ₽
                             </div>
                             <div>
-                            <button nclick="removeFromShoppingBasket(${dataShoppingBasket[key].id})" class="btn btn-outline-danger border-0 bi bi-x-circle"></button>
-                            <button id="selector_${dataShoppingBasket[key].id}" onclick="selectProduct(${key},${dataShoppingBasket[key].id}, ${true})" class="btn btn-outline-secondary border-0 bi bi-check-circle"></button>
+                            <button onclick="removeFromShoppingBasket(${product.productId})" class="btn btn-outline-danger border-0 bi bi-x-circle"></button>
+                            <button id="selector_${product.productId}" onclick="selectProduct(${index}, ${true})" class="btn btn-outline-secondary border-0 bi bi-check-circle"></button>
                             </div>
                             <hr />
                             <div class="mx-auto pb-1">
-                                <button onclick="changeCountProduct(${key}, 'minus')" type="submit" class="btn bi bi-dash-circle opacity-100"></button>
-                                <input onblur="changeCountProduct( ${key}, 'input', document.getElementById('countProduct_${key}').value)"
-                                    id="countProduct_${key}" type="number" min="1" max="50" name="count" value="${dataShoppingBasket[key].count}" style="object-fit: width: 4px; height: 20px; " required />
-                                <button onclick="changeCountProduct( ${key},'plus')" type="submit" class="btn bi bi-plus-circle opacity-100"></button>
+                                <button onclick="changeCountProduct(${product}, 'minus')" type="submit" class="btn bi bi-dash-circle opacity-100"></button>
+                                <input onblur="changeCountProduct( ${product}, 'input', document.getElementById('countProduct_${product}').value)"
+                                    id="countProduct_${product.productId}" type="number" min="1" max="50" name="count" value="${product.count}" style="object-fit: width: 4px; height: 20px; " required />
+                                <button onclick="changeCountProduct( ${product},'plus')" type="submit" class="btn bi bi-plus-circle opacity-100"></button>
                             </div>
                         </div>
                     </div>
@@ -148,27 +147,26 @@ function activeSelectBox() {
         boxSelect.setAttribute("hidden", "true");
     }
 }
-function selectProduct(key, id, isSelect) {
+function selectProduct(index, isSelect) {
 
-    let selector = document.getElementById(`selector_${id}`);
+    let selector = document.getElementById(`selector_${dataShoppingBasket[index].productId}`);
     selectedProductArray = [];
 
     if (isSelect == true) {
         selector.outerHTML =
-            `<button id="selector_${id}" onclick="selectProduct(${key}, ${id}, ${false})" type="submit"
-            class="btn btn-outline-success border-0 bi bi-check-circle-fill"></button>`;
-        dataShoppingBasket[key].isSelect = true;
+            `<button id="selector_${dataShoppingBasket[index].productId}" onclick="selectProduct(${index}, ${false})"class="btn btn-outline-success border-0 bi bi-check-circle-fill"></button>`;
+        dataShoppingBasket[index].isSelect = true;
     }
     else {
         selector.outerHTML =
-            `<button id="selector_${id}" onclick="selectProduct(${key},${id}, ${true})" type="submit"
+            `<button id="selector_${dataShoppingBasket[index].productId}" onclick="selectProduct(${index},${true})" type="submit"
             class="btn btn-outline-secondary border-0 bi bi-check-circle"></button>`;
-        dataShoppingBasket[key].isSelect = false;
+        dataShoppingBasket[index].isSelect = false;
     }
 
-    for (let key in dataShoppingBasket) {
-        if (dataShoppingBasket[key].isSelect == true) {
-            selectedProductArray.push(dataShoppingBasket[key].productId);
+    for (let index in dataShoppingBasket) {
+        if (dataShoppingBasket[index].isSelect == true) {
+            selectedProductArray.push(dataShoppingBasket[index].productId);
         }
     }
 
@@ -212,41 +210,41 @@ function removeFromShoppingBasket(productId) {
         }
     });
 }
-function changeCountProduct(key, operation, count = 1) {
+function changeCountProduct(product, operation, count = 1) {
 
     if (parseInt(count) == 0) {
-        removeFromShoppingBasket(dataShoppingBasket[key].productId);
+        removeFromShoppingBasket(dataShoppingBasket[product].productId);
         showBtnSaveChange();
         return;
     }
 
     showBtnSaveChange();
 
-    let indicateCountProduct = document.getElementById(`countProduct_${key}`);
+    let indicateCountProduct = document.getElementById(`countProduct_${product.productId}`);
 
     switch (operation) {
         case "minus":
-            dataShoppingBasket[key].count--;
+            dataShoppingBasket[product].count--;
             countProduct--;
-            totalPrice -= dataShoppingBasket[key].price
-            if (dataShoppingBasket[key].count <= 0) {
+            totalPrice -= dataShoppingBasket[product].price
+            if (dataShoppingBasket[product].count <= 0) {
                 showBtnSaveChange();
-                removeFromShoppingBasket(dataShoppingBasket[key].productId)
+                removeFromShoppingBasket(dataShoppingBasket[product].productId)
             }
             break;
         case "plus":
-            dataShoppingBasket[key].count++;
+            dataShoppingBasket[product].count++;
             countProduct++;
-            totalPrice += dataShoppingBasket[key].price;
+            totalPrice += dataShoppingBasket[product].price;
             break;
         case "input":
             count = parseInt(count);
-            countProduct -= dataShoppingBasket[key].count;
-            totalPrice -= dataShoppingBasket[key].count * dataShoppingBasket[key].price;
+            countProduct -= dataShoppingBasket[product].count;
+            totalPrice -= dataShoppingBasket[product].count * dataShoppingBasket[product].price;
 
-            dataShoppingBasket[key].count = count;
-            countProduct += dataShoppingBasket[key].count;
-            totalPrice += dataShoppingBasket[key].count * dataShoppingBasket[key].price;
+            dataShoppingBasket[product].count = count;
+            countProduct += dataShoppingBasket[product].count;
+            totalPrice += dataShoppingBasket[product].count * dataShoppingBasket[product].price;
             break
         default:
             Swal.fire({
@@ -257,11 +255,11 @@ function changeCountProduct(key, operation, count = 1) {
     }
 
 
-    if (!selectedProductArray.includes(key)) {
-        selectedProductArray.push(key);
+    if (!selectedProductArray.includes(product)) {
+        selectedProductArray.push(product);
     }
 
-    indicateCountProduct.setAttribute("value", dataShoppingBasket[key].count);
+    indicateCountProduct.setAttribute("value", dataShoppingBasket[product].count);
     showTotal();
 }
 function confirmChangeCount() {
@@ -324,7 +322,7 @@ function confirmChangeCount() {
 }
 function addToWishlist(selectedProductArray) {
     $.ajax({
-        url: '/Customer/WishList/AddWishList?newProductId=' + selectedProductArray,
+        url: '/Customer/WishList/AddWishList?productIds=' + selectedProductArray,
         type: 'POST',
         success: function (response) {
 

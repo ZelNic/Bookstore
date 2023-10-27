@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 
 namespace Minotaur.Areas.Identity.Pages.Account.Manage
@@ -20,13 +21,13 @@ namespace Minotaur.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<MinotaurUser> _userManager;
         private readonly ILogger<DownloadPersonalDataModel> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DownloadPersonalDataModel(
-            UserManager<MinotaurUser> userManager,
-            ILogger<DownloadPersonalDataModel> logger)
+        public DownloadPersonalDataModel(UserManager<MinotaurUser> userManager,ILogger<DownloadPersonalDataModel> logger, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult OnGet()
@@ -45,21 +46,38 @@ namespace Minotaur.Areas.Identity.Pages.Account.Manage
             _logger.LogInformation("User with ID '{UserId}' asked for their personal data.", _userManager.GetUserId(User));
 
             // Only include personal data for download
-            var personalData = new Dictionary<string, string>();
-            var personalDataProps = typeof(MinotaurUser).GetProperties().Where(
-                            prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
-            foreach (var p in personalDataProps)
-            {
-                personalData.Add(p.Name, p.GetValue(user)?.ToString() ?? "null");
-            }
+            //var personalData = new Dictionary<string, string>();
+            //var personalDataProps = typeof(MinotaurUser).GetProperties().Where(
+            //                prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
+            //foreach (var p in personalDataProps)
+            //{
+            //    personalData.Add(p.Name, p.GetValue(user)?.ToString() ?? "null");
+            //}
 
-            var logins = await _userManager.GetLoginsAsync(user);
-            foreach (var l in logins)
-            {
-                personalData.Add($"{l.LoginProvider} external login provider key", l.ProviderKey);
-            }
+            //var logins = await _userManager.GetLoginsAsync(user);
+            //foreach (var l in logins)
+            //{
+            //    personalData.Add($"{l.LoginProvider} external login provider key", l.ProviderKey);
+            //}
 
-            personalData.Add($"Authenticator Key", await _userManager.GetAuthenticatorKeyAsync(user));
+            //personalData.Add($"Authenticator Key", await _userManager.GetAuthenticatorKeyAsync(user));
+            
+            var minotaurUser = await _unitOfWork.MinotaurUsers.GetAsync(u=>u.Id == user.Id);
+            var personalData = new 
+            {
+                minotaurUser.Id,
+                minotaurUser.UserName,
+                minotaurUser.FirstName,
+                minotaurUser.Surname,
+                minotaurUser.LastName,
+                minotaurUser.Email,
+                minotaurUser.PhoneNumber,
+                minotaurUser.City,
+                minotaurUser.Street,
+                minotaurUser.HouseNumber,
+                minotaurUser.DateofBirth,
+                minotaurUser.Region
+            };
 
             Response.Headers.Add("Content-Disposition", "attachment; filename=PersonalData.json");
             return new FileContentResult(JsonSerializer.SerializeToUtf8Bytes(personalData), "application/json");

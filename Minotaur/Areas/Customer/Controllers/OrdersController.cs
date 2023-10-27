@@ -77,8 +77,6 @@ namespace Minotaur.Areas.Customer
                         prodIdAndName.TryAdd(productData.Id, _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id).Result.Name);
                     }
                 }
-
-               
             }
 
             return Json(new { data = formatedOrders, prodIdAndName });
