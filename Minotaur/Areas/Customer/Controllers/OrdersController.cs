@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Minotaur.Models.SD;
 using Minotaur.DataAccess.Repository.IRepository;
+using System.Collections.Generic;
 
 namespace Minotaur.Areas.Customer
 {
@@ -33,9 +34,7 @@ namespace Minotaur.Areas.Customer
         {
             var user = await _userManager.GetUserAsync(User);
 
-            var ordersDB = _unitOfWork.Orders.GetAll(u => u.UserId == Guid.Parse(user.Id)).OrderByDescending(u => u.OrderId).ToList();            
-
-            var formatedOrders = ordersDB.Select(o => new
+            var formatedOrders = (await _unitOfWork.Orders.GetAllAsync(u => u.UserId == Guid.Parse(user.Id))).Select(o => new
             {
                 o.OrderId,
                 o.UserId,
@@ -61,21 +60,18 @@ namespace Minotaur.Areas.Customer
 
             foreach (var order in formatedOrders)
             {
-                if(order.ShippedProducts != null)
+                if (order.ShippedProducts != null)
                 {
                     List<OrderProductData> opd = order.ShippedProducts;
                     foreach (var productData in opd)
-                    {
-                        prodIdAndName.TryAdd(productData.Id, _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id).Result.Name);
-                    }
+                        prodIdAndName.TryAdd(productData.Id, (await _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id)).Name);
                 }
                 else
                 {
                     List<OrderProductData> opd = order.OrderedProducts;
                     foreach (var productData in opd)
-                    {
-                        prodIdAndName.TryAdd(productData.Id, _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id).Result.Name);
-                    }
+                        prodIdAndName.TryAdd(productData.Id, (await _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id)).Name);
+
                 }
             }
 

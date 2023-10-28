@@ -14,6 +14,6 @@ namespace Minotaur.Models.Models
         public string? AccessRights { get; set; }
         public int AdmissionOrder { get; set; }
         public int OrderDismissal { get; set; }
-
+        public int WorkerRating { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using BookStore.DataBase.Repository.IRepository;
-using Minotaur.Models.Models;
+using Minotaur.Models.Models.ModelReview;
 
 namespace Minotaur.DataAccess.Repository.IRepository
 {

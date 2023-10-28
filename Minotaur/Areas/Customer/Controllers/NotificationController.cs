@@ -30,8 +30,8 @@ namespace Minotaur.Areas.Customer
         public async Task<IActionResult> GetDataNotification()
         {
             MinotaurUser? user = await _userManager.GetUserAsync(User);
-            var notifications = await _unitOfWork.Notifications.GetAllAsync(u => u.RecipientId == Guid.Parse(user.Id));
-            var notHiddenNotifications = notifications.OrderByDescending(n => n.SendingTime).Where(n => n.IsHidden == false)
+            var notHiddenNotifications = (await _unitOfWork.Notifications.GetAllAsync(u => u.RecipientId == Guid.Parse(user.Id)))
+                .OrderByDescending(n => n.SendingTime).Where(n => n.IsHidden == false)
                 .Select(n => new
                 {
                     n.Id,
@@ -59,7 +59,7 @@ namespace Minotaur.Areas.Customer
                 notification.IsHidden = true;
 
                 _unitOfWork.Notifications.Update(notification);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
             }
             return Ok();
         }
@@ -76,7 +76,7 @@ namespace Minotaur.Areas.Customer
             });
 
             _unitOfWork.Notifications.UpdateRange(notifications.ToArray());
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             return Ok();
         }
@@ -88,7 +88,12 @@ namespace Minotaur.Areas.Customer
             if (notification == null) { return BadRequest("Уведомление не найдено"); }
 
             Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == notification.OrderId);
-            if (order == null) { _unitOfWork.Notifications.Remove(notification); _unitOfWork.Save(); return BadRequest("Заказ не найден"); }
+            if (order == null)
+            {
+                _unitOfWork.Notifications.Remove(notification);
+                await _unitOfWork.Save();
+                return BadRequest("Заказ не найден");
+            }
 
             Notification notificationForCustomer = new()
             {
@@ -119,14 +124,14 @@ namespace Minotaur.Areas.Customer
                     SendingTime = MoscowTime.GetTime(),
                 };
 
-                _unitOfWork.Notifications.AddAsync(notificationForPicker);
+                await _unitOfWork.Notifications.AddAsync(notificationForPicker);
             }
 
             notification.IsHidden = true;
             _unitOfWork.Notifications.Update(notification);
             _unitOfWork.Orders.Update(order);
-            _unitOfWork.Notifications.AddAsync(notificationForCustomer);
-            _unitOfWork.Save();
+            await _unitOfWork.Notifications.AddAsync(notificationForCustomer);
+            await _unitOfWork.Save();
 
             return Ok();
         }

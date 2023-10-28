@@ -40,12 +40,12 @@ builder.Services.ConfigureApplicationCookie(option =>
 });
 
 
-builder.Services.AddScoped<ITelegramBotClient>(provider =>
+builder.Services.AddSingleton<ITelegramBotClient>(provider =>
 {
     var botToken = "6504892449:AAEDmHDwgkFG_Wg6Gywn-5ivRHcePsySn-4";
     return new TelegramBotClient(botToken);
 });
-builder.Services.AddTransient<TelegramController>();
+builder.Services.AddScoped<TelegramController>();
 
 
 //TODO: обдумать целесобразность внедения системы почасовой смены кода получения заказа

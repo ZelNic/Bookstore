@@ -14,7 +14,7 @@ namespace Minotaur.TelegramController
     {
         private readonly ITelegramBotClient _botClient;
         private readonly IUnitOfWork _unitOfWork;
-        private const string BOT_TOKEN = "6504892449:AAEDmHDwgkFG_Wg6Gywn-5ivRHcePsySn-4";
+        //private const string BOT_TOKEN = "6504892449:AAEDmHDwgkFG_Wg6Gywn-5ivRHcePsySn-4";
 
         public TelegramController(ITelegramBotClient botClient, IUnitOfWork unitOfWork)
         {
@@ -38,10 +38,9 @@ namespace Minotaur.TelegramController
                 SendingTime = MoscowTime.GetTime(),
                 TypeNotification = NotificationSD.SimpleNotification,
             };
+
             await _unitOfWork.Notifications.AddAsync(notifAboutStartTelegramBot);
-
-
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
         }
 
         private async Task Error(ITelegramBotClient client, Exception exception, CancellationToken token)
@@ -55,7 +54,7 @@ namespace Minotaur.TelegramController
                 TypeNotification = NotificationSD.ErrorNotification,
             };
             await _unitOfWork.Notifications.AddAsync(notificationAboutError);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
         }
 
         private async Task Update(ITelegramBotClient client, Update update, CancellationToken token)
@@ -67,19 +66,23 @@ namespace Minotaur.TelegramController
         private async Task Bot_OnMessage(Message message)
         {
             RequestTelegram? request = await _unitOfWork.TelegramRequestsRepository.GetAsync(r => r.ChatId == message.Chat.Id, null, false);
+
             if (request != null)
             {
+                _unitOfWork.TelegramRequestsRepository.StopTracking(request);
+
                 switch (request.Operation)
                 {
                     case "/orderstatus":
                         _unitOfWork.TelegramRequestsRepository.Remove(request);
-                        _unitOfWork.Save();
-                        await HandleOrderStatusInput(message.Chat.Id, message.Text); return;
+                        await _unitOfWork.Save();
+                        await HandleOrderStatusInput(message.Chat.Id, message.Text);
+                        return;
 
                     default:
                         _unitOfWork.TelegramRequestsRepository.Remove(request);
-                        _unitOfWork.Save();
-                        return;
+                        await _unitOfWork.Save();
+                        break;
                 }
             }
 
@@ -110,12 +113,16 @@ namespace Minotaur.TelegramController
                     await _botClient.SendTextMessageAsync(message.Chat.Id, "Вызван оператор! Ожидайте.");
                     break;
                 case "/orderstatus":
-                    await _unitOfWork.TelegramRequestsRepository.AddAsync(new()
+
+                    RequestTelegram newTask = new()
                     {
                         ChatId = message.Chat.Id,
                         Operation = message.Text
-                    });
-                    _unitOfWork.Save();
+                    };
+
+                    await _unitOfWork.TelegramRequestsRepository.AddAsync(newTask);                   
+                    await _unitOfWork.Save();
+                    _unitOfWork.TelegramRequestsRepository.StopTracking(newTask);
 
                     await _botClient.SendTextMessageAsync(message.Chat.Id, "Введите номер заказа:");
                     break;
@@ -126,7 +133,19 @@ namespace Minotaur.TelegramController
 
         private async Task HandleOrderStatusInput(long chatId, string messageText)
         {
-            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == Guid.Parse(messageText));
+            Guid? guid = null;
+            if (Guid.TryParse(messageText, out Guid result))
+            {
+                guid = result;
+            }
+            else
+            {
+                await _botClient.SendTextMessageAsync(chatId, $"Неверный код заказа.");
+                return;
+            }
+
+            Order? order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == guid);
+
             if (order != null)
             {
                 await _botClient.SendTextMessageAsync(chatId, $"Статус заказа - {order.OrderStatus}.");

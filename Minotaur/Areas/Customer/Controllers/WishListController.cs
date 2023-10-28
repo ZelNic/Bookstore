@@ -27,24 +27,22 @@ namespace Minotaur.Areas.Customer
 
         public async Task<IActionResult> GetWishList()
         {
-            MinotaurUser user = await _userManager.GetUserAsync(User);
-
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
             WishList? wishList = await _unitOfWork.WishLists.GetAsync(u => u.UserId == user.Id);
             if (wishList == null) { return BadRequest("Список желаний пуст"); }
 
             List<int>? listId = wishList.ProductId.Split('|').Select(int.Parse).ToList();
 
-            var product = await _unitOfWork.Products.GetAllAsync(u => listId.Contains(u.ProductId));
-
-            var wishListJson = product.Join(_unitOfWork.Categories.GetAll(), b => b.Category, c => c.Id, (b, c) => new
-            {
-                image = b.ImageURL,
-                nameProduct = b.Name,
-                author = b.Author,
-                category = c.Name,
-                price = b.Price,
-                productId = b.ProductId
-            }).ToList();
+            var wishListJson = (await _unitOfWork.Products.GetAllAsync(u => listId.Contains(u.ProductId)))
+                .Join(_unitOfWork.Categories.GetAll(), b => b.Category, c => c.Id, (b, c) => new
+                {
+                    image = b.ImageURL,
+                    nameProduct = b.Name,
+                    author = b.Author,
+                    category = c.Name,
+                    price = b.Price,
+                    productId = b.ProductId
+                }).ToList();
 
             return Json(new { data = wishListJson });
 
@@ -84,7 +82,7 @@ namespace Minotaur.Areas.Customer
                 await _unitOfWork.WishLists.AddAsync(newProductInWishList);
             }
 
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             return Ok();
         }
@@ -111,7 +109,7 @@ namespace Minotaur.Areas.Customer
                 _unitOfWork.WishLists.Update(wishList);
             }
 
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             return Ok();
         }

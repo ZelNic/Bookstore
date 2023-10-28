@@ -48,6 +48,7 @@ function generateOrderCards() {
                     </td>
                     <td>${product.price} ₽ </td>
                     <td>${product.count}</td>
+                    <td><button id="btnReview_${product.id}" onclick="reviewHandler(${product.id}, '${productNameData[product.id]}')" class="btn btn-success">Отзыв</button></td>
                 </tr>
             </tbody>
             `;
@@ -82,6 +83,7 @@ function generateOrderCards() {
                                 <th scope="col">Название</th>
                                 <th scope="col">Цена</th>
                                 <th scope="col">Количество</th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
                         ${tableOrder}
@@ -108,10 +110,210 @@ function generateOrderCards() {
                             </div>
                         </div>
                     </div>
-                    <hr class="" />
+                    <hr/>
+                    <button id="btnReviewOrder_${order.orderId}" onclick="reviewHandler(${product.id}, '${productNameData[product.id]}')" class="btn btn-success">Отзыв о заказе</button>
                 </div>
             </div>
         `;
     }
     return html;
+}
+
+function reviewProductHandler(productId, productName) {
+
+    let formReview = `
+                   <form id="reviewForm" enctype="multipart/form-data">
+                          <div class="form-row">
+                            
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="productRating">Оценка товара:</label>
+                              <select class="form-control" id="productRating" name="ProductRating" required>
+                                <option selected disabled>Выбрать</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="productRating">Оценка пункта выдачи:</label>
+                              <select class="form-control" id="productRating" name="ProductRating" required>
+                                <option selected disabled>Выбрать</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="productRating">Оценка сотрудника:</label>
+                              <select class="form-control" id="productRating" name="ProductRating" required>
+                                <option selected disabled>Выбрать</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="review">Отзыв:</label>
+                              <textarea class="form-control" id="review" name="Review" required></textarea>
+                            </div>
+                            <div class="form-group col-md-12 mb-1">
+                              <label for="photo">Фотография:</label>
+                              <input type="file" class="form-control-file" id="photo" name="Photo">
+                            </div>
+                          </div>
+                        </form>
+                        `;
+
+    Swal.fire({
+        title: `Отзыв на ${productName}`,
+        html: formWorkerData,
+        showCancelButton: true,
+        confirmButtonText: 'Сохранить',
+        cancelButtonText: 'Отмена',
+        preConfirm: () => {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData(document.getElementById('dataUser'));
+                const reviewObject = {};
+
+                for (const [key, value] of formData.entries()) {
+                    reviewObject[key] = value;
+                }
+
+                const reviewJson = JSON.stringify(reviewObject);
+
+                $.ajax({
+                    url: `=${reviewJson}`,
+                    type: 'POST',
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Отзыв поступил на проверку модерации',
+                        });
+                    },
+                    error: function (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Ошибка...',
+                            text: 'Отзыв не опубликован',
+                        });
+                    }
+                });
+            });
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false
+    });
+}
+
+
+function reviewOrderHandler(orderId) {
+    let formReview = `
+                        <form id="reviewForm" enctype="multipart/form-data">
+                        <div class="form-row">
+                            <div class="form-group col-md-12 mb-1">
+                                <label for="deliveryRating">Оценка доставки:</label>
+                                <select class="form-control" id="deliveryRating" name="DeliveryRating" required>
+                                    <option selected disabled>Выбрать</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                                <div class="form-group col-md-12 mb-1">
+                                    <label for="review">Отзыв доставку:</label>
+                                    <textarea class="form-control" id="review" name="Review"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12 mb-1">
+                                <label for="productRating">Оценка пункта выдачи:</label>
+                                <select class="form-control" id="productRating" name="ProductRating" required>
+                                    <option selected disabled>Выбрать</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                                <div class="form-group col-md-12 mb-1">
+                                    <label for="review">Отзыв на пункт выдачи:</label>
+                                    <textarea class="form-control" id="review" name="Review"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12 mb-1">
+                                <label for="productRating">Оценка сотрудника:</label>
+                                <select class="form-control" id="productRating" name="ProductRating" required>
+                                    <option selected disabled>Выбрать</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                                <div class="form-group col-md-12 mb-1">
+                                    <label for="review">Отзыв на сотрудника:</label>
+                                    <textarea class="form-control" id="review" name="Review"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12 mb-1">
+                                <label for="review">Отзыв:</label>
+                                <textarea class="form-control" id="review" name="Review"></textarea>
+                            </div>
+                            <div class="form-group col-md-12 mb-1">
+                                <label for="photo">Фотография:</label>
+                                <input type="file" class="form-control-file" id="photo" name="Photo">
+                            </div>
+                        </div>
+                    </form>
+                        `;
+
+    Swal.fire({
+        title: `Отзыв на ${productName}`,
+        html: formWorkerData,
+        showCancelButton: true,
+        confirmButtonText: 'Сохранить',
+        cancelButtonText: 'Отмена',
+        preConfirm: () => {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData(document.getElementById('dataUser'));
+                const reviewObject = {};
+
+                for (const [key, value] of formData.entries()) {
+                    reviewObject[key] = value;
+                }
+
+                const reviewJson = JSON.stringify(reviewObject);
+
+                $.ajax({
+                    url: `=${reviewJson}`,
+                    type: 'POST',
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Отзыв поступил на проверку модерации',
+                        });
+                    },
+                    error: function (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Ошибка...',
+                            text: 'Отзыв не опубликован',
+                        });
+                    }
+                });
+            });
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false
+    });
 }

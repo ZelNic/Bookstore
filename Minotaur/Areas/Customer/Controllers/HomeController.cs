@@ -86,8 +86,7 @@ namespace Minotaur.Areas.Customer
         private async Task<List<int>> GetDataByShoppingBasketUser(string userId)
         {
             List<int> productInSB = new();
-            var shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAllAsync(w => w.UserId == Guid.Parse(userId));
-            var activeSB = shoppingBasket.Where(s => s.IsPurchased == false).FirstOrDefault();
+            var activeSB = (await _unitOfWork.ShoppingBaskets.GetAsync(b => b.UserId == Guid.Parse(userId) && b.IsPurchased == false));
             if (activeSB != null)
             {
                 productInSB = ShoppingBasketController.ParseProductData(activeSB.ProductIdAndCount).Keys.ToList();
@@ -99,6 +98,7 @@ namespace Minotaur.Areas.Customer
         private async Task<MinotaurUser> GetDataByUser()
         {
             MinotaurUser? user = await _userManager.GetUserAsync(User);
+
             return user;
         }
 
@@ -117,6 +117,7 @@ namespace Minotaur.Areas.Customer
                 wishlist = await GetDataByWishlistUser(user.Id);
                 shoppingBasket = await GetDataByShoppingBasketUser(user.Id);
             }
+
             ViewBag.inWishlist = wishlist.Contains(id);
             ViewBag.inBasket = shoppingBasket.Contains(id);
 
@@ -134,13 +135,13 @@ namespace Minotaur.Areas.Customer
             return View(products);
         }
 
-        public async Task<IActionResult> Privacy()
+        public IActionResult Privacy()
         {
             return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public async Task<IActionResult> Error()
+        public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }

@@ -42,9 +42,9 @@ namespace Minotaur.DataAccess.Repository
 
         }
 
-        public async void Save()
+        public async Task Save()
         {
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
     }

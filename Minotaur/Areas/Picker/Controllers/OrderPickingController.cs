@@ -35,7 +35,7 @@ namespace Minotaur.Areas.Picker.Controllers
 
             try
             {
-                var assemblyOrders = _unitOfWork.Orders.GetAll().Where(s => requiredOrderTypes.Contains(s.OrderStatus))
+                var assemblyOrders = (await _unitOfWork.Orders.GetAllAsync(s => requiredOrderTypes.Contains(s.OrderStatus)))
                               .Select(s => new
                               {
                                   s.OrderId,
@@ -47,7 +47,7 @@ namespace Minotaur.Areas.Picker.Controllers
                                       {
                                           p.ProductId,
                                           p.Name,
-                                          p.Author,
+                                          p.Author, 
                                           o.Count,
                                           o.Price,
                                           IsChecked = false,
@@ -62,13 +62,13 @@ namespace Minotaur.Areas.Picker.Controllers
                                           record.Count,
                                           record.ShelfNumber
                                       }).ToList(),
-                              }).ToList();
+                              });
 
                 return Json(new { data = assemblyOrders });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -82,7 +82,7 @@ namespace Minotaur.Areas.Picker.Controllers
                 order.AssemblyResponsibleWorkerId = picker.WorkerId;
 
                 _unitOfWork.Orders.Update(order);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
 
                 return Ok();
             }
@@ -112,9 +112,9 @@ namespace Minotaur.Areas.Picker.Controllers
                     TypeNotification = NotificationSD.Refund,
                     Text = $"Необходимо осуществить возврат средств в сумме {order.AssemblyResponsibleWorkerId} за заказ под номером: {order.OrderId}."
                 };
-                _unitOfWork.Notifications.AddAsync(notificationForAdminForRefund);
+                await _unitOfWork.Notifications.AddAsync(notificationForAdminForRefund);
                 _unitOfWork.Orders.Update(order);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
 
                 return Ok();
             }
@@ -155,16 +155,16 @@ namespace Minotaur.Areas.Picker.Controllers
                         Notification notificationForWorkerPickUpPoint = new()
                         {
                             OrderId = order.OrderId,
-                            RecipientId = workerPickUpPoin.FirstOrDefault().UserId,        
+                            RecipientId = workerPickUpPoin.FirstOrDefault().UserId,
                             SenderId = picker.WorkerId,
                             SendingTime = MoscowTime.GetTime(),
                             TypeNotification = NotificationSD.SimpleNotification,
                             Text = $"Скоро в пункт будет доставлен заказ {order.OrderId}."
                         };
-                        _unitOfWork.Notifications.AddAsync(notificationForWorkerPickUpPoint);
+                        await _unitOfWork.Notifications.AddAsync(notificationForWorkerPickUpPoint);
                     }
 
-                    _unitOfWork.Notifications.AddAsync(notification);
+                    await _unitOfWork.Notifications.AddAsync(notification);
                 }
                 else if (order.MissingItems == missingProduct)
                 {
@@ -223,8 +223,6 @@ namespace Minotaur.Areas.Picker.Controllers
                         Text = $"Необходимо осуществить возврат средств в сумме {order.RefundAmount} за заказ под номером: {order.OrderId}."
                     };
 
-                    // TODO: нужно сделать возможность рефанда для админа
-
                     Notification notification = new()
                     {
                         OrderId = order.OrderId,
@@ -235,8 +233,8 @@ namespace Minotaur.Areas.Picker.Controllers
                         Text = $"Ваша заказ полностью собран и отправлен"
                     };
 
-                    _unitOfWork.Notifications.AddAsync(notificationForAdminForRefund);
-                    _unitOfWork.Notifications.AddAsync(notification);
+                    await _unitOfWork.Notifications.AddAsync(notificationForAdminForRefund);
+                    await _unitOfWork.Notifications.AddAsync(notification);
                 }
                 else
                 {
@@ -268,17 +266,17 @@ namespace Minotaur.Areas.Picker.Controllers
                         Text = $"Здравствуйте, к сожалению, на складе закончились следующие товары, которые Вы заказывали: {misProductNameAndCount}" +
                         $" Будет осуществлен возврат средств за отсутствующие товары. Согласны Вы получить не полный заказ?"
                     };
-                    _unitOfWork.Notifications.AddAsync(notification);
+                    await _unitOfWork.Notifications.AddAsync(notification);
                 }
 
                 _unitOfWork.Orders.Update(order);
 
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
                 return Ok();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
 

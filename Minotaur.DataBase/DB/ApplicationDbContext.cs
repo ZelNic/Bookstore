@@ -6,6 +6,7 @@ using Minotaur.Utility;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Minotaur.Models.OrganizationalDocumentation.HR;
+using Minotaur.Models.Models.ModelReview;
 
 namespace Minotaur.DataAccess
 {
@@ -23,7 +24,10 @@ namespace Minotaur.DataAccess
         public DbSet<ShoppingBasket> ShoppingBaskets { get; set; }
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<Review> Reviews { get; set; }
+
+        public DbSet<Review> ProductReviews { get; set; }
+        public DbSet
+
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RecordStock> StockMagazine { get; set; }
         public DbSet<Office> Offices { get; set; }

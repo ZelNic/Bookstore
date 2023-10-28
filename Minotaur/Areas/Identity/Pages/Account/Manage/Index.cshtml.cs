@@ -139,7 +139,7 @@ namespace Minotaur.Areas.Identity.Pages.Account.Manage
             user.HouseNumber = Input.HouseNumber;
 
             _unitOfWork.MinotaurUsers.Update(user);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Данные профиля были обновлены";

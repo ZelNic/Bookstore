@@ -81,7 +81,7 @@ namespace Minotaur.Areas.PickUp
 
                 _unitOfWork.Orders.Update(order);
                 await _unitOfWork.Notifications.AddAsync(notification);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
 
                 return Ok();
             }
@@ -101,14 +101,13 @@ namespace Minotaur.Areas.PickUp
                 return BadRequest("Заказ не найден");
             }
 
-            //IDEI: сделать отправку кода на телеграмм
+            //IDEI: отправка кода на телеграмм??
 
             Random random = new();
             int confirmationСode = random.Next(100000, 999999);
 
             var user = await _userManager.GetUserAsync(User);
             Worker? workerOrderPUp = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(user.Id));
-
 
             Notification notification = new()
             {
@@ -122,8 +121,8 @@ namespace Minotaur.Areas.PickUp
             order.ConfirmationCode = confirmationСode;
 
             _unitOfWork.Orders.Update(order);
-            _unitOfWork.Notifications.AddAsync(notification);
-            _unitOfWork.Save();
+            await _unitOfWork.Notifications.AddAsync(notification);
+            await _unitOfWork.Save();
             return Ok();
         }
 
@@ -138,12 +137,12 @@ namespace Minotaur.Areas.PickUp
 
             if (order.ConfirmationCode == confirmationCode)
             {
-                order.ConfirmationCode = 0;
-                order.OrderStatus = StatusByOrder.Сompleted;
-
                 var user = await _userManager.GetUserAsync(User);
                 var workerPickUp = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(user.Id));
 
+                order.ConfirmationCode = 0;
+                order.OrderStatus = StatusByOrder.Сompleted;
+                order.AssemblyResponsibleWorkerId = workerPickUp.WorkerId;                
 
                 Notification notification = new()
                 {
@@ -157,7 +156,7 @@ namespace Minotaur.Areas.PickUp
 
                 await _unitOfWork.Notifications.AddAsync(notification) ;
                 _unitOfWork.Orders.Update(order);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
                 return Ok();
             }
             else

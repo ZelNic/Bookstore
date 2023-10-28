@@ -1,5 +1,5 @@
 ﻿using Minotaur.DataAccess.Repository.IRepository;
-using Minotaur.Models.Models;
+using Minotaur.Models.Models.ModelReview;
 
 namespace Minotaur.DataAccess.Repository
 {
@@ -13,12 +13,12 @@ namespace Minotaur.DataAccess.Repository
 
         public void Update(Review review)
         {
-            _db.Reviews.Update(review);
+            //_db.Reviews.Update(review);
         }
 
         public void UpdateRange(Review[] reviews)
         {
-            _db.Reviews.UpdateRange(reviews);
+            //_db.Reviews.UpdateRange(reviews);
         }
     }
 }

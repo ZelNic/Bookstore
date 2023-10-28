@@ -21,6 +21,7 @@
     <PackageReference Include="CassandraCSharpDriver" Version="3.19.3" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
     <PackageReference Include="DocX" Version="3.0.23523.1209" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.62.0.3155" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.13" />
@@ -43,7 +44,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Customer\API\" />
     <Folder Include="Areas\HR\Controllers\" />
     <Folder Include="Areas\Stockkeeper\PurchaseRequisitions\" />
   </ItemGroup>

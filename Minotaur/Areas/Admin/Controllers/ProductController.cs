@@ -18,16 +18,13 @@ namespace Minotaur.Areas.Admin.Controllers
         }
 
 
-
+        //TODO: переписать старницу с продуктами для админа, добавить поиск и частичную загрузку страниц
         public async Task<IActionResult> Index()
         {
-            List<Product> productsList = _unitOfWork.Products.GetAllAsync().Result.ToList();
-            List<Category> categoriesList = _unitOfWork.Categories.GetAllAsync().Result.ToList();
-
             ProductVM productVM = new()
             {
-                ProductsList = productsList,
-                CategoriesList = categoriesList,
+                ProductsList = (await _unitOfWork.Products.GetAllAsync()).ToList(),
+                CategoriesList = (await _unitOfWork.Categories.GetAllAsync()).ToList(),
             };
 
             return View(productVM);
@@ -37,17 +34,10 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> DetailsProduct(int? productId)
         {
-            var product = new Product();
-
-            if (productId != null)
-            {
-                product = await _unitOfWork.Products.GetAsync(u => u.ProductId == productId);
-            }
-
             ProductVM bookVM = new()
             {
-                Product = product,
-                CategoriesList = _unitOfWork.Categories.GetAllAsync().Result.ToList()
+                Product = await _unitOfWork.Products.GetAsync(u => u.ProductId == productId),
+                CategoriesList = await _unitOfWork.Categories.GetAllAsync()
             };
 
             return View(bookVM);
@@ -63,7 +53,7 @@ namespace Minotaur.Areas.Admin.Controllers
 
             if (product.ProductId == 0)
             {
-                _unitOfWork.Products.AddAsync(product);
+                await _unitOfWork.Products.AddAsync(product);
             }
             else
             {
@@ -83,7 +73,7 @@ namespace Minotaur.Areas.Admin.Controllers
                 }
             }
 
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
             return Ok();
         }
 
@@ -95,13 +85,11 @@ namespace Minotaur.Areas.Admin.Controllers
             if (productOnDelete != null)
             {
                 _unitOfWork.Products.Remove(productOnDelete);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
                 return Ok();
             }
-            else
-            {
-                return BadRequest();
-            }
+
+            return BadRequest("Товар не найден");
         }
     }
 }

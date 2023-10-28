@@ -17,7 +17,7 @@ namespace Minotaur.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.12")
+                .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -492,25 +492,33 @@ namespace Minotaur.Migrations
 
             modelBuilder.Entity("Minotaur.Models.Models.Review", b =>
                 {
-                    b.Property<int>("ReviewsId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewsId"));
-
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DeliveryRating")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsShowReview")
                         .HasColumnType("bit");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PhotoTitles")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PickUpRating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProductRating")
                         .HasColumnType("int");
@@ -518,10 +526,13 @@ namespace Minotaur.Migrations
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("WorkerRating")
                         .HasColumnType("int");
 
-                    b.HasKey("ReviewsId");
+                    b.HasKey("Id");
 
                     b.ToTable("Reviews");
                 });
@@ -580,7 +591,7 @@ namespace Minotaur.Migrations
                     b.Property<int>("AdmissionOrder")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("OfficeId")
+                    b.Property<Guid>("OfficeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("OfficeName")
@@ -597,6 +608,9 @@ namespace Minotaur.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("WorkerRating")
+                        .HasColumnType("int");
 
                     b.HasKey("WorkerId");
 

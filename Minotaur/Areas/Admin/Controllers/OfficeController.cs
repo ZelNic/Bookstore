@@ -28,12 +28,12 @@ namespace Minotaur.Areas.Admin.Controllers
 
         public async Task<IActionResult> GetDataOffice()
         {
-            var offices = _unitOfWork.Offices.GetAllAsync().Result;
+            var offices = await _unitOfWork.Offices.GetAllAsync();
 
             return Json(new { data = offices });
         }
 
-        public async Task<IActionResult> GetDataForFormNewOffice()
+        public IActionResult GetDataForFormNewOffice()
         {
             string[]? officeTypes = Enum.GetValues(typeof(TypesOfOffices)).Cast<TypesOfOffices>().Select(e => Enum.GetName(typeof(TypesOfOffices), e)).ToArray();
             string[]? officeStatus = Enum.GetValues(typeof(OfficeStatus)).Cast<OfficeStatus>().Select(e => Enum.GetName(typeof(OfficeStatus), e)).ToArray();
@@ -52,7 +52,7 @@ namespace Minotaur.Areas.Admin.Controllers
             if (office != null)
             {
                 await _unitOfWork.Offices.AddAsync(office);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
             }
 
             return Ok();

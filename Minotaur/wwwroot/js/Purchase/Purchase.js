@@ -60,7 +60,7 @@ function getInfomationAboutBuyer() {
 
 function getOrderPickupPoint(callback) {
     $.ajax({
-        url: '/API/API/GetOrderPickupPoint',
+        url: '/Purchase/Purchase/GetDataByPickUp',
         type: 'GET',
         dataType: 'json',
 

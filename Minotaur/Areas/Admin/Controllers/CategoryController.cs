@@ -21,7 +21,7 @@ namespace Minotaur.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            List<Category> categoryList = _unitOfWork.Categories.GetAllAsync().Result.ToList();
+            var categoryList = await _unitOfWork.Categories.GetAllAsync();
             return View(categoryList);
         }
 
@@ -29,8 +29,8 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             CategoryVM categoryVM = new()
             {
-                BookList = _unitOfWork.Products.GetAllAsync(u => u.Category == categoryId).Result.ToList(),
-                CategoryList = _unitOfWork.Categories.GetAllAsync().Result.ToList()
+                BookList = (await _unitOfWork.Products.GetAllAsync(u => u.Category == categoryId)).ToList(),
+                CategoryList = (await _unitOfWork.Categories.GetAllAsync()).ToList(),
             };
 
             return View(categoryVM);
@@ -45,7 +45,7 @@ namespace Minotaur.Areas.Admin.Controllers
                 return View(category);
             }
 
-            var book = _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
+            var book = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
 
             return View(book);
         }
@@ -62,7 +62,7 @@ namespace Minotaur.Areas.Admin.Controllers
                 _unitOfWork.Categories.Update(category);
             }
 
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
             return RedirectToAction("Index", "Category");
         }
 
@@ -72,7 +72,7 @@ namespace Minotaur.Areas.Admin.Controllers
         {
             if (categoryId != null)
             {
-                var categoryOnDelete = _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
+                var categoryOnDelete = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
                 return View(categoryOnDelete);
             }
             else return NotFound();
@@ -85,7 +85,7 @@ namespace Minotaur.Areas.Admin.Controllers
             if (categoryOnDelete != null)
             {
                 _unitOfWork.Categories.Remove(categoryOnDelete);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
                 return RedirectToAction("Index", "Category");
             }
             else

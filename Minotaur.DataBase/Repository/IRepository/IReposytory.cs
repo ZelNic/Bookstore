@@ -10,6 +10,7 @@ namespace BookStore.DataBase.Repository.IRepository
         Task AddAsync(T entity);
         void Remove(T entity);
         void RemoveRange(IEnumerable<T> entity);
-       
+        void StopTracking(T entity);
+
     }
 }

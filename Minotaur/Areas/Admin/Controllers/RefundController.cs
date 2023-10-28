@@ -23,11 +23,11 @@ namespace Minotaur.Areas.Admin.Controllers
 
         public async Task<ActionResult> MakeRefund(string notificationId)
         {
-            Notification notification = await _unitOfWork.Notifications.GetAsync(n => n.Id == Guid.Parse(notificationId));
-            Order refundOrder = await _unitOfWork.Orders.GetAsync(o => o.OrderId == notification.OrderId);
+            Notification? notification = await _unitOfWork.Notifications.GetAsync(n => n.Id == Guid.Parse(notificationId));
+            Order? refundOrder = await _unitOfWork.Orders.GetAsync(o => o.OrderId == notification.OrderId);
 
             notification.IsHidden = true;
-            //IDEA создать "банк" и переместить всю логику по денежным операциям в него
+            //IDEA создать "банк" и переместить всю логику по денежным операциям в него??
 
             MinotaurUser? admin = await _userManager.GetUserAsync(User);
             MinotaurUser? returnRecipient = await _unitOfWork.MinotaurUsers.GetAsync(u => u.Id == refundOrder.UserId.ToString());
@@ -40,7 +40,7 @@ namespace Minotaur.Areas.Admin.Controllers
 
             _unitOfWork.Notifications.Update(notification);
             _unitOfWork.MinotaurUsers.UpdateRange(new[] { admin, returnRecipient });
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             return Ok();
         }

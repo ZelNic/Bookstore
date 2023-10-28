@@ -29,9 +29,9 @@ namespace Minotaur.Areas.Customer
         }
         public async Task<IActionResult> GetShoppingBasket()
         {
-            MinotaurUser user = await _userManager.GetUserAsync(User);
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
 
-            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAllAsync(u => u.UserId == Guid.Parse(user.Id)).Result.Where(n => n.IsPurchased == false).FirstOrDefault();
+            ShoppingBasket? shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAsync(u => u.UserId == Guid.Parse(user.Id) && u.IsPurchased == false);
 
             if (shoppingBasket == null)
             {
@@ -40,8 +40,7 @@ namespace Minotaur.Areas.Customer
 
             Dictionary<int, int> productIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
 
-            var sb = _unitOfWork.Products.GetAllAsync().Result.Where(u => productIdAndCount.Keys.Contains(u.ProductId))
-           .Join(_unitOfWork.Categories.GetAllAsync().Result, b => b.Category, c => c.Id, (b, c) => new
+            var necessaryData = (await _unitOfWork.Products.GetAllAsync(u => productIdAndCount.Keys.Contains(u.ProductId))).Join(await _unitOfWork.Categories.GetAllAsync(), b => b.Category, c => c.Id, (b, c) => new
            {
                image = b.ImageURL,
                nameProduct = b.Name,
@@ -53,7 +52,7 @@ namespace Minotaur.Areas.Customer
                isSelect = false
            }).ToList();
 
-            return Json(new { data = sb });
+            return Json(new { data = necessaryData });
         }
 
 
@@ -106,9 +105,9 @@ namespace Minotaur.Areas.Customer
         [HttpPost]
         public async Task<IActionResult> AddToBasketProduct(int productId)
         {
-            MinotaurUser user = await _userManager.GetUserAsync(User);
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
 
-            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAllAsync().Result.Where(u => u.UserId == Guid.Parse(user.Id)).Where(n => n.IsPurchased == false).FirstOrDefault();
+            ShoppingBasket? shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAsync(b => b.UserId == Guid.Parse(user.Id) && b.IsPurchased == false);
 
             if (shoppingBasket != null)
             {
@@ -140,22 +139,21 @@ namespace Minotaur.Areas.Customer
                     ProductIdAndCount = productId.ToString() + ":1"
                 };
 
-                _unitOfWork.ShoppingBaskets.AddAsync(newShoppingBasket);
+                await _unitOfWork.ShoppingBaskets.AddAsync(newShoppingBasket);
             }
 
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             return Ok();
         }
 
 
-
         [HttpPost]
         public async Task<IActionResult> RemoveFromBasket(string productsId)
         {
-            MinotaurUser user = await _userManager.GetUserAsync(User);
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
 
-            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAll(u => u.UserId == Guid.Parse(user.Id)).Where(n => n.IsPurchased == false).FirstOrDefault();
+            ShoppingBasket? shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAsync(b => b.UserId == Guid.Parse(user.Id) && b.IsPurchased == false);
             if (shoppingBasket == null) { return BadRequest("Пустая корзина"); }
 
             List<int> listProductsId = productsId.Split(',').Select(int.Parse).ToList();
@@ -173,14 +171,14 @@ namespace Minotaur.Areas.Customer
             if (productIdAndCount.Count == 0)
             {
                 _unitOfWork.ShoppingBaskets.Remove(shoppingBasket);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
                 return BadRequest("Пустая корзина");
             }
             else
             {
                 shoppingBasket.ProductIdAndCount = SerializationProductData(productIdAndCount);
-                _unitOfWork.Save();
                 _unitOfWork.ShoppingBaskets.Update(shoppingBasket);
+                await _unitOfWork.Save();
                 return Ok();
             }
         }
@@ -189,10 +187,8 @@ namespace Minotaur.Areas.Customer
         [HttpPost]
         public async Task<IActionResult> ChangeCountProduct(string productData)
         {
-            MinotaurUser user = await _userManager.GetUserAsync(User);
-
-            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAll(u => u.UserId == Guid.Parse(user.Id)).Where(n => n.IsPurchased == false).FirstOrDefault();
-
+            MinotaurUser? user = await _userManager.GetUserAsync(User);
+            ShoppingBasket? shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAsync(b => b.UserId == Guid.Parse(user.Id) && b.IsPurchased == false);
             if (shoppingBasket == null) { return BadRequest(); }
 
             Dictionary<int, int> oldProductIdAndCount = ParseProductData(shoppingBasket.ProductIdAndCount);
@@ -209,7 +205,7 @@ namespace Minotaur.Areas.Customer
 
             shoppingBasket.ProductIdAndCount = SerializationProductData(oldProductIdAndCount);
             _unitOfWork.ShoppingBaskets.Update(shoppingBasket);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             return Ok();
         }

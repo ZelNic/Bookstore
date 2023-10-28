@@ -26,9 +26,7 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDataUserRoles()
         {
-            var worker = await _unitOfWork.Workers.GetAllAsync();
-
-            var dataWorkerWithUserData = worker.Join(_unitOfWork.MinotaurUsers.GetAll(), w => w.UserId, u => Guid.Parse(u.Id), (w, u) => new { Worker = w, User = u })
+            var dataWorkerWithUserData = (await _unitOfWork.Workers.GetAllAsync()).Join(_unitOfWork.MinotaurUsers.GetAll(), w => w.UserId, u => Guid.Parse(u.Id), (w, u) => new { Worker = w, User = u })
                 .Select(w => new
                 {
                     w.Worker.WorkerId,
@@ -90,7 +88,7 @@ namespace Minotaur.Areas.Admin.Controllers
             worker.AccessRights = SerializationWorkerRoles(arrayRoles);
 
             _unitOfWork.Workers.Update(worker);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             await _userManager.AddToRoleAsync(minotaurUser, role);
             return Ok();
@@ -115,7 +113,7 @@ namespace Minotaur.Areas.Admin.Controllers
             worker.AccessRights = SerializationWorkerRoles(arrayRoles);
 
             _unitOfWork.Workers.Update(worker);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             await _userManager.RemoveFromRoleAsync(minotaurUser, role);
             return Ok();

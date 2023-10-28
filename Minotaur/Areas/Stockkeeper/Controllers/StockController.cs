@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+﻿
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -56,7 +57,7 @@ namespace Minotaur.Areas.Stockkeeper
             DataByStock? dataByStock = await GetStockDataAsync();
 
             var stockJournal = dataByStock.Records.Where(u => u.ResponsiblePersonId == dataByStock.StockKeeper.WorkerId)
-                .Join(_unitOfWork.Products.GetAllAsync().Result, s => s.ProductId, b => b.ProductId, (s, b) => new
+                .Join(await _unitOfWork.Products.GetAllAsync(), s => s.ProductId, b => b.ProductId, (s, b) => new
                 {
                     id = s.Id,
                     productId = s.ProductId,
@@ -76,7 +77,7 @@ namespace Minotaur.Areas.Stockkeeper
         [HttpPost]
         public async Task<IActionResult> AddProductInStock(int productId, int numberShelf, int productCount)
         {
-            Product product = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
+            Product? product = await _unitOfWork.Products.GetAsync(p => p.ProductId == productId);
             if (product == null) { return BadRequest("Такого товара нет в базе. Проверьте правильность введенных данных."); }
 
             DataByStock? dataByStock = await GetStockDataAsync();
@@ -105,10 +106,10 @@ namespace Minotaur.Areas.Stockkeeper
                     Operation = OperationStock.ReceiptOfGoods,
                     IsNeed = _unitOfWork.StockMagazine.GetAsync(u => u.ProductId == productId).Result.IsNeed
                 };
-                _unitOfWork.StockMagazine.AddAsync(record);
+                await _unitOfWork.StockMagazine.AddAsync(record);
             }
 
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
             return Ok($"Товар {product.Name} добавлен на полку {numberShelf} в количестве {productCount} шт.");
 
         }
@@ -147,7 +148,7 @@ namespace Minotaur.Areas.Stockkeeper
                 productOnShelf.Count += productCount;
 
                 _unitOfWork.StockMagazine.Update(productOnShelf);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
                 return Ok();
             }
             else
@@ -164,8 +165,8 @@ namespace Minotaur.Areas.Stockkeeper
                     IsNeed = _unitOfWork.StockMagazine.GetAsync(u => u.ProductId == selectedRecord.ProductId).Result.IsNeed,
                 };
 
-                _unitOfWork.StockMagazine.AddAsync(newRecord);
-                _unitOfWork.Save();
+                await _unitOfWork.StockMagazine.AddAsync(newRecord);
+                await _unitOfWork.Save();
 
                 return Ok();
             }
@@ -186,12 +187,12 @@ namespace Minotaur.Areas.Stockkeeper
             }
 
             _unitOfWork.StockMagazine.UpdateRange(recordsWithNeedProduct);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
 
             return Ok();
         }
 
-        //For PurchaseRequest
+
 
         [HttpGet]
         public IActionResult PurchaseRequest()
@@ -205,19 +206,19 @@ namespace Minotaur.Areas.Stockkeeper
             DataByStock dataByStock = await GetStockDataAsync();
             if (dataByStock.Records == null) { return BadRequest($"Отсутсвуют записи по складу {dataByStock.Stock.Name}."); }
 
-
             var request = dataByStock.Records.Where(p => p.IsNeed == true)
-                .Join(_unitOfWork.Products.GetAllAsync().Result, s => s.ProductId, b => b.ProductId, (s, b) => new
+                .Join(await _unitOfWork.Products.GetAllAsync(), s => s.ProductId, b => b.ProductId, async (s, b) => new
                 {
                     s.ProductId,
-                    TitleProduct = _unitOfWork.Products.GetAllAsync(u => u.ProductId == s.ProductId).Result.Select(u => u.Name).FirstOrDefault(),
-                    TotalProduct = _unitOfWork.StockMagazine.GetAllAsync(u => u.IsNeed == true).Result.Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
-                }).Distinct().ToArray();
-
+                    TitleProduct = (await _unitOfWork.Products.GetAsync(u => u.ProductId == s.ProductId)).Name,
+                    TotalProduct = (await _unitOfWork.StockMagazine.GetAllAsync(u => u.IsNeed == true)).Where(i => i.ProductId == s.ProductId).Select(u => u.Count).Sum(),
+                }).Distinct();
 
             return Json(new { data = request });
         }
 
+
+        // TODO: разделить метод на несколько частей с информацией, что операция создания документа удалась, иначе не сохранять изменения
 
         [HttpPost]
         public async Task<IActionResult> OrderProducts([FromBody] RecordStock[] purchaseRequestData)
@@ -243,7 +244,7 @@ namespace Minotaur.Areas.Stockkeeper
                 ProductDataOnPurchase = productDataOnPurchase
             };
 
-            _unitOfWork.StockMagazine.AddAsync(recordStockPurchase);
+            await _unitOfWork.StockMagazine.AddAsync(recordStockPurchase);
 
             //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -257,17 +258,14 @@ namespace Minotaur.Areas.Stockkeeper
 
             using (WordprocessingDocument doc = WordprocessingDocument.Open(filledFilePath, true))
             {
-                // Получаем основную часть документа
                 MainDocumentPart mainPart = doc.MainDocumentPart;
 
-                // Получаем текст документа
                 string docText;
                 using (StreamReader sr = new StreamReader(mainPart.GetStream()))
                 {
                     docText = sr.ReadToEnd();
                 }
 
-                // Заменяем значения в тексте документа
                 Dictionary<string, string> replacements = new Dictionary<string, string>{
                     {"Number", recordStockPurchase.Id.ToString()},
                     {"TypeOffice", dataByStock.Stock.Type.ToString()},
@@ -288,8 +286,8 @@ namespace Minotaur.Areas.Stockkeeper
                     sw.Write(docText);
                 }
 
-                Table table = mainPart.Document.Body.Elements<Table>().FirstOrDefault();
-                TableProperties sourceTableProperties = table.GetFirstChild<TableProperties>();
+                Table? table = mainPart?.Document?.Body?.Elements<Table>().FirstOrDefault();
+                TableProperties? sourceTableProperties = table?.GetFirstChild<TableProperties>();
 
                 TableProperties copiedTableProperties = (TableProperties)sourceTableProperties.CloneNode(true);
 
@@ -322,12 +320,12 @@ namespace Minotaur.Areas.Stockkeeper
                     productNameCell.AppendChild(cellProperties.CloneNode(true));
                     countCell.AppendChild(cellProperties.CloneNode(true));
 
-                    table.AppendChild(newRow);
+                    table?.AppendChild(newRow);
                 }
 
 
 
-                mainPart.Document.Save();
+                mainPart?.Document.Save();
             }
 
             byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
@@ -340,7 +338,7 @@ namespace Minotaur.Areas.Stockkeeper
             Response.Headers.Add(HeaderNames.ContentDisposition, contentDispositionHeader.ToString());
             Response.Headers.Add(HeaderNames.XContentTypeOptions, "nosniff");
 
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
             return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         }
     }

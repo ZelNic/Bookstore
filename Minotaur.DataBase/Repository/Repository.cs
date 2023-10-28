@@ -42,7 +42,6 @@ namespace Minotaur.DataAccess.Repository
                 }
             }
             return await query.FirstOrDefaultAsync();
-
         }
 
         public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
@@ -84,14 +83,18 @@ namespace Minotaur.DataAccess.Repository
         }
 
         public void Remove(T entity)
-        {
-            _dbSet.Entry(entity).State = EntityState.Detached;
+        {            
             _dbSet.Remove(entity);
         }
 
         public void RemoveRange(IEnumerable<T> entity)
         {
             _dbSet.RemoveRange(entity);
+        }
+
+        public void StopTracking(T entity)
+        {
+            _dbSet.Entry(entity).State = EntityState.Detached;
         }
     }
 }

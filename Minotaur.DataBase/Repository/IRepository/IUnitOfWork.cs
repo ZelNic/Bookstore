@@ -15,6 +15,6 @@
         IWorkersRepository Workers { get; }
         IOrganizationalOrderRepository OrganizationalOrders { get; }
         ITelegramRequestsRepository TelegramRequestsRepository { get; }
-        void Save();
+        Task Save();
     }
 }

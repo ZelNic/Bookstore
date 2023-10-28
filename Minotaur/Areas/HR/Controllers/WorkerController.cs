@@ -28,31 +28,30 @@ namespace Minotaur.Areas.HR.Controllers
             _userManager = userManager;
         }
 
-
-        public async Task<IActionResult> Index() => View();
+        public IActionResult Index() => View();
 
         public async Task<IActionResult> GetDataByWorkers(string? workerId = null)
         {
-            var workers = _unitOfWork.Workers.GetAll()
-                .Join<Worker, MinotaurUser, Guid, dynamic>(_unitOfWork.MinotaurUsers.GetAll(), e => e.UserId, u => Guid.Parse(u.Id), (e, u) => new { Worker = e, User = u })
-                .Select(w => new
-                {
-                    w.Worker.WorkerId,
-                    w.Worker.UserId,
-                    w.Worker.Status,
-                    w.Worker.OfficeId,
-                    w.Worker.OfficeName,
-                    LFS = w.User.LastName + " " + w.User.FirstName + " " + w.User.Surname,
-                    w.Worker.AccessRights,
-                    w.Worker.Post,
-                    w.User.Email,
-                    w.Worker.AdmissionOrder,
-                    w.Worker.OrderDismissal,
-                });
+            var request = await _unitOfWork.Workers.GetAllAsync();
+            var workers = request.Join<Worker, MinotaurUser, Guid, dynamic>(_unitOfWork.MinotaurUsers.GetAll(), e => e.UserId, u => Guid.Parse(u.Id), (e, u) => new { Worker = e, User = u })
+                 .Select(w => new
+                 {
+                     w.Worker.WorkerId,
+                     w.Worker.UserId,
+                     w.Worker.Status,
+                     w.Worker.OfficeId,
+                     w.Worker.OfficeName,
+                     LFS = w.User.LastName + " " + w.User.FirstName + " " + w.User.Surname,
+                     w.Worker.AccessRights,
+                     w.Worker.Post,
+                     w.User.Email,
+                     w.Worker.AdmissionOrder,
+                     w.Worker.OrderDismissal,
+                 });
 
             if (workerId != null)
             {
-                foreach (var worker in workers)
+                foreach (var worker in request)
                 {
                     if (worker.WorkerId == Guid.Parse(workerId))
                     {
@@ -76,7 +75,7 @@ namespace Minotaur.Areas.HR.Controllers
         public async Task<IActionResult> FindUserForHiring(string email)
         {
             MinotaurUser? user = await _userManager.FindByEmailAsync(email);
-            if (user == null) return BadRequest(new { error = "Пользователь не найден. Необходимо зарегестировать работника в качестве сотрудника или проверить введеные данные." });
+            if (user == null) return BadRequest("Пользователь не найден. Необходимо зарегестировать работника в качестве сотрудника или проверить введеные данные.");
 
             var userWithNeedProperties = new
             {
@@ -91,7 +90,7 @@ namespace Minotaur.Areas.HR.Controllers
                 user.HouseNumber
             };
 
-            var office = _unitOfWork.Offices.GetAllAsync().Result;
+            var office = await _unitOfWork.Offices.GetAllAsync();
 
             return Json(new { data = userWithNeedProperties, office });
         }
@@ -100,10 +99,10 @@ namespace Minotaur.Areas.HR.Controllers
         public async Task<IActionResult> UpsertEmployeeUserData(string dataUser)
         {
             var newDatauser = JsonConvert.DeserializeObject<MinotaurUser>(dataUser);
-            if (newDatauser == null) { return BadRequest(new { error = "Ошибка в обработке данных" }); }
+            if (newDatauser == null) { return BadRequest("Ошибка в обработке данных"); }
 
             var oldDataUser = await _userManager.FindByIdAsync(newDatauser.Id);
-            if (oldDataUser == null) { return BadRequest(new { error = "Пользователь не найден." }); }
+            if (oldDataUser == null) { return BadRequest("Пользователь не найден."); }
 
             oldDataUser.FirstName = newDatauser.FirstName;
             oldDataUser.LastName = newDatauser.LastName;
@@ -116,14 +115,14 @@ namespace Minotaur.Areas.HR.Controllers
 
             await _userManager.UpdateAsync(oldDataUser);
 
-            if (_unitOfWork.Workers.GetAllAsync().Result.Where(u => u.UserId == Guid.Parse(oldDataUser.Id)).FirstOrDefault() == null)
+            if (await _unitOfWork.Workers.GetAsync(u => u.UserId == Guid.Parse(oldDataUser.Id)) == null)
             {
                 var result = AddNewWorker(oldDataUser);
                 return Json(new { data = result });
             }
             else
             {
-                var workerData = _unitOfWork.Workers.GetAllAsync().Result.Where(u => u.UserId == Guid.Parse(oldDataUser.Id)).FirstOrDefault();
+                var workerData = await _unitOfWork.Workers.GetAllAsync(u => u.UserId == Guid.Parse(oldDataUser.Id));
                 return Json(new { data = workerData });
             }
         }
@@ -139,33 +138,35 @@ namespace Minotaur.Areas.HR.Controllers
 
             try
             {
-                _unitOfWork.Workers.AddAsync(worker);
-                _unitOfWork.Save();
+                await _unitOfWork.Workers.AddAsync(worker);
+                await _unitOfWork.Save();
 
                 var hr = await _userManager.GetUserAsync(User);
                 var hrId = hr.Id;
 
+                var registeredWorker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(oldDataUser.Id));
+
                 OrganizationalOrder order = new()
                 {
                     Name = "Приказ о приеме на работу",
-                    WorkerId = _unitOfWork.Workers.GetAllAsync().Result.Where(w => w.UserId == Guid.Parse(oldDataUser.Id)).Select(i => i.WorkerId).FirstOrDefault(),
+                    WorkerId = registeredWorker.WorkerId,
                     HrID = Guid.Parse(hrId),
-                    Date = MoscowTime.GetTime().ToString("dd.MM.yyyy"),
+                    Date = MoscowTime.GetTime().ToString("dd.MM.yyyy HH:mm")
                 };
 
-                _unitOfWork.OrganizationalOrders.AddAsync(order);
-                _unitOfWork.Save();
+                await _unitOfWork.OrganizationalOrders.AddAsync(order);
+                await _unitOfWork.Save();
 
                 worker.AdmissionOrder = order.Id;
                 _unitOfWork.Workers.Update(worker);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
 
                 return Json(new { data = worker });
 
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = $"{ex.Message}" });
+                return BadRequest(ex.Message);
             }
         }
 
@@ -178,20 +179,22 @@ namespace Minotaur.Areas.HR.Controllers
 
             if (await _userManager.FindByIdAsync(newDataWorker.UserId.ToString()) != null)
             {
-                var office = _unitOfWork.Offices.GetAllAsync().Result.Where(u => u.Id == newDataWorker.OfficeId).FirstOrDefault();
+                var office = await _unitOfWork.Offices.GetAsync(u => u.Id == newDataWorker.OfficeId);
                 if (office == null) { return BadRequest("Офис не найден"); }
 
-                Worker? oldDataWorker = _unitOfWork.Workers.GetAllAsync().Result.Where(u => u.WorkerId == newDataWorker.WorkerId).FirstOrDefault();
+                Worker? oldDataWorker = await _unitOfWork.Workers.GetAsync(u => u.WorkerId == newDataWorker.WorkerId);
                 if (oldDataWorker == null) { return BadRequest("Работник не найден"); }
+
+                var admissionOrder = await _unitOfWork.OrganizationalOrders.GetAsync(w => w.WorkerId == oldDataWorker.WorkerId);
 
                 oldDataWorker.Status = newDataWorker.Status;
                 oldDataWorker.OfficeId = newDataWorker.OfficeId;
-                oldDataWorker.OfficeName = _unitOfWork.Offices.GetAllAsync().Result.Where(i => i.Id == newDataWorker.OfficeId).Select(o => o.Name).FirstOrDefault();
+                oldDataWorker.OfficeName = office.Name;
                 oldDataWorker.Post = newDataWorker.Post;
-                oldDataWorker.AdmissionOrder = _unitOfWork.OrganizationalOrders.GetAllAsync().Result.Where(w => w.WorkerId == oldDataWorker.WorkerId).Select(i => i.Id).FirstOrDefault();
+                oldDataWorker.AdmissionOrder = admissionOrder.Id;
                 oldDataWorker.OrderDismissal = newDataWorker.OrderDismissal;
                 _unitOfWork.Workers.Update(oldDataWorker);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
                 return Ok();
             }
             else
@@ -202,8 +205,8 @@ namespace Minotaur.Areas.HR.Controllers
 
         public async Task<IActionResult> FireEmployee(string workerId)
         {
-            Worker? exWorker = _unitOfWork.Workers.GetAllAsync().Result.Where(w => w.WorkerId.ToString() == workerId).FirstOrDefault();
-            if (exWorker == null) { return BadRequest(new { error = "Работник не найден" }); }
+            Worker? exWorker = await _unitOfWork.Workers.GetAsync(w => w.WorkerId.ToString() == workerId);
+            if (exWorker == null) { return BadRequest("Работник не найден"); }
 
             exWorker.Status = StatusWorker.Fired;
 
@@ -216,6 +219,5 @@ namespace Minotaur.Areas.HR.Controllers
             await _userManager.AddToRoleAsync(minotaurUser, Roles.Role_Customer);
             return Ok();
         }
-
     }
 }

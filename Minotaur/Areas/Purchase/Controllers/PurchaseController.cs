@@ -1,19 +1,14 @@
-﻿using Minotaur.Areas.Customer;
-using Minotaur.DataAccess;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Minotaur.Areas.Customer;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
 using Minotaur.Models.SD;
 using Minotaur.Utility;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using System.Linq;
-using Minotaur.DataAccess.Repository.IRepository;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using DocumentFormat.OpenXml.Vml.Office;
-using Minotaur.DataAccess.Repository;
 
 namespace Minotaur.Areas.Purchase
 {
@@ -28,6 +23,14 @@ namespace Minotaur.Areas.Purchase
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetDataByPickUp()
+        {
+            var orderPickupPoint = await _unitOfWork.Offices.GetAllAsync(p => p.Type == "Пункт выдачи");
+            return Json(new { data = orderPickupPoint });
         }
 
         [HttpGet]
@@ -53,14 +56,12 @@ namespace Minotaur.Areas.Purchase
             return Json(new { data = order });
         }
 
-
         public async Task<List<OrderProductData>> GetVerifiedProductData()
         {
             MinotaurUser? user = await _userManager.GetUserAsync(User);
 
-
-            ShoppingBasket? shoppingBasket = _unitOfWork.ShoppingBaskets.GetAllAsync().Result.Where(u => u.UserId == Guid.Parse(user.Id)).Where(n => n.IsPurchased == false).FirstOrDefault();
-            if (shoppingBasket == null) { return null; }
+            ShoppingBasket? shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAsync(b => b.UserId == Guid.Parse(user.Id) && b.IsPurchased == false);
+            if (shoppingBasket == null) { return new List<OrderProductData>(); }
 
             Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(shoppingBasket.ProductIdAndCount);
 
@@ -74,12 +75,11 @@ namespace Minotaur.Areas.Purchase
                     Count = productIdAndCount[p.ProductId]
                 }).ToList();
 
-
             return purchaseData;
         }
 
         [HttpGet]
-        public async Task<IActionResult> FillDeliveryDate()
+        public IActionResult FillDeliveryDate()
         {
             return View();
         }
@@ -106,12 +106,16 @@ namespace Minotaur.Areas.Purchase
         public async Task<IActionResult> AddMoneyOnWallet(int sum)
         {
             MinotaurUser? user = await _userManager.GetUserAsync(User);
+            if (user == null) { return BadRequest("Пользователь не найден"); }
 
             user.PersonalWallet += sum;
             await _userManager.UpdateAsync(user);
+
             return Ok();
         }
 
+
+        //TODO: протестировать, ибо могут быть ошибки
 
         [HttpPost]
         public async Task<IActionResult> Payment(string dataDelivery)
@@ -127,11 +131,11 @@ namespace Minotaur.Areas.Purchase
             if (confirmedPrice != order.PurchaseAmount) { return BadRequest("Ошибочная стоимость заказа."); }
 
 
-            List<ShoppingBasket> sb = _unitOfWork.ShoppingBaskets.GetAllAsync(u => u.UserId == Guid.Parse(user.Id)).Result.Where(n=>n.IsPurchased == false).ToList();
-            if (sb == null) return BadRequest("Запись о списке покупок не найдена.");
+            var shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAsync(b => b.UserId == Guid.Parse(user.Id) &&  b.IsPurchased == false);
+            if (shoppingBasket == null) return BadRequest("Запись о списке покупок не найдена.");
 
 
-            Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(sb[0].ProductIdAndCount);
+            Dictionary<int, int> productIdAndCount = ShoppingBasketController.ParseProductData(shoppingBasket.ProductIdAndCount);
 
             List<OrderProductData> productData = await GetVerifiedProductData();
             string prodDataJson = JsonConvert.SerializeObject(productData);
@@ -155,17 +159,17 @@ namespace Minotaur.Areas.Purchase
 
                     _unitOfWork.MinotaurUsers.UpdateRange(users);
 
-                    sb[0].IsPurchased = true;
+                    shoppingBasket.IsPurchased = true;
 
-                    _unitOfWork.ShoppingBaskets.UpdateRange(sb.ToArray());
+                    _unitOfWork.ShoppingBaskets.Update(shoppingBasket);
 
-                    _unitOfWork.Orders.AddAsync(order);
-                    _unitOfWork.Save();
+                    await _unitOfWork.Orders.AddAsync(order);
+                    await _unitOfWork.Save();
 
                     return Ok();
                 }
                 else
-                {                   
+                {
                     return BadRequest("Технические проблемы со стороны магазина.");
                 }
             }
