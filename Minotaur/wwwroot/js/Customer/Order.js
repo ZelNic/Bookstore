@@ -48,7 +48,7 @@ function generateOrderCards() {
                     </td>
                     <td>${product.price} ₽ </td>
                     <td>${product.count}</td>
-                    <td><button id="btnReview_${product.id}" onclick="reviewHandler(${product.id}, '${productNameData[product.id]}')" class="btn btn-success">Отзыв</button></td>
+                    <td><button  onclick="reviewProductHandler('${product.id}', '${productNameData[product.id]}')" class="btn btn-success">Отзыв</button></td>
                 </tr>
             </tbody>
             `;
@@ -56,6 +56,7 @@ function generateOrderCards() {
             countProduct += product.count;
             sumPrice += product.count * product.price;
         }
+
 
         html += `
                     <div class="mb-5">
@@ -111,7 +112,7 @@ function generateOrderCards() {
                         </div>
                     </div>
                     <hr/>
-                    <button id="btnReviewOrder_${order.orderId}" onclick="reviewHandler(${product.id}, '${productNameData[product.id]}')" class="btn btn-success">Отзыв о заказе</button>
+                    <button onclick="reviewOrderHandler('${order.orderId}')" class="btn btn-success">Отзыв о заказе</button>
                 </div>
             </div>
         `;
@@ -121,10 +122,9 @@ function generateOrderCards() {
 
 function reviewProductHandler(productId, productName) {
 
-    let formReview = `
-                   <form id="reviewForm" enctype="multipart/form-data">
-                          <div class="form-row">
-                            
+    let formProductReview = `
+                   <form id="formReviewProduct" enctype="multipart/form-data">
+                          <div class="form-row">                            
                             <div class="form-group col-md-12 mb-1">
                               <label for="productRating">Оценка товара:</label>
                               <select class="form-control" id="productRating" name="ProductRating" required>
@@ -135,29 +135,7 @@ function reviewProductHandler(productId, productName) {
                                 <option value="4">4</option>
                                 <option value="5">5</option>
                               </select>
-                            </div>
-                            <div class="form-group col-md-12 mb-1">
-                              <label for="productRating">Оценка пункта выдачи:</label>
-                              <select class="form-control" id="productRating" name="ProductRating" required>
-                                <option selected disabled>Выбрать</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                              </select>
-                            </div>
-                            <div class="form-group col-md-12 mb-1">
-                              <label for="productRating">Оценка сотрудника:</label>
-                              <select class="form-control" id="productRating" name="ProductRating" required>
-                                <option selected disabled>Выбрать</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                              </select>
-                            </div>
+                            </div>      
                           </div>
                           <div class="form-row">
                             <div class="form-group col-md-12 mb-1">
@@ -174,13 +152,13 @@ function reviewProductHandler(productId, productName) {
 
     Swal.fire({
         title: `Отзыв на ${productName}`,
-        html: formWorkerData,
+        html: formProductReview,
         showCancelButton: true,
         confirmButtonText: 'Сохранить',
         cancelButtonText: 'Отмена',
         preConfirm: () => {
             return new Promise((resolve, reject) => {
-                const formData = new FormData(document.getElementById('dataUser'));
+                const formData = new FormData(document.getElementById('formReviewProduct'));
                 const reviewObject = {};
 
                 for (const [key, value] of formData.entries()) {
@@ -215,12 +193,12 @@ function reviewProductHandler(productId, productName) {
 
 
 function reviewOrderHandler(orderId) {
-    let formReview = `
-                        <form id="reviewForm" enctype="multipart/form-data">
+    let formOrderReview = `
+                        <form id="formOrderReview" enctype="multipart/form-data">
                         <div class="form-row">
                             <div class="form-group col-md-12 mb-1">
                                 <label for="deliveryRating">Оценка доставки:</label>
-                                <select class="form-control" id="deliveryRating" name="DeliveryRating" required>
+                                <select class="form-control" name="DeliveryRating" required>
                                     <option selected disabled>Выбрать</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -230,12 +208,12 @@ function reviewOrderHandler(orderId) {
                                 </select>
                                 <div class="form-group col-md-12 mb-1">
                                     <label for="review">Отзыв доставку:</label>
-                                    <textarea class="form-control" id="review" name="Review"></textarea>
+                                    <textarea class="form-control" ></textarea>
                                 </div>
                             </div>
                             <div class="form-group col-md-12 mb-1">
                                 <label for="productRating">Оценка пункта выдачи:</label>
-                                <select class="form-control" id="productRating" name="ProductRating" required>
+                                <select class="form-control"  required>
                                     <option selected disabled>Выбрать</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -245,12 +223,12 @@ function reviewOrderHandler(orderId) {
                                 </select>
                                 <div class="form-group col-md-12 mb-1">
                                     <label for="review">Отзыв на пункт выдачи:</label>
-                                    <textarea class="form-control" id="review" name="Review"></textarea>
+                                    <textarea class="form-control" ></textarea>
                                 </div>
                             </div>
                             <div class="form-group col-md-12 mb-1">
                                 <label for="productRating">Оценка сотрудника:</label>
-                                <select class="form-control" id="productRating" name="ProductRating" required>
+                                <select class="form-control"  required>
                                     <option selected disabled>Выбрать</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -260,32 +238,32 @@ function reviewOrderHandler(orderId) {
                                 </select>
                                 <div class="form-group col-md-12 mb-1">
                                     <label for="review">Отзыв на сотрудника:</label>
-                                    <textarea class="form-control" id="review" name="Review"></textarea>
+                                    <textarea class="form-control"></textarea>
                                 </div>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-12 mb-1">
                                 <label for="review">Отзыв:</label>
-                                <textarea class="form-control" id="review" name="Review"></textarea>
+                                <textarea class="form-control" ></textarea>
                             </div>
                             <div class="form-group col-md-12 mb-1">
                                 <label for="photo">Фотография:</label>
-                                <input type="file" class="form-control-file" id="photo" name="Photo">
+                                <input type="file" class="form-control-file">
                             </div>
                         </div>
                     </form>
                         `;
 
     Swal.fire({
-        title: `Отзыв на ${productName}`,
-        html: formWorkerData,
+        title: `Отзыв на заказ`,
+        html: formOrderReview,
         showCancelButton: true,
         confirmButtonText: 'Сохранить',
         cancelButtonText: 'Отмена',
         preConfirm: () => {
             return new Promise((resolve, reject) => {
-                const formData = new FormData(document.getElementById('dataUser'));
+                const formData = new FormData(document.getElementById('formOrderReview'));
                 const reviewObject = {};
 
                 for (const [key, value] of formData.entries()) {
@@ -317,3 +295,5 @@ function reviewOrderHandler(orderId) {
         allowEscapeKey: false
     });
 }
+
+

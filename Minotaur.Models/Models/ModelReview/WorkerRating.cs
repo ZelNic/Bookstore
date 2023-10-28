@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Minotaur.Models.Models.ModelReview
 {
     public class WorkerRating
     {
+        [Key]
+        public Guid Id { get; set; }
+        [Required][Range(1, 5)] public int Rating { get; set; }
+        public string? WorkerReviewText { get; set; }
     }
 }

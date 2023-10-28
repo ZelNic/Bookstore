@@ -26,7 +26,8 @@ namespace Minotaur.DataAccess
         public DbSet<Order> Orders { get; set; }
 
         public DbSet<Review> ProductReviews { get; set; }
-        public DbSet
+        //public DbSet
+        // TODO: добавить новые таблицы для рейтингов заказов, доставки, сотрудников
 
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RecordStock> StockMagazine { get; set; }
