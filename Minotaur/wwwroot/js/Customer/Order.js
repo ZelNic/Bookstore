@@ -1,6 +1,6 @@
 
 let ordersData;
-let productNameData;
+let countCellForPhoto = 1;
 
 $(document).ready(function () {
     getOrders();
@@ -15,7 +15,6 @@ function getOrders() {
         dataType: 'json',
         success: function (response) {
             ordersData = response.data;
-            productNameData = response.prodIdAndName;
             orders.innerHTML = `${generateOrderCards()}`;
         },
     });
@@ -24,7 +23,8 @@ function getOrders() {
 function generateOrderCards() {
     let html = ``;
 
-    for (var order of ordersData) {
+
+    for (let [index, order] of ordersData.entries()) {
 
         let countProduct = 0;
         let sumPrice = 0;
@@ -37,18 +37,17 @@ function generateOrderCards() {
         else {
             showProduct = order.orderedProducts;
         }
-
-        for (var product of showProduct) {
+        for (let [indexProduct, product] of showProduct.entries()) {
             tableOrder += `
             <tbody class="table-group-divider">
                 <tr>
                     <td>${product.id}</td>
                     <td id="nameProduct_${product.id}">
-                        <a href="/Customer/Home/Details?productId=${product.id}">${productNameData[product.id]}</a>
+                        <a href="/Customer/Home/Details?productId=${product.id}">${product.productName}</a>
                     </td>
                     <td>${product.price} ₽ </td>
                     <td>${product.count}</td>
-                    <td><button  onclick="reviewProductHandler('${product.id}', '${productNameData[product.id]}')" class="btn btn-success">Отзыв</button></td>
+                    <td><button  onclick="reviewProductHandler('${index}', '${indexProduct}')" class="btn btn-success">Отзыв</button></td>
                 </tr>
             </tbody>
             `;
@@ -112,7 +111,7 @@ function generateOrderCards() {
                         </div>
                     </div>
                     <hr/>
-                    <button onclick="reviewOrderHandler('${order.orderId}')" class="btn btn-success">Отзыв о заказе</button>
+                    <button onclick="reviewOrderHandler('${index}')" class="btn btn-success">Отзыв о заказе</button>
                 </div>
             </div>
         `;
@@ -120,14 +119,21 @@ function generateOrderCards() {
     return html;
 }
 
-function reviewProductHandler(productId, productName) {
+function reviewProductHandler(index, indexProduct) {
+
+    countCellForPhoto = 1;
 
     let formProductReview = `
-                   <form id="formReviewProduct" enctype="multipart/form-data">
-                          <div class="form-row">                            
+                   <form id="formReviewProduct" enctype="application/x-www-form-urlencoded">
+                          <div class="form-row">    
+
+                          <input name="OrderId" value="${ordersData[index].shippedProducts[indexProduct].productName}" hidden>   
+                          <input name="ProductId" value="${ordersData[index].shippedProducts[indexProduct].id}" hidden>   
+                          <input name="UserId" value="${ordersData[index].shippedProducts[indexProduct].userId}" hidden>   
+
                             <div class="form-group col-md-12 mb-1">
                               <label for="productRating">Оценка товара:</label>
-                              <select class="form-control" id="productRating" name="ProductRating" required>
+                              <select name="Rating" class="form-control" id="productRating" required>
                                 <option selected disabled>Выбрать</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
@@ -139,37 +145,40 @@ function reviewProductHandler(productId, productName) {
                           </div>
                           <div class="form-row">
                             <div class="form-group col-md-12 mb-1">
-                              <label for="review">Отзыв:</label>
-                              <textarea class="form-control" id="review" name="Review" required></textarea>
+                              <label>Отзыв:</label>
+                              <textarea name="Review" class="form-control" id="review" ></textarea>
                             </div>
+                              <label for="photo">Фото:</label>
                             <div class="form-group col-md-12 mb-1">
-                              <label for="photo">Фотография:</label>
-                              <input type="file" class="form-control-file" id="photo" name="Photo">
+                              <div id="placeForCelslForPhoto">
+                              <input type="file" class="form-control-file" id="photos" name="Photos" multiple>
+                              </div>
+                              <label class="opacity-50 fs-6">*до 10 снимков</label>
                             </div>
+                            <label for="isAnonymous">Опубликовать анонимно?</label>
+                            <input type="checkbox" id="isAnonymous" name="IsAnonymous" value="false">
+
                           </div>
-                        </form>
-                        `;
+                        </form>                              
+                        `;  
+
 
     Swal.fire({
-        title: `Отзыв на ${productName}`,
+        title: `Отзыв на ${ordersData[index].shippedProducts[indexProduct].productName}`,
         html: formProductReview,
         showCancelButton: true,
         confirmButtonText: 'Сохранить',
         cancelButtonText: 'Отмена',
-        preConfirm: () => {
+        preConfirm: () => {           
             return new Promise((resolve, reject) => {
-                const formData = new FormData(document.getElementById('formReviewProduct'));
-                const reviewObject = {};
-
-                for (const [key, value] of formData.entries()) {
-                    reviewObject[key] = value;
-                }
-
-                const reviewJson = JSON.stringify(reviewObject);
+                let form = document.getElementById("formReviewProduct");
+                let formData = new FormData(form);
+                console.log(formData);
 
                 $.ajax({
-                    url: `=${reviewJson}`,
+                    url: `/Custmomer/Review/PostReview`,
                     type: 'POST',
+                    body: formData,
                     success: function (response) {
                         Swal.fire({
                             icon: 'success',
@@ -186,12 +195,38 @@ function reviewProductHandler(productId, productName) {
                 });
             });
         },
-        allowOutsideClick: false,
-        allowEscapeKey: false
+        allowOutsideClick: true,
+        allowEscapeKey: true,
+        didOpen: () => {
+            document.getElementById("photos").addEventListener("change", checkFileCountAndSize);
+        }
     });
 }
 
 
+// TODO: сделать так, чтб изменялось количество файлов
+
+function checkFileCountAndSize() {    
+    let files = document.getElementById("photos").files;
+    let maxFiles = 10; // Максимальное количество файлов
+    let maxSizeInBytes = 5 * 1024 * 1024; // Максимальный размер файла в байтах (5 МБ)
+
+    if (files.length > maxFiles) {
+        alert("Максимальное количество файлов: " + maxFiles);
+        files = Array.from(files).slice(0, maxFiles);
+        return;
+    }
+
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].size > maxSizeInBytes) {
+            alert("Размер файла превышает допустимый предел: " + (maxSizeInBytes / (1024 * 1024)) + " МБ");
+            // Очистите выбранный файл или предупредите пользователя
+            return;
+        }
+    }
+
+  // Продолжайте с обработкой выбранных файлов
+}
 function reviewOrderHandler(orderId) {
     let formOrderReview = `
                         <form id="formOrderReview" enctype="multipart/form-data">

@@ -30,9 +30,9 @@ namespace Minotaur.Areas.Customer.Controllers
             return Json(reviews);
         }
 
-        public async Task<IActionResult> PostReview(string review)
+        [HttpPost]
+        public async Task<IActionResult> PostReview([FromBody] ProductReviews productReviews)
         {
-            Review? r = JsonConvert.DeserializeObject<Review>(review);
 
 
 

@@ -55,27 +55,9 @@ namespace Minotaur.Areas.Customer
                 o.OrderStatus,
                 o.TravelHistory
             }).ToList();
+           
 
-            Dictionary<int, string> prodIdAndName = new();
-
-            foreach (var order in formatedOrders)
-            {
-                if (order.ShippedProducts != null)
-                {
-                    List<OrderProductData> opd = order.ShippedProducts;
-                    foreach (var productData in opd)
-                        prodIdAndName.TryAdd(productData.Id, (await _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id)).Name);
-                }
-                else
-                {
-                    List<OrderProductData> opd = order.OrderedProducts;
-                    foreach (var productData in opd)
-                        prodIdAndName.TryAdd(productData.Id, (await _unitOfWork.Products.GetAsync(u => u.ProductId == productData.Id)).Name);
-
-                }
-            }
-
-            return Json(new { data = formatedOrders, prodIdAndName });
+            return Json(new { data = formatedOrders});
         }
     }
 }

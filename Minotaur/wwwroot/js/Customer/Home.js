@@ -59,6 +59,7 @@ function generateProductsCard() {
         }
 
         cardsProduct += `   
+        
                         <div class="col-lg-2 col-sm-1 px-3">
                             <div class="col-10">
                                 <div class="card card-deck shadow h-100">
@@ -69,10 +70,10 @@ function generateProductsCard() {
                                                 <p class="card-title text-black"><b>${product.name}</b></p>
                                             </div>
                                             <div>
-                                                <p class="card-title text-dark opacity-75"><b>${product.author}</b></p>
+                                                <p class="card-title text-dark opacity-75 fs-6"><b>${product.author}</b></p>
                                             </div>
                                             <div>
-                                                <p class="card-title text-dark opacity-75"><b>${product.category}</b></p>
+                                                <p class="card-title text-dark opacity-75 fs-6"><b>${product.category}</b></p>
                                             </div>
                                             <hr />
                                             <div class="text-center text-muted fs-3 fw-bold">
