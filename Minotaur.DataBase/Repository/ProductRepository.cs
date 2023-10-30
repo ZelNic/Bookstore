@@ -15,7 +15,7 @@ namespace Minotaur.DataAccess.Repository
         {
             Product? productFromDb = _db.Products.FirstOrDefault(i => i.ProductId == product.ProductId);
             if (productFromDb != null)
-            {                
+            {
                 _db.Products.Update(product);
             }
         }

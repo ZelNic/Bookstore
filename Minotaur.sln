@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minotaur.Utility", "Minotau
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minotaur.TelegramBot", "Minotaur.TelegramBot\Minotaur.TelegramBot.csproj", "{860E89E0-12CF-4152-A247-DF53B497FDDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Scheduler", "Minotaur.Scheduler\Minotaur.Scheduler.csproj", "{2F399D0E-CFF6-4365-A186-C68CB4795151}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minotaur.Scheduler", "Minotaur.Scheduler\Minotaur.Scheduler.csproj", "{2F399D0E-CFF6-4365-A186-C68CB4795151}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

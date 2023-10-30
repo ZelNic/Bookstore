@@ -62,7 +62,7 @@ namespace Minotaur.Areas.Admin.Controllers
                 _unitOfWork.Categories.Update(category);
             }
 
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             return RedirectToAction("Index", "Category");
         }
 
@@ -85,7 +85,7 @@ namespace Minotaur.Areas.Admin.Controllers
             if (categoryOnDelete != null)
             {
                 _unitOfWork.Categories.Remove(categoryOnDelete);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
                 return RedirectToAction("Index", "Category");
             }
             else

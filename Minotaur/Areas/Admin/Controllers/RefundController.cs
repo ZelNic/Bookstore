@@ -40,7 +40,7 @@ namespace Minotaur.Areas.Admin.Controllers
 
             _unitOfWork.Notifications.Update(notification);
             _unitOfWork.MinotaurUsers.UpdateRange(new[] { admin, returnRecipient });
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }

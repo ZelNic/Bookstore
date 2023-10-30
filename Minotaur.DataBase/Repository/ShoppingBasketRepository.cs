@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Minotaur.DataAccess.Repository.IRepository;
+﻿using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models.Models;
 
 namespace Minotaur.DataAccess.Repository
@@ -11,15 +10,15 @@ namespace Minotaur.DataAccess.Repository
         {
             _db = db;
         }
-        
+
         public void Update(ShoppingBasket basket)
         {
-            _db.Update(basket);
+            _db.ShoppingBaskets.Update(basket);
         }
 
         public void UpdateRange(ShoppingBasket[] baskets)
         {
-            _db.UpdateRange(baskets);
+            _db.ShoppingBaskets.UpdateRange(baskets);
         }
     }
 }

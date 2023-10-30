@@ -8,5 +8,6 @@
         public const string Role_Order_Picker = "OrderPicker";
         public const string Role_Stockkeeper = "Stockkeeper";
         public const string Role_HR = "HR";
+        public const string Role_Operator = "Operator";
     }
 }

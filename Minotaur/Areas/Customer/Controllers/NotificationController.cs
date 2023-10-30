@@ -59,7 +59,7 @@ namespace Minotaur.Areas.Customer
                 notification.IsHidden = true;
 
                 _unitOfWork.Notifications.Update(notification);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
             }
             return Ok();
         }
@@ -76,7 +76,7 @@ namespace Minotaur.Areas.Customer
             });
 
             _unitOfWork.Notifications.UpdateRange(notifications.ToArray());
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }
@@ -91,7 +91,7 @@ namespace Minotaur.Areas.Customer
             if (order == null)
             {
                 _unitOfWork.Notifications.Remove(notification);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
                 return BadRequest("Заказ не найден");
             }
 
@@ -131,7 +131,7 @@ namespace Minotaur.Areas.Customer
             _unitOfWork.Notifications.Update(notification);
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.Notifications.AddAsync(notificationForCustomer);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }

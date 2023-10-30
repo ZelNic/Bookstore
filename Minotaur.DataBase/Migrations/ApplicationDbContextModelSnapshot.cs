@@ -271,16 +271,19 @@ namespace Minotaur.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Minotaur.Models.Models.ModelReview.Review", b =>
+            modelBuilder.Entity("Minotaur.Models.Models.ModelReview.ProductReview", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Comment")
+                    b.Property<string>("FilePaths")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAnonymous")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRejected")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsShowReview")
@@ -289,13 +292,7 @@ namespace Minotaur.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("PhotoTitlesFiles")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductRating")
                         .HasColumnType("int");
 
                     b.Property<string>("ProductReviewText")
@@ -303,6 +300,9 @@ namespace Minotaur.Migrations
 
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");

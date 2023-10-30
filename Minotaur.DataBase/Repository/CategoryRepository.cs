@@ -13,10 +13,7 @@ namespace Minotaur.DataAccess.Repository
 
         public void Update(Category category)
         {
-            if(_db.Categories.Contains(category))
-            {
-                _db.Categories.Update(category);
-            }
+            _db.Categories.Update(category);
         }
 
         public void UpdateRange(Category[] category)

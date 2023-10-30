@@ -19,7 +19,7 @@ namespace Minotaur.DataAccess.Repository
 
         public void UpdateRange(MinotaurUser[] minotaurUsers)
         {
-            _db.UpdateRange(minotaurUsers);
+            _db.MinotaurUsers.UpdateRange(minotaurUsers);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Minotaur.Areas.Admin.Controllers
             if (office != null)
             {
                 await _unitOfWork.Offices.AddAsync(office);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
             }
 
             return Ok();

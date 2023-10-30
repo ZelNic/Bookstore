@@ -40,7 +40,7 @@ namespace Minotaur.TelegramController
             };
 
             await _unitOfWork.Notifications.AddAsync(notifAboutStartTelegramBot);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
 
         private async Task Error(ITelegramBotClient client, Exception exception, CancellationToken token)
@@ -54,7 +54,7 @@ namespace Minotaur.TelegramController
                 TypeNotification = NotificationSD.ErrorNotification,
             };
             await _unitOfWork.Notifications.AddAsync(notificationAboutError);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
 
         private async Task Update(ITelegramBotClient client, Update update, CancellationToken token)
@@ -65,23 +65,23 @@ namespace Minotaur.TelegramController
 
         private async Task Bot_OnMessage(Message message)
         {
-            RequestTelegram? request = await _unitOfWork.TelegramRequestsRepository.GetAsync(r => r.ChatId == message.Chat.Id, null, false);
+            RequestTelegram? request = await _unitOfWork.TelegramRequests.GetAsync(r => r.ChatId == message.Chat.Id, null, false);
 
             if (request != null)
             {
-                _unitOfWork.TelegramRequestsRepository.StopTracking(request);
+                _unitOfWork.TelegramRequests.StopTracking(request);
 
                 switch (request.Operation)
                 {
                     case "/orderstatus":
-                        _unitOfWork.TelegramRequestsRepository.Remove(request);
-                        await _unitOfWork.Save();
+                        _unitOfWork.TelegramRequests.Remove(request);
+                        await _unitOfWork.SaveAsync();
                         await HandleOrderStatusInput(message.Chat.Id, message.Text);
                         return;
 
                     default:
-                        _unitOfWork.TelegramRequestsRepository.Remove(request);
-                        await _unitOfWork.Save();
+                        _unitOfWork.TelegramRequests.Remove(request);
+                        await _unitOfWork.SaveAsync();
                         break;
                 }
             }
@@ -120,9 +120,9 @@ namespace Minotaur.TelegramController
                         Operation = message.Text
                     };
 
-                    await _unitOfWork.TelegramRequestsRepository.AddAsync(newTask);                   
-                    await _unitOfWork.Save();
-                    _unitOfWork.TelegramRequestsRepository.StopTracking(newTask);
+                    await _unitOfWork.TelegramRequests.AddAsync(newTask);                   
+                    await _unitOfWork.SaveAsync();
+                    _unitOfWork.TelegramRequests.StopTracking(newTask);
 
                     await _botClient.SendTextMessageAsync(message.Chat.Id, "Введите номер заказа:");
                     break;

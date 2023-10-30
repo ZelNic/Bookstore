@@ -164,7 +164,7 @@ namespace Minotaur.Areas.Purchase
                     _unitOfWork.ShoppingBaskets.Update(shoppingBasket);
 
                     await _unitOfWork.Orders.AddAsync(order);
-                    await _unitOfWork.Save();
+                    await _unitOfWork.SaveAsync();
 
                     return Ok();
                 }

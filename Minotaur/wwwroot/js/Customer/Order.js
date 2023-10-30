@@ -1,6 +1,5 @@
 
 let ordersData;
-let countCellForPhoto = 1;
 
 $(document).ready(function () {
     getOrders();
@@ -19,24 +18,20 @@ function getOrders() {
         },
     });
 }
-
 function generateOrderCards() {
     let html = ``;
 
 
-    for (let [index, order] of ordersData.entries()) {
+    for (let [indexOrder, order] of ordersData.entries()) {
 
         let countProduct = 0;
         let sumPrice = 0;
         var tableOrder = ``;
-        var showProduct;
+        var showProduct;        
 
-        if (order.shippedProducts != null) {
-            showProduct = order.shippedProducts;
-        }
-        else {
-            showProduct = order.orderedProducts;
-        }
+
+        showProduct = order.shippedProducts != null ? order.shippedProducts : order.orderedProducts;
+       
         for (let [indexProduct, product] of showProduct.entries()) {
             tableOrder += `
             <tbody class="table-group-divider">
@@ -47,7 +42,7 @@ function generateOrderCards() {
                     </td>
                     <td>${product.price} ₽ </td>
                     <td>${product.count}</td>
-                    <td><button  onclick="reviewProductHandler('${index}', '${indexProduct}')" class="btn btn-success">Отзыв</button></td>
+                    <td><button  onclick="reviewProductHandler('${indexOrder}', '${indexProduct}')" class="btn btn-success">Отзыв</button></td>
                 </tr>
             </tbody>
             `;
@@ -55,7 +50,6 @@ function generateOrderCards() {
             countProduct += product.count;
             sumPrice += product.count * product.price;
         }
-
 
         html += `
                     <div class="mb-5">
@@ -111,25 +105,22 @@ function generateOrderCards() {
                         </div>
                     </div>
                     <hr/>
-                    <button onclick="reviewOrderHandler('${index}')" class="btn btn-success">Отзыв о заказе</button>
+                    <button onclick="reviewOrderHandler('${indexOrder}')" class="btn btn-success">Отзыв о заказе</button>
                 </div>
             </div>
         `;
     }
     return html;
 }
-
-function reviewProductHandler(index, indexProduct) {
-
-    countCellForPhoto = 1;
+function reviewProductHandler(indexOrder, indexProduct) {
 
     let formProductReview = `
-                   <form id="formReviewProduct" enctype="application/x-www-form-urlencoded">
+                   <form id="formReviewProduct" enctype="multipart/form-data">
                           <div class="form-row">    
 
-                          <input name="OrderId" value="${ordersData[index].shippedProducts[indexProduct].productName}" hidden>   
-                          <input name="ProductId" value="${ordersData[index].shippedProducts[indexProduct].id}" hidden>   
-                          <input name="UserId" value="${ordersData[index].shippedProducts[indexProduct].userId}" hidden>   
+                          <input name="OrderId" value="${ordersData[indexOrder].orderId}" hidden>   
+                          <input name="ProductId" value="${ordersData[indexOrder].shippedProducts[indexProduct].id}" hidden>   
+                          <input name="UserId" value="${ordersData[indexOrder].userId}" hidden>   
 
                             <div class="form-group col-md-12 mb-1">
                               <label for="productRating">Оценка товара:</label>
@@ -146,7 +137,7 @@ function reviewProductHandler(index, indexProduct) {
                           <div class="form-row">
                             <div class="form-group col-md-12 mb-1">
                               <label>Отзыв:</label>
-                              <textarea name="Review" class="form-control" id="review" ></textarea>
+                              <textarea name="ProductReviewText" class="form-control" id="review" ></textarea>
                             </div>
                               <label for="photo">Фото:</label>
                             <div class="form-group col-md-12 mb-1">
@@ -162,9 +153,8 @@ function reviewProductHandler(index, indexProduct) {
                         </form>                              
                         `;  
 
-
     Swal.fire({
-        title: `Отзыв на ${ordersData[index].shippedProducts[indexProduct].productName}`,
+        title: `Отзыв на ${ordersData[indexOrder].shippedProducts[indexProduct].productName}`,
         html: formProductReview,
         showCancelButton: true,
         confirmButtonText: 'Сохранить',
@@ -173,12 +163,13 @@ function reviewProductHandler(index, indexProduct) {
             return new Promise((resolve, reject) => {
                 let form = document.getElementById("formReviewProduct");
                 let formData = new FormData(form);
-                console.log(formData);
-
+                
                 $.ajax({
                     url: `/Custmomer/Review/PostReview`,
                     type: 'POST',
-                    body: formData,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     success: function (response) {
                         Swal.fire({
                             icon: 'success',
@@ -202,8 +193,6 @@ function reviewProductHandler(index, indexProduct) {
         }
     });
 }
-
-
 // TODO: сделать так, чтб изменялось количество файлов
 
 function checkFileCountAndSize() {    
@@ -227,6 +216,9 @@ function checkFileCountAndSize() {
 
   // Продолжайте с обработкой выбранных файлов
 }
+
+
+// TODO: НЕ РАБОТАЕТ
 function reviewOrderHandler(orderId) {
     let formOrderReview = `
                         <form id="formOrderReview" enctype="multipart/form-data">

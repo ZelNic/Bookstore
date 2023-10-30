@@ -81,7 +81,7 @@ namespace Minotaur.Areas.PickUp
 
                 _unitOfWork.Orders.Update(order);
                 await _unitOfWork.Notifications.AddAsync(notification);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
                 return Ok();
             }
@@ -122,7 +122,7 @@ namespace Minotaur.Areas.PickUp
 
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.Notifications.AddAsync(notification);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             return Ok();
         }
 
@@ -156,7 +156,7 @@ namespace Minotaur.Areas.PickUp
 
                 await _unitOfWork.Notifications.AddAsync(notification) ;
                 _unitOfWork.Orders.Update(order);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
                 return Ok();
             }
             else

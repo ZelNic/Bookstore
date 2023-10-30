@@ -109,7 +109,7 @@ namespace Minotaur.Areas.Stockkeeper
                 await _unitOfWork.StockMagazine.AddAsync(record);
             }
 
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             return Ok($"Товар {product.Name} добавлен на полку {numberShelf} в количестве {productCount} шт.");
 
         }
@@ -148,7 +148,7 @@ namespace Minotaur.Areas.Stockkeeper
                 productOnShelf.Count += productCount;
 
                 _unitOfWork.StockMagazine.Update(productOnShelf);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
                 return Ok();
             }
             else
@@ -166,7 +166,7 @@ namespace Minotaur.Areas.Stockkeeper
                 };
 
                 await _unitOfWork.StockMagazine.AddAsync(newRecord);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
                 return Ok();
             }
@@ -187,7 +187,7 @@ namespace Minotaur.Areas.Stockkeeper
             }
 
             _unitOfWork.StockMagazine.UpdateRange(recordsWithNeedProduct);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }
@@ -338,7 +338,7 @@ namespace Minotaur.Areas.Stockkeeper
             Response.Headers.Add(HeaderNames.ContentDisposition, contentDispositionHeader.ToString());
             Response.Headers.Add(HeaderNames.XContentTypeOptions, "nosniff");
 
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         }
     }

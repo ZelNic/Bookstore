@@ -82,7 +82,7 @@ namespace Minotaur.Areas.Picker.Controllers
                 order.AssemblyResponsibleWorkerId = picker.WorkerId;
 
                 _unitOfWork.Orders.Update(order);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
                 return Ok();
             }
@@ -114,7 +114,7 @@ namespace Minotaur.Areas.Picker.Controllers
                 };
                 await _unitOfWork.Notifications.AddAsync(notificationForAdminForRefund);
                 _unitOfWork.Orders.Update(order);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
                 return Ok();
             }
@@ -271,7 +271,7 @@ namespace Minotaur.Areas.Picker.Controllers
 
                 _unitOfWork.Orders.Update(order);
 
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
                 return Ok();
             }
             catch (Exception ex)

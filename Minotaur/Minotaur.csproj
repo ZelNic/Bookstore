@@ -46,6 +46,7 @@
   <ItemGroup>
     <Folder Include="Areas\HR\Controllers\" />
     <Folder Include="Areas\Stockkeeper\PurchaseRequisitions\" />
+    <Folder Include="wwwroot\fileStorage\productReviewFiles\" />
   </ItemGroup>
 
 </Project>

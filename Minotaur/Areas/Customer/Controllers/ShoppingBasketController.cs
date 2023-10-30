@@ -142,7 +142,7 @@ namespace Minotaur.Areas.Customer
                 await _unitOfWork.ShoppingBaskets.AddAsync(newShoppingBasket);
             }
 
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }
@@ -171,14 +171,14 @@ namespace Minotaur.Areas.Customer
             if (productIdAndCount.Count == 0)
             {
                 _unitOfWork.ShoppingBaskets.Remove(shoppingBasket);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
                 return BadRequest("Пустая корзина");
             }
             else
             {
                 shoppingBasket.ProductIdAndCount = SerializationProductData(productIdAndCount);
                 _unitOfWork.ShoppingBaskets.Update(shoppingBasket);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
                 return Ok();
             }
         }
@@ -205,7 +205,7 @@ namespace Minotaur.Areas.Customer
 
             shoppingBasket.ProductIdAndCount = SerializationProductData(oldProductIdAndCount);
             _unitOfWork.ShoppingBaskets.Update(shoppingBasket);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }

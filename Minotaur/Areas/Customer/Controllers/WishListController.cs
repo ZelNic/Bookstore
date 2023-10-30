@@ -82,7 +82,7 @@ namespace Minotaur.Areas.Customer
                 await _unitOfWork.WishLists.AddAsync(newProductInWishList);
             }
 
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }
@@ -109,7 +109,7 @@ namespace Minotaur.Areas.Customer
                 _unitOfWork.WishLists.Update(wishList);
             }
 
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }

@@ -1,4 +1,6 @@
-﻿namespace Minotaur.DataAccess.Repository.IRepository
+﻿using Minotaur.Models.Models.ModelReview;
+
+namespace Minotaur.DataAccess.Repository.IRepository
 {
     public interface IUnitOfWork
     {
@@ -8,13 +10,13 @@
         IShoppingBasketsRepository ShoppingBaskets { get; }
         IWishListRepository WishLists { get; }
         IOrdersRepository Orders { get; }
-        IReviewsRepository Reviews { get; }
         INotificationsRepository Notifications { get; }
         IStockMagazineRepository StockMagazine { get; }
         IOfficesRepository Offices { get; }
         IWorkersRepository Workers { get; }
         IOrganizationalOrderRepository OrganizationalOrders { get; }
-        ITelegramRequestsRepository TelegramRequestsRepository { get; }
-        Task Save();
+        IProductReviewsRepository ProductReviews { get; }
+        ITelegramRequestsRepository TelegramRequests { get; }
+        Task SaveAsync();
     }
 }

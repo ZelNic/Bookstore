@@ -139,7 +139,7 @@ namespace Minotaur.Areas.HR.Controllers
             try
             {
                 await _unitOfWork.Workers.AddAsync(worker);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
                 var hr = await _userManager.GetUserAsync(User);
                 var hrId = hr.Id;
@@ -155,11 +155,11 @@ namespace Minotaur.Areas.HR.Controllers
                 };
 
                 await _unitOfWork.OrganizationalOrders.AddAsync(order);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
                 worker.AdmissionOrder = order.Id;
                 _unitOfWork.Workers.Update(worker);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
                 return Json(new { data = worker });
 
@@ -194,7 +194,7 @@ namespace Minotaur.Areas.HR.Controllers
                 oldDataWorker.AdmissionOrder = admissionOrder.Id;
                 oldDataWorker.OrderDismissal = newDataWorker.OrderDismissal;
                 _unitOfWork.Workers.Update(oldDataWorker);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
                 return Ok();
             }
             else

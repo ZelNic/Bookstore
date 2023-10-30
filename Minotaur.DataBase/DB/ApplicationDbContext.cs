@@ -24,9 +24,8 @@ namespace Minotaur.DataAccess
         public DbSet<ShoppingBasket> ShoppingBaskets { get; set; }
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<ProductReview> ProductReviews { get; set; }
 
-        public DbSet<Review> ProductReviews { get; set; }
-        //public DbSet
         // TODO: добавить новые таблицы для рейтингов заказов, доставки, сотрудников
 
         public DbSet<Notification> Notifications { get; set; }
@@ -59,9 +58,9 @@ namespace Minotaur.DataAccess
                 {
                     Id = 1,
                     Name = "Художественная литература",
-                }                        
+                }
             );
-            
+
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Minotaur.DataAccess.Repository
 
         public void UpdateRange(Notification[] notifications)
         {
-            _db.UpdateRange(notifications);
+            _db.Notifications.UpdateRange(notifications);
         }
     }
 }

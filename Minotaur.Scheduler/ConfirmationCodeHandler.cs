@@ -28,7 +28,7 @@ namespace Minotaur.Scheduler
             });
 
             _unitOfWork.Orders.UpdateRange(orders.ToArray());
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
     }
 }

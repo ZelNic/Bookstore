@@ -38,6 +38,7 @@ namespace Minotaur.DataAccess.DbInitializer
                 _roleManager.CreateAsync(new IdentityRole(Roles.Role_Worker_Order_Pickup_Point)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(Roles.Role_Stockkeeper)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(Roles.Role_HR)).GetAwaiter().GetResult();
+                _roleManager.CreateAsync(new IdentityRole(Roles.Role_Operator)).GetAwaiter().GetResult();
 
                 _userManager.CreateAsync(new MinotaurUser
                 {

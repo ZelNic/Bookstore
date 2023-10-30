@@ -88,7 +88,7 @@ namespace Minotaur.Areas.Admin.Controllers
             worker.AccessRights = SerializationWorkerRoles(arrayRoles);
 
             _unitOfWork.Workers.Update(worker);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             await _userManager.AddToRoleAsync(minotaurUser, role);
             return Ok();
@@ -113,7 +113,7 @@ namespace Minotaur.Areas.Admin.Controllers
             worker.AccessRights = SerializationWorkerRoles(arrayRoles);
 
             _unitOfWork.Workers.Update(worker);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             await _userManager.RemoveFromRoleAsync(minotaurUser, role);
             return Ok();
