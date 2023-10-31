@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
@@ -48,7 +49,7 @@ namespace Minotaur.Areas.Operator.Controllers
                     Photo = r.FilePaths == null ? null : JsonConvert.DeserializeObject<string[]>(r.FilePaths),
                 });
 
-            if (reviews == null) { return BadRequest("Отзывов на модерацию нет"); }
+            if (reviews.IsNullOrEmpty()) { return BadRequest("Отзывов на модерацию нет"); }
 
             return Json(new { data = reviews });
         }

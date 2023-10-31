@@ -6,7 +6,6 @@ $(document).ready(function () {
     getProductsCard();
 });
 
-
 function getProductsCard(numberPage = 1) {
     $.ajax({
         url: '/Customer/Home/GetProductsData?numberPage=' + numberPage,
@@ -25,7 +24,6 @@ function getProductsCard(numberPage = 1) {
         },
     });
 }
-
 function genarateBtnNumberPages() {
     let btnNumberPages = ``;
 
@@ -37,7 +35,6 @@ function genarateBtnNumberPages() {
 
     return btnNumberPages;
 }
-
 function generateProductsCard() {
 
     let cardsProduct = ``;
@@ -95,11 +92,6 @@ function generateProductsCard() {
     }
     return cardsProduct;
 }
-
-
-
-
-
 function goToLogin() {
     window.location.href = '/Identity/Account/Login'
 }
@@ -111,14 +103,7 @@ function goToShoppingBasket() {
 }
 
 function getDetails(productId) {
-
-    $.ajax({
-        url: `/Customer/Home/Details?id=${productId}`,
-        method: 'get',
-        success: function (response) {
-            window.location.href = `/Customer/Home/Details?id=${productId}`
-        }
-    });
+    window.location.href = `/Customer/Home/Details?id=${productId}`
 }
 
 function addToWishList(index) {

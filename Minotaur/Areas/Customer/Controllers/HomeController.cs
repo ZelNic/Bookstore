@@ -102,6 +102,18 @@ namespace Minotaur.Areas.Customer
             return user;
         }
 
+        public async Task<IActionResult> Search(string? searchString)
+        {
+            if (searchString == null)
+            {
+                return RedirectToAction("Index");
+            }
+            var products = await _unitOfWork.Products.GetAllAsync(product => product.Name.Contains(searchString.ToLower()));
+
+            return View(products);
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -122,17 +134,6 @@ namespace Minotaur.Areas.Customer
             ViewBag.inBasket = shoppingBasket.Contains(id);
 
             return View(product);
-        }
-
-        public async Task<IActionResult> Search(string? searchString)
-        {
-            if (searchString == null)
-            {
-                return RedirectToAction("Index");
-            }
-            var products = await _unitOfWork.Products.GetAllAsync(product => product.Name.Contains(searchString.ToLower()));
-
-            return View(products);
         }
 
         public IActionResult Privacy()

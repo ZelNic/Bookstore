@@ -16,5 +16,7 @@ namespace Minotaur.Models.Models.ModelReview
         public bool IsShowReview { get; set; } = false;
         public bool IsAnonymous { get; set; } = false;
         public bool IsRejected { get; set; } = false;
+        public string? IdWhoLiked { get; set; }
+        public string? IdWhoDisiked { get; set; }
     }
 }

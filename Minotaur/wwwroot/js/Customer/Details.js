@@ -1,4 +1,8 @@
 ﻿
+
+
+
+
 function changeFunctionButtonWishlist(id, isAdd) {
     let btnWishlist = document.getElementById(`btnWishList_${id}`);
 
@@ -10,7 +14,6 @@ function changeFunctionButtonWishlist(id, isAdd) {
         <button onclick="addToWishlist(${id})" class="btn btn-outline-danger border-1 btn bi-heart mt-1 mb-2" style="width: 100%; height: 40px;"></button>`;
     }
 }
-
 function addToWishlist(id) {
     $.ajax({
         url: '/Customer/WishList/AddWishList?newProductId=' + id,
@@ -100,7 +103,6 @@ function removeFromWishlist(id) {
         }
     });
 }
-
 function changeFunctionButtonShoppingBasket(id, isAdd) {
     let btnShoppingBasket = document.getElementById(`btnShoppingBasket_${id}`);
 
@@ -114,8 +116,6 @@ function changeFunctionButtonShoppingBasket(id, isAdd) {
        <button onclick="addToShoppingBasket(${id})" class="btn btn-outline-success border-1 btn bi bi-bag mt-1 mb-2" style="width: 100%; height: 40px;"></button>`;
     }    
 }
-
-
 function addToShoppingBasket(id) {
     $.ajax({
         url: '/Customer/ShoppingBasket/AddToBasketProduct?productId=' + id,
@@ -210,7 +210,6 @@ function removeFromShoppingBasket(id) {
         }
     });
 }
-
 function informAboutNeedToLogin() {
     const Toast = Swal.mixin({
         toast: true,

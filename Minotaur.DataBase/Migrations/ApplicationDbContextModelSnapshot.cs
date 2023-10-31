@@ -280,6 +280,12 @@ namespace Minotaur.Migrations
                     b.Property<string>("FilePaths")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("IdWhoDisiked")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdWhoLiked")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsAnonymous")
                         .HasColumnType("bit");
 
