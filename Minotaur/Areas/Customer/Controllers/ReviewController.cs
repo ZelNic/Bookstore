@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models.ModelReview;
@@ -10,13 +13,11 @@ using Newtonsoft.Json;
 namespace Minotaur.Areas.Customer.Controllers
 {
     [Area("Customer"), Authorize]
-
     public class ReviewController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
-
 
         public ReviewController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager, IWebHostEnvironment webHostEnvironment)
         {
@@ -24,11 +25,15 @@ namespace Minotaur.Areas.Customer.Controllers
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
         }
+        public IActionResult Index()
+        {
+            return View();
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetReviewsOnProduct(int productId)
         {
-            var reviews = (await _unitOfWork.ProductReviews.GetAllAsync(r => r.IsShowReview == true))
+            var reviews = (await _unitOfWork.ProductReviews.GetAllAsync(r => r.ProductId == productId && r.IsShowReview == true))
                .Join<ProductReview, MinotaurUser, Guid, dynamic>((await _unitOfWork.MinotaurUsers.GetAllAsync()), r => r.UserId, u => Guid.Parse(u.Id), (r, u) => new
                {
                    NameUser = r.IsAnonymous == true ? "Пользователь" : $"{u.FirstName} {u.LastName}",
@@ -45,17 +50,39 @@ namespace Minotaur.Areas.Customer.Controllers
                    CountDislike = r.IdWhoDisiked == null ? 0 : DeserializationUserId(r.IdWhoDisiked.ToString()).Count(),
                    Photo = r.FilePaths == null ? null : JsonConvert.DeserializeObject<string[]>(r.FilePaths),
                });
-
-
-            if (reviews == null) { return BadRequest("Отзывов на модерацию нет"); }
-
             return Json(new { data = reviews });
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> GetRatingReview(string id)
         {
-            return View();
+            ProductReview? review = await _unitOfWork.ProductReviews.GetAsync(r => r.Id == Guid.Parse(id));
+            if (review == null) return BadRequest("Отзыв не найден");
+
+            int countLike = review.IdWhoLiked == null ? 0 : DeserializationUserId(review.IdWhoLiked.ToString()).Count();
+            int countDislike = review.IdWhoDisiked == null ? 0 : DeserializationUserId(review.IdWhoDisiked.ToString()).Count();
+
+            return Json(new { data = new { CountLike = countLike, CountDislike = countDislike } });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckForRefeedback(string orderId, int productId)
+        {
+            ProductReview? review = await _unitOfWork.ProductReviews.GetAsync(r => r.OrderId == Guid.Parse(orderId) && r.ProductId == productId);
+            if (review == null) return Json(new { });
+            else
+            {
+                if (review.IsRejected == true || review.IsShowReview == false)
+                {
+                    return Json(new { data = review });
+                }
+                else
+                {
+                    return BadRequest("Отзыв по данному заказу на данный товар уже оставлен");
+                }
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> PostReview(BaseProductReviews productReviews)
         {
@@ -74,7 +101,6 @@ namespace Minotaur.Areas.Customer.Controllers
                     if (!Directory.Exists(finalPath))
                         Directory.CreateDirectory(finalPath);
 
-
                     using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
                     {
                         photo.CopyTo(fileStream);
@@ -82,7 +108,6 @@ namespace Minotaur.Areas.Customer.Controllers
                     }
                 });
             }
-
 
             ProductReview productReview = new()
             {
@@ -96,7 +121,6 @@ namespace Minotaur.Areas.Customer.Controllers
                 IsShowReview = false,
                 IsAnonymous = productReviews.IsAnonymous,
             };
-
 
             await _unitOfWork.ProductReviews.AddAsync(productReview);
             await _unitOfWork.SaveAsync();
@@ -126,7 +150,6 @@ namespace Minotaur.Areas.Customer.Controllers
 
             return json;
         }
-
         [HttpPost]
         public async Task<IActionResult> RateReview(string reviewId, bool isLiked)
         {
@@ -134,24 +157,25 @@ namespace Minotaur.Areas.Customer.Controllers
             var review = await _unitOfWork.ProductReviews.GetAsync(r => r.Id == Guid.Parse(reviewId));
             if (review == null) return BadRequest("Отзыв не найден");
 
-            var liked = DeserializationUserId(review.IdWhoLiked.ToString());
-            var disliked = DeserializationUserId(review.IdWhoDisiked.ToString());
+            List<Guid> liked = review.IdWhoLiked == null ? new List<Guid> { } : DeserializationUserId(review.IdWhoLiked.ToString());
+            List<Guid> disliked = review.IdWhoDisiked == null ? new List<Guid> { } : DeserializationUserId(review.IdWhoDisiked.ToString());
 
-            bool isAddLiked = false;
-            bool isDisliked = false;
+            bool isChangeLiked = false;
+            bool isChangeDisliked = false;
 
             if (isLiked)
             {
                 if ((!liked.Contains(Guid.Parse(user.Id))) && (!disliked.Contains(Guid.Parse(user.Id))))
                 {
                     liked.Add(Guid.Parse(user.Id));
-                    isAddLiked = true;
+                    isChangeLiked = true;
                 }
-                else if ((!liked.Contains(Guid.Parse(user.Id))) && (disliked.Contains(Guid.Parse(user.Id))))
+                else if ((!liked.Contains(Guid.Parse(user.Id)) && (disliked.Contains(Guid.Parse(user.Id)))))
                 {
                     disliked.Remove(Guid.Parse(user.Id));
                     liked.Add(Guid.Parse(user.Id));
-                    isAddLiked = true;
+                    isChangeLiked = true;
+                    isChangeDisliked = true;
                 }
             }
             else
@@ -159,35 +183,39 @@ namespace Minotaur.Areas.Customer.Controllers
                 if ((!disliked.Contains(Guid.Parse(user.Id))) && (!liked.Contains(Guid.Parse(user.Id))))
                 {
                     disliked.Add(Guid.Parse(user.Id));
-                    isDisliked = true;
+                    isChangeDisliked = true;
                 }
                 else if ((!disliked.Contains(Guid.Parse(user.Id))) && (liked.Contains(Guid.Parse(user.Id))))
                 {
                     liked.Remove(Guid.Parse(user.Id));
                     disliked.Add(Guid.Parse(user.Id));
-                    isDisliked = true;
+                    isChangeLiked = true;
+                    isChangeDisliked = true;
                 }
             }
 
             string changedList = "";
 
-            if (isAddLiked == true)
+            if (isChangeLiked == true || isChangeDisliked == true)
             {
-                changedList = Serialization(liked);
-                review.IdWhoLiked = changedList;
-            }
-            else if (isDisliked == true)
-            {
-                changedList = Serialization(disliked);
-                review.IdWhoDisiked = changedList;
+                if (isChangeLiked == true)
+                {
+                    changedList = Serialization(liked);
+                    review.IdWhoLiked = changedList;
+                }
+                if (isChangeDisliked == true)
+                {
+                    changedList = Serialization(disliked);
+                    review.IdWhoDisiked = changedList;
+                }
             }
             else
             {
-                return BadRequest("Отзыв уже оценен");
+                return BadRequest("Вы уже оценили отзыв");
             }
 
             _unitOfWork.ProductReviews.Update(review);
-            await _unitOfWork.SaveAsync(); 
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }

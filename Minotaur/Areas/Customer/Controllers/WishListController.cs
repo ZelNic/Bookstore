@@ -48,6 +48,7 @@ namespace Minotaur.Areas.Customer
 
         }
 
+        //TODO: bag
 
         [HttpPost]
         public async Task<IActionResult> AddWishList(string productIds)

@@ -14,6 +14,5 @@ namespace Minotaur.Models.Models
         public string? EmailSender { get; set; }
         public string? EmailRecipien { get; set; }
         public string? Text { get; set; }
-        public bool IsHidden { get; set; }
     }
 }

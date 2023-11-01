@@ -330,9 +330,6 @@ namespace Minotaur.Migrations
                     b.Property<string>("EmailSender")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsHidden")
-                        .HasColumnType("bit");
-
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 

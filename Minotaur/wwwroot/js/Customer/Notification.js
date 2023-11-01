@@ -10,10 +10,9 @@ const ErrorNotification = "Уведомление об ошибке";
 $(document).ready(function () {
     getDataNotification();
 });
-
-function hideAllNotifications() {
+function removeAllNotifications() {
     $.ajax({
-        url: '/Customer/Notification/HideAllNotifications',
+        url: '/Customer/Notification/RemoveAllNotifications',
         method: 'POST',
         success: function (response) {
             const Toast = Swal.mixin({
@@ -29,7 +28,7 @@ function hideAllNotifications() {
             })
             Toast.fire({
                 icon: 'success',
-                title: 'Все уведомления успешно скрыты'
+                title: 'Все уведомления успешно удалены'
             })
             getDataNotification();
         },
@@ -47,15 +46,13 @@ function hideAllNotifications() {
             })
             Toast.fire({
                 icon: 'error',
-                title: 'Не удалось скрыть все уведомления'
+                title: error.responseText
             })
             getDataNotification();
 
         },
     });
 }
-
-
 function getDataNotification() {
     divNotifData = document.getElementById("notificationData");
     $.ajax({
@@ -87,7 +84,7 @@ function generateCardNotitfications() {
                 break;
             case OrderArrived:
                 functionForNotification = `
-                    <button onclick="hiddenNotification('${notification.id}')" class="btn btn-sm btn-secondary bi bi-x-square"></button>
+                    <button onclick="removeNotification('${notification.id}')" class="btn btn-sm btn-secondary bi bi-x-square"></button>
                     <button onclick="goToOrder()" class="btn btn-sm btn-primary">Перейти к заказу</button>`
                 break;
             case Refund:
@@ -95,14 +92,13 @@ function generateCardNotitfications() {
                 colorForNotification = `text-bg-warning`;
                 break;
             case ErrorNotification:
-                functionForNotification = `<button onclick="hiddenNotification('${notification.id}')" class="btn btn-sm btn-secondary bi bi-x-square"></button>`;
+                functionForNotification = `<button onclick="removeNotification('${notification.id}')" class="btn btn-sm btn-secondary bi bi-x-square"></button>`;
                 colorForNotification = `text-bg-danger`;
                 break;
             default:
-                functionForNotification = `<button onclick="hiddenNotification('${notification.id}')" class="btn btn-sm btn-secondary bi bi-x-square"></button>`;
+                functionForNotification = `<button onclick="removeNotification('${notification.id}')" class="btn btn-sm btn-secondary bi bi-x-square"></button>`;
                 colorForNotification = `text-bg-success`;
         }
-
 
 
         cardsNotification += `
@@ -133,6 +129,7 @@ function generateCardNotitfications() {
     return cardsNotification;
 }
 
+//TODO: Перенести метод refund в другую область
 async function refund(notificationId) {
     $.ajax({
         url: '/Admin/Refund/MakeRefund?notificationId=' + notificationId,
@@ -166,7 +163,6 @@ async function refund(notificationId) {
     });
 
 }
-
 function goToOrder() {
     window.location.href = '/Customer/Orders/Index';
 }
@@ -203,9 +199,9 @@ function answerOrder(notificationId, answer) {
         }
     })
 }
-function hiddenNotification(notificationId) {
+function removeNotification(notificationId) {
     $.ajax({
-        url: '/Customer/Notification/HideNotification?notificationId=' + notificationId,
+        url: '/Customer/Notification/RemoveNotification?notificationId=' + notificationId,
         method: 'POST',
         success: function (response) {
 
@@ -248,6 +244,4 @@ function hiddenNotification(notificationId) {
             })
         }
     });
-
-
 }

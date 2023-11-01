@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Minotaur.DataAccess.Repository.IRepository;
@@ -31,7 +30,7 @@ namespace Minotaur.Areas.Customer
         {
             MinotaurUser? user = await _userManager.GetUserAsync(User);
             var notHiddenNotifications = (await _unitOfWork.Notifications.GetAllAsync(u => u.RecipientId == Guid.Parse(user.Id)))
-                .OrderByDescending(n => n.SendingTime).Where(n => n.IsHidden == false)
+                .OrderByDescending(n => n.SendingTime)
                 .Select(n => new
                 {
                     n.Id,
@@ -39,7 +38,6 @@ namespace Minotaur.Areas.Customer
                     SendingTime = n.SendingTime.ToString("dd.MM.yyyy HH:mm"),
                     n.Text,
                     n.TypeNotification,
-                    n.IsHidden,
                 });
 
             if (notHiddenNotifications == null)
@@ -51,31 +49,26 @@ namespace Minotaur.Areas.Customer
         }
 
         [HttpPost]
-        public async Task<IActionResult> HideNotification(string notificationId)
+        public async Task<IActionResult> RemoveNotification(string notificationId)
         {
             Notification? notification = await _unitOfWork.Notifications.GetAsync(n => n.Id == Guid.Parse(notificationId));
-            if (notification != null)
-            {
-                notification.IsHidden = true;
+            if (notification == null) { return BadRequest("Уведомлений нет"); }
 
-                _unitOfWork.Notifications.Update(notification);
-                await _unitOfWork.SaveAsync();
-            }
+            _unitOfWork.Notifications.Remove(notification);
+            await _unitOfWork.SaveAsync();
+
             return Ok();
         }
 
         [HttpPost]
-        public async Task<IActionResult> HideAllNotifications()
+        public async Task<IActionResult> RemoveAllNotifications()
         {
             var user = await _userManager.GetUserAsync(User);
-            var notifications = await _unitOfWork.Notifications.GetAllAsync(u => u.RecipientId == Guid.Parse(user.Id) && !u.IsHidden);
+            var notifications = await _unitOfWork.Notifications.GetAllAsync(u => u.RecipientId == Guid.Parse(user.Id));
 
-            Parallel.ForEach(notifications, notification =>
-            {
-                notification.IsHidden = true;
-            });
+            if (notifications == null) { return BadRequest("Уведомлений нет"); }
 
-            _unitOfWork.Notifications.UpdateRange(notifications.ToArray());
+            _unitOfWork.Notifications.RemoveRange(notifications.ToArray());
             await _unitOfWork.SaveAsync();
 
             return Ok();
@@ -100,7 +93,6 @@ namespace Minotaur.Areas.Customer
                 OrderId = order.OrderId,
                 RecipientId = order.UserId,
                 TypeNotification = NotificationSD.SimpleNotification,
-                IsHidden = false,
                 SendingTime = MoscowTime.GetTime(),
             };
 
@@ -127,7 +119,6 @@ namespace Minotaur.Areas.Customer
                 await _unitOfWork.Notifications.AddAsync(notificationForPicker);
             }
 
-            notification.IsHidden = true;
             _unitOfWork.Notifications.Update(notification);
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.Notifications.AddAsync(notificationForCustomer);

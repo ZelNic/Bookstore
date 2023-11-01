@@ -27,18 +27,18 @@ function generateOrderCards() {
         let countProduct = 0;
         let sumPrice = 0;
         var tableOrder = ``;
-        var showProduct;        
+        var showProduct;
 
 
         showProduct = order.shippedProducts != null ? order.shippedProducts : order.orderedProducts;
-       
+
         for (let [indexProduct, product] of showProduct.entries()) {
             tableOrder += `
             <tbody class="table-group-divider">
                 <tr>
                     <td>${product.id}</td>
                     <td id="nameProduct_${product.id}">
-                        <a href="/Customer/Home/Details?productId=${product.id}">${product.productName}</a>
+                        <a href="/Customer/Home/Details?id=${product.id}">${product.productName}</a>
                     </td>
                     <td>${product.price} ₽ </td>
                     <td>${product.count}</td>
@@ -112,7 +112,3 @@ function generateOrderCards() {
     }
     return html;
 }
-
-
-
-
