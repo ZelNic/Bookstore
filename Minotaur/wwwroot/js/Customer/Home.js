@@ -55,8 +55,7 @@ function generateProductsCard() {
                 : `<button id="btnShoppingBasket_${index}" onclick="addToShoppingBasket(${index})" class="btn btn-outline-success border-0 bi bi-cart"></button>`}`;
         }
 
-        cardsProduct += `   
-        
+        cardsProduct += `           
                         <div class="col-lg-2 col-sm-1 px-3">
                             <div class="col-10">
                                 <div class="card card-deck shadow h-100">
@@ -108,7 +107,7 @@ function getDetails(productId) {
 
 function addToWishList(index) {
     $.ajax({
-        url: '/Customer/WishList/AddWishList?newProductId=' + String(productsCardData[index].productId),
+        url: '/Customer/WishList/AddWishList?productIds=' + String(productsCardData[index].productId),
         method: 'POST',
         success: function (response) {
 

@@ -129,16 +129,12 @@ function rateReview(reviewId, isLiked) {
 }
 function getRateReview(reviewId) {
     $.ajax({
-        url: `/Customer/Review/GetRatingReview?id=${reviewId}`,
+        url: `/Customer/Review/GetRatingReviewProduct?id=${reviewId}`,
         method: 'GET',
         dataType: 'json',
         success: function (response) {
             let countLike = document.getElementById(`countLike_${reviewId}`);
             let countDislike = document.getElementById(`countDislike_${reviewId}`);
-            console.log(response.data);
-            console.log(response.data.countLike);
-            console.log(response.data.countDislike);
-
             countLike.textContent = response.data.countLike;
             countDislike.textContent = response.data.countDislike;
         }
@@ -148,7 +144,6 @@ function reviewProductHandler(indexOrder, indexProduct) {
     $.ajax({
         url: `/Customer/Review/CheckForRefeedback?orderId=${ordersData[indexOrder].orderId}&productId=${ordersData[indexOrder].shippedProducts[indexProduct].id}`,
         method: 'GET',
-        data: 'json',
         success: function (response) {
             let formProductReview = `
                    <form id="formReviewProduct" enctype="multipart/form-data">
@@ -174,16 +169,16 @@ function reviewProductHandler(indexOrder, indexProduct) {
                             <div class="form-group col-md-12 mb-1">
                               <label>Отзыв:</label>
                               <textarea name="ProductReviewText" class="form-control" id="review" ></textarea>
+                            <label for="isAnonymous">Опубликовать анонимно?</label>
+                            <input type="checkbox" id="isAnonymous" name="IsAnonymous" value="false">
                             </div>
                               <label for="photo">Фото:</label>
                             <div class="form-group col-md-12 mb-1">
                               <div id="placeForCelslForPhoto">
-                              <input type="file" class="form-control-file" id="photos" name="Photos" multiple>
+                              <input type="file" class="form-control-file" id="photos" name="Photos" multiple accept="image/jpeg, image/png, image/gif">
                               </div>
-                              <label class="opacity-50 fs-6">*до 10 снимков</label>
+                              <label class="opacity-50 fs-6">*до 10 снимков, лишнии фотографии будут удалены</label>
                             </div>
-                            <label for="isAnonymous">Опубликовать анонимно?</label>
-                            <input type="checkbox" id="isAnonymous" name="IsAnonymous" value="false">
                           </div>
                         </form>                              
                         `;
@@ -205,7 +200,6 @@ function reviewProductHandler(indexOrder, indexProduct) {
                         }
 
                         let formData = new FormData(form);
-                        console.log(formData);
 
                         $.ajax({
                             url: `/Customer/Review/PostReview`,
@@ -256,8 +250,6 @@ function reviewProductHandler(indexOrder, indexProduct) {
         }
     });
 }
-
-//TODO: НЕ РАБОТАЕТ
 function checkFileCountAndSize() {
     let files = document.getElementById("photos").files;
     let maxFiles = 10; // Максимальное количество файлов
@@ -281,8 +273,14 @@ function checkFileCountAndSize() {
 }
 
 function reviewOrderHandler(orderId) {
-    let formOrderReview = `
+
+    $.ajax({
+        url: `/customer/review/CheckForRefeedbackOrder?orderId=${orderId}`,
+        type: 'POST',
+        success: function (response) {
+            let formOrderReview = `
                         <form id="formOrderReview" enctype="multipart/form-data">
+                        <input name="OrderId" value="${orderId}" hidden> 
                         <div class="form-row">
                             <div class="form-group col-md-12 mb-1">
                                 <label for="deliveryRating">Оценка доставки:</label>
@@ -296,12 +294,12 @@ function reviewOrderHandler(orderId) {
                                 </select>
                                 <div class="form-group col-md-12 mb-1">
                                     <label for="review">Отзыв доставку:</label>
-                                    <textarea class="form-control" ></textarea>
+                                    <textarea class="form-control" name="DeliveryReviewText" ></textarea>
                                 </div>
                             </div>
                             <div class="form-group col-md-12 mb-1">
                                 <label for="productRating">Оценка пункта выдачи:</label>
-                                <select class="form-control"  required>
+                                <select class="form-control" name="PickUpRating" required>
                                     <option selected disabled>Выбрать</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -311,12 +309,12 @@ function reviewOrderHandler(orderId) {
                                 </select>
                                 <div class="form-group col-md-12 mb-1">
                                     <label for="review">Отзыв на пункт выдачи:</label>
-                                    <textarea class="form-control" ></textarea>
+                                    <textarea class="form-control" name="PickUpReviewText" ></textarea>
                                 </div>
                             </div>
                             <div class="form-group col-md-12 mb-1">
                                 <label for="productRating">Оценка сотрудника:</label>
-                                <select class="form-control"  required>
+                                <select class="form-control" name="WorkerRating" required>
                                     <option selected disabled>Выбрать</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -326,61 +324,56 @@ function reviewOrderHandler(orderId) {
                                 </select>
                                 <div class="form-group col-md-12 mb-1">
                                     <label for="review">Отзыв на сотрудника:</label>
-                                    <textarea class="form-control"></textarea>
+                                    <textarea class="form-control" name="WorkerReviewText"></textarea>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-12 mb-1">
-                                <label for="review">Отзыв:</label>
-                                <textarea class="form-control" ></textarea>
-                            </div>
-                            <div class="form-group col-md-12 mb-1">
-                                <label for="photo">Фотография:</label>
-                                <input type="file" class="form-control-file">
-                            </div>
-                        </div>
+                        </div>                       
                     </form>
                         `;
-
-    Swal.fire({
-        title: `Отзыв на заказ`,
-        html: formOrderReview,
-        showCancelButton: true,
-        confirmButtonText: 'Сохранить',
-        cancelButtonText: 'Отмена',
-        preConfirm: () => {
-            return new Promise((resolve, reject) => {
-                const formData = new FormData(document.getElementById('formOrderReview'));
-                const reviewObject = {};
-
-                for (const [key, value] of formData.entries()) {
-                    reviewObject[key] = value;
-                }
-
-                const reviewJson = JSON.stringify(reviewObject);
-
-                $.ajax({
-                    url: `=${reviewJson}`,
-                    type: 'POST',
-                    success: function (response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Отзыв поступил на проверку модерации',
+            Swal.fire({
+                title: `Отзыв на заказ`,
+                html: formOrderReview,
+                showCancelButton: true,
+                confirmButtonText: 'Сохранить',
+                cancelButtonText: 'Отмена',
+                preConfirm: () => {
+                    return new Promise((resolve, reject) => {
+                        let form = document.getElementById("formOrderReview");
+                        let formData = new FormData(form);
+                        $.ajax({
+                            url: `/customer/review/postReviewOrder?`,
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Отзыв успешно отправлен',
+                                });
+                            },
+                            error: function (error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Ошибка...',
+                                    text: error.responseText,
+                                });
+                            }
                         });
-                    },
-                    error: function (error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Ошибка...',
-                            text: 'Отзыв не опубликован',
-                        });
-                    }
-                });
+                    });
+                },
+                allowOutsideClick: false,
+                allowEscapeKey: false
             });
         },
-        allowOutsideClick: false,
-        allowEscapeKey: false
+        error: function (error) {
+            Swal.fire({
+                icon: 'info',
+                title: '',
+                text: error.responseText,
+
+            });
+        },
     });
 }
-//
+

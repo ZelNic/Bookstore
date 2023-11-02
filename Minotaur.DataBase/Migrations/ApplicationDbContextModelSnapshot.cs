@@ -271,6 +271,46 @@ namespace Minotaur.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Minotaur.Models.Models.ModelReview.DeliveryReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DeliveryReviewText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DeliveryReviews");
+                });
+
+            modelBuilder.Entity("Minotaur.Models.Models.ModelReview.PickUpReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("PickUpRating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PickUpReviewText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PickUpReviews");
+                });
+
             modelBuilder.Entity("Minotaur.Models.Models.ModelReview.ProductReview", b =>
                 {
                     b.Property<Guid>("Id")
@@ -316,6 +356,29 @@ namespace Minotaur.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProductReviews");
+                });
+
+            modelBuilder.Entity("Minotaur.Models.Models.ModelReview.WorkerReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("WorkerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("WorkerReviewText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WorkerReviews");
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.Notification", b =>

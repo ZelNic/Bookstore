@@ -34,30 +34,31 @@ namespace Minotaur.Areas.Customer
         {
             var user = await _userManager.GetUserAsync(User);
 
-            var formatedOrders = (await _unitOfWork.Orders.GetAllAsync(u => u.UserId == Guid.Parse(user.Id))).Select(o => new
-            {
-                o.OrderId,
-                o.UserId,
-                o.ReceiverName,
-                o.ReceiverLastName,
-                o.PhoneNumber,
-                OrderedProducts = o.OrderedProducts != null ? JsonConvert.DeserializeObject<List<OrderProductData>>(o.OrderedProducts) : null,
-                ShippedProducts = o.ShippedProducts != null ? JsonConvert.DeserializeObject<List<OrderProductData>>(o.ShippedProducts) : null,
-                PurchaseDate = o.PurchaseDate.ToString("dd.MM.yyyy HH:mm"),
-                o.PurchaseAmount,
-                o.RefundAmount,
-                o.City,
-                o.Street,
-                o.HouseNumber,
-                o.CurrentPosition,
-                o.IsCourierDelivery,
-                o.OrderPickupPointId,
-                o.OrderStatus,
-                o.TravelHistory
-            }).ToList();
-           
+            var formatedOrders = (await _unitOfWork.Orders.GetAllAsync(u => u.UserId == Guid.Parse(user.Id)))
+                .Select(o => new
+                {
+                    o.OrderId,
+                    o.UserId,
+                    o.ReceiverName,
+                    o.ReceiverLastName,
+                    o.PhoneNumber,
+                    OrderedProducts = o.OrderedProducts != null ? JsonConvert.DeserializeObject<List<OrderProductData>>(o.OrderedProducts) : null,
+                    ShippedProducts = o.ShippedProducts != null ? JsonConvert.DeserializeObject<List<OrderProductData>>(o.ShippedProducts) : null,
+                    PurchaseDate = o.PurchaseDate.ToString("dd.MM.yyyy HH:mm"),
+                    o.PurchaseAmount,
+                    o.RefundAmount,
+                    o.City,
+                    o.Street,
+                    o.HouseNumber,
+                    o.CurrentPosition,
+                    o.IsCourierDelivery,
+                    o.OrderPickupPointId,
+                    o.OrderStatus,
+                    o.TravelHistory
+                }).ToList();
 
-            return Json(new { data = formatedOrders});
+
+            return Json(new { data = formatedOrders });
         }
     }
 }

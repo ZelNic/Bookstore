@@ -24,17 +24,16 @@ namespace Minotaur.DataAccess
         public DbSet<ShoppingBasket> ShoppingBaskets { get; set; }
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<ProductReview> ProductReviews { get; set; }
-
-        // TODO: добавить новые таблицы для рейтингов заказов, доставки, сотрудников
-
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RecordStock> StockMagazine { get; set; }
         public DbSet<Office> Offices { get; set; }
         public DbSet<Worker> Workers { get; set; }
         public DbSet<OrganizationalOrder> OrganizationalOrders { get; set; }
         public DbSet<RequestTelegram> TelegramRequests { get; set; }
-
+        public DbSet<ProductReview> ProductReviews { get; set; }
+        public DbSet<PickUpReview> PickUpReviews { get; set; }
+        public DbSet<WorkerReview> WorkerReviews { get; set; }
+        public DbSet<DeliveryReview> DeliveryReviews { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

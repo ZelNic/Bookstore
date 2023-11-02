@@ -19,6 +19,9 @@ namespace Minotaur.DataAccess.Repository
         public IOrganizationalOrderRepository OrganizationalOrders { get; set; }        
         public ITelegramRequestsRepository TelegramRequests { get; set; }
         public IProductReviewsRepository ProductReviews { get; set; }
+        public IPickUpReviewRepository PickUpReviews { get; set; }
+        public IWorkerReviewRepository WorkerReviews { get; set; }
+        public IDeliveryReviewRepository DeliveryReviews { get; set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
@@ -37,6 +40,9 @@ namespace Minotaur.DataAccess.Repository
             OrganizationalOrders = new OrganizationalOrdersRepository(_db);
             TelegramRequests = new TelegramRequestsRepository(_db);
             ProductReviews = new ProductReviewsRepository(_db);
+            PickUpReviews = new PickUpReviewRepository(_db);
+            WorkerReviews = new WorkerReviewRepository(_db);
+            DeliveryReviews = new DeliveryReviewRepository(_db);
         }
 
         public async Task SaveAsync()

@@ -21,14 +21,12 @@ function getOrders() {
 function generateOrderCards() {
     let html = ``;
 
-
     for (let [indexOrder, order] of ordersData.entries()) {
 
         let countProduct = 0;
         let sumPrice = 0;
         var tableOrder = ``;
         var showProduct;
-
 
         showProduct = order.shippedProducts != null ? order.shippedProducts : order.orderedProducts;
 
@@ -105,7 +103,7 @@ function generateOrderCards() {
                         </div>
                     </div>
                     <hr/>
-                    <button onclick="reviewOrderHandler('${indexOrder}')" class="btn btn-success">Отзыв о заказе</button>
+                    <button onclick="reviewOrderHandler('${order.orderId}')" class="btn btn-success">Отзыв о заказе</button>
                 </div>
             </div>
         `;

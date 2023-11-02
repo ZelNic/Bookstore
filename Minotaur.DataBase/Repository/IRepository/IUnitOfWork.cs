@@ -17,6 +17,9 @@ namespace Minotaur.DataAccess.Repository.IRepository
         IOrganizationalOrderRepository OrganizationalOrders { get; }
         IProductReviewsRepository ProductReviews { get; }
         ITelegramRequestsRepository TelegramRequests { get; }
+        IPickUpReviewRepository PickUpReviews { get; }
+        IWorkerReviewRepository WorkerReviews { get; }
+        IDeliveryReviewRepository DeliveryReviews { get; }
         Task SaveAsync();
     }
 }

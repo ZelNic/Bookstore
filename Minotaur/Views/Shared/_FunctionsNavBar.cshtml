@@ -3,9 +3,6 @@
 @inject SignInManager<MinotaurUser> SignInManager
 @inject UserManager<MinotaurUser> UserManager
 
-
-    @*TODO:добавить новую роль в функция навбара*@
-
 @if (User.Identity?.IsAuthenticated == true)
 {
     if (User.IsInRole(Roles.Role_Admin))
@@ -22,7 +19,12 @@
                 <li><a class="nav-link text-light" asp-area="Operator" asp-controller="Reviews" asp-action="Index">Отзывы на товары</a></li>
             </ul>
         </div>
-
+    }
+    if (User.IsInRole(Roles.Role_Operator))
+    {
+        <ul class="navbar-nav flex-grow-1">
+            <li><a class="nav-link text-light" asp-area="Operator" asp-controller="Reviews" asp-action="Index">Модерация отзывов</a></li>
+        </ul>
     }
     if (User.IsInRole(Roles.Role_Worker_Order_Pickup_Point))
     {

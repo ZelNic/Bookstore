@@ -1,9 +1,6 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models.ModelReview;
@@ -25,11 +22,11 @@ namespace Minotaur.Areas.Customer.Controllers
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
         }
+        #region ProductReview
         public IActionResult Index()
         {
             return View();
         }
-
         [HttpGet]
         public async Task<IActionResult> GetReviewsOnProduct(int productId)
         {
@@ -46,35 +43,48 @@ namespace Minotaur.Areas.Customer.Controllers
                    r.UserId,
                    r.IsShowReview,
                    r.IsRejected,
-                   CountLike = r.IdWhoLiked == null ? 0 : DeserializationUserId(r.IdWhoLiked.ToString()).Count(),
-                   CountDislike = r.IdWhoDisiked == null ? 0 : DeserializationUserId(r.IdWhoDisiked.ToString()).Count(),
+                   CountLike = r.IdWhoLiked == null ? 0 : JsonConvert.DeserializeObject<Guid[]>(r.IdWhoLiked.ToString()).Count(),
+                   CountDislike = r.IdWhoDisiked == null ? 0 : JsonConvert.DeserializeObject<Guid[]>(r.IdWhoDisiked.ToString()).Count(),
                    Photo = r.FilePaths == null ? null : JsonConvert.DeserializeObject<string[]>(r.FilePaths),
                });
             return Json(new { data = reviews });
         }
-
         [HttpGet]
-        public async Task<IActionResult> GetRatingReview(string id)
+        public async Task<IActionResult> GetRatingReviewProduct(string id)
         {
             ProductReview? review = await _unitOfWork.ProductReviews.GetAsync(r => r.Id == Guid.Parse(id));
             if (review == null) return BadRequest("Отзыв не найден");
 
-            int countLike = review.IdWhoLiked == null ? 0 : DeserializationUserId(review.IdWhoLiked.ToString()).Count();
-            int countDislike = review.IdWhoDisiked == null ? 0 : DeserializationUserId(review.IdWhoDisiked.ToString()).Count();
+            int countLike = review.IdWhoLiked == null ? 0 : JsonConvert.DeserializeObject<Guid[]>(review.IdWhoLiked.ToString()).Count();
+            int countDislike = review.IdWhoDisiked == null ? 0 : JsonConvert.DeserializeObject<Guid[]>(review.IdWhoDisiked.ToString()).Count();
 
             return Json(new { data = new { CountLike = countLike, CountDislike = countDislike } });
         }
-
         [HttpGet]
         public async Task<IActionResult> CheckForRefeedback(string orderId, int productId)
         {
             ProductReview? review = await _unitOfWork.ProductReviews.GetAsync(r => r.OrderId == Guid.Parse(orderId) && r.ProductId == productId);
-            if (review == null) return Json(new { });
+            if (review == null) return Ok();
             else
             {
                 if (review.IsRejected == true || review.IsShowReview == false)
                 {
-                    return Json(new { data = review });
+                    string wwwRootPath = _webHostEnvironment.WebRootPath;
+                    string productPath = @"fileStorage\productReviewFiles\";
+                    var filePaths = JsonConvert.DeserializeObject<List<string>>(review.FilePaths);
+
+                    foreach (var filePath in filePaths)
+                    {
+                        string fullPath = Path.Combine(wwwRootPath, productPath, filePath);
+                        if (System.IO.File.Exists(fullPath))
+                        {
+                            System.IO.File.Delete(fullPath);
+                        }
+                    }
+
+                    _unitOfWork.ProductReviews.Remove(review);
+                    await _unitOfWork.SaveAsync();
+                    return Ok();
                 }
                 else
                 {
@@ -82,11 +92,11 @@ namespace Minotaur.Areas.Customer.Controllers
                 }
             }
         }
-
         [HttpPost]
         public async Task<IActionResult> PostReview(BaseProductReviews productReviews)
         {
             List<string> filePaths = new List<string>();
+            if (productReviews.Photos.Count >= 10) { productReviews.Photos.RemoveRange(9, productReviews.Photos.Count - 10); }
 
             if (productReviews.Photos != null)
             {
@@ -127,29 +137,6 @@ namespace Minotaur.Areas.Customer.Controllers
 
             return Ok();
         }
-
-        // IDEA: создать систему рекомендаций на основание купленных книг и сопоставлением их по категориям.
-
-        private List<Guid> DeserializationUserId(string ids)
-        {
-            List<Guid>? result = new List<Guid>();
-            try
-            {
-                result = JsonConvert.DeserializeObject<List<Guid>>(ids);
-            }
-            catch (Exception ex)
-            {
-                return result;
-            }
-
-            return result;
-        }
-        private string Serialization(List<Guid> ids)
-        {
-            string json = JsonConvert.SerializeObject(ids);
-
-            return json;
-        }
         [HttpPost]
         public async Task<IActionResult> RateReview(string reviewId, bool isLiked)
         {
@@ -157,8 +144,8 @@ namespace Minotaur.Areas.Customer.Controllers
             var review = await _unitOfWork.ProductReviews.GetAsync(r => r.Id == Guid.Parse(reviewId));
             if (review == null) return BadRequest("Отзыв не найден");
 
-            List<Guid> liked = review.IdWhoLiked == null ? new List<Guid> { } : DeserializationUserId(review.IdWhoLiked.ToString());
-            List<Guid> disliked = review.IdWhoDisiked == null ? new List<Guid> { } : DeserializationUserId(review.IdWhoDisiked.ToString());
+            List<Guid> liked = review.IdWhoLiked == null ? new List<Guid> { } : JsonConvert.DeserializeObject<List<Guid>>(review.IdWhoLiked.ToString());
+            List<Guid> disliked = review.IdWhoDisiked == null ? new List<Guid> { } : JsonConvert.DeserializeObject<List<Guid>>(review.IdWhoLiked.ToString());
 
             bool isChangeLiked = false;
             bool isChangeDisliked = false;
@@ -200,12 +187,12 @@ namespace Minotaur.Areas.Customer.Controllers
             {
                 if (isChangeLiked == true)
                 {
-                    changedList = Serialization(liked);
+                    changedList = JsonConvert.SerializeObject(liked);
                     review.IdWhoLiked = changedList;
                 }
                 if (isChangeDisliked == true)
                 {
-                    changedList = Serialization(disliked);
+                    changedList = JsonConvert.SerializeObject(disliked);
                     review.IdWhoDisiked = changedList;
                 }
             }
@@ -219,7 +206,78 @@ namespace Minotaur.Areas.Customer.Controllers
 
             return Ok();
         }
+        #endregion
+
+
+        #region OrderReview
+        [HttpPost]
+        public async Task<IActionResult> PostReviewOrder(BaseOrderReviews orderReview)
+        {
+            var order = await _unitOfWork.Orders.GetAsync(o => o.OrderId == orderReview.OrderId);
+            if (order == null) { return BadRequest("Заказ не найден"); }
+
+            try
+            {
+                DeliveryReview deliveryReview = new()
+                {
+                    OrderId = orderReview.OrderId,
+                    Rating = orderReview.DeliveryRating,
+                    DeliveryReviewText = orderReview.DeliveryReviewText,
+                };
+
+                PickUpReview pickUpReview = new()
+                {
+                    OrderId = orderReview.OrderId,
+                    PickUpRating = orderReview.PickUpRating,
+                    PickUpReviewText = orderReview.PickUpReviewText,
+                };
+
+                WorkerReview workerReview = new()
+                {
+                    OrderId = orderReview.OrderId,
+                    WorkerId = order.AssemblyResponsibleWorkerId,
+                    Rating = orderReview.WorkerRating,
+                    WorkerReviewText = orderReview.WorkerReviewText,
+                };
+
+                await _unitOfWork.DeliveryReviews.AddAsync(deliveryReview);
+                await _unitOfWork.PickUpReviews.AddAsync(pickUpReview);
+                await _unitOfWork.WorkerReviews.AddAsync(workerReview);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
+        }
+
+
+        public async Task<IActionResult> CheckForRefeedbackOrder(string orderId)
+        {
+            if (await _unitOfWork.DeliveryReviews.GetAsync(dr => dr.OrderId == Guid.Parse(orderId)) != null)
+            {
+                return BadRequest("Заказ уже оценен");
+            }
+            else { return Ok(); }
+        }
+
+        #endregion
+
+        #region PickUpReview
+
+        #endregion
+
+        #region DeliveryReview
+
+        #endregion
+
+        #region WorkerReview
+
+        #endregion
     }
 }
 
-//TODO: сделать так, что повторно отзыв нельзя было оставить на один и тот же продукт в ОДНОМ заказе
+
+// IDEA: создать систему рекомендаций на основание купленных книг и сопоставлением их по категориям.

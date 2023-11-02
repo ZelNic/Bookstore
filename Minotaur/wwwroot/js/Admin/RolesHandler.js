@@ -35,7 +35,8 @@ function getDataUserRoles() {
                                 <input type="checkbox" class="role-checkbox" value="WorkerOrderPickupPoint" ${roleArray.includes("WorkerOrderPickupPoint") ? 'checked' : ''} userId="${userId}"/> Сотрудник пункта выдачи<br>
                                 <input type="checkbox" class="role-checkbox" value="Customer" ${roleArray.includes("Customer") ? 'checked' : ''} userId="${userId}"/> Пользователь<br>
                                 <input type="checkbox" class="role-checkbox" value="HR" ${roleArray.includes("HR") ? 'checked' : ''} userId="${userId}"/> HR<br>
-                                <input type="checkbox" class="role-checkbox" value="Stockkeeper" ${roleArray.includes("Stockkeeper") ? 'checked' : ''} userId="${userId}"/> Кладовщик<br>                        
+                                <input type="checkbox" class="role-checkbox" value="Stockkeeper" ${roleArray.includes("Stockkeeper") ? 'checked' : ''} userId="${userId}"/> Кладовщик<br>   
+                                <input type="checkbox" class="role-checkbox" value="Operator" ${roleArray.includes("Operator") ? 'checked' : ''} userId="${userId}"/> Оператор<br>  
                             </div>`;
                 },
                 "width": "30%"
@@ -87,7 +88,9 @@ function getDataUserRoles() {
 }
 
 
-async function ConfirmActionAsync(userId) {
+
+// IDEA: сделать проверку на админа
+async function сonfirmActionAsync(userId) {
     const { value: password } = await Swal.fire({
         title: 'Введите пароль',
         input: 'password',

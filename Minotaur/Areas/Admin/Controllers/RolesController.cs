@@ -42,7 +42,6 @@ namespace Minotaur.Areas.Admin.Controllers
 
             return Json(new { data = dataWorkerWithUserData });
         }
-
         private List<string> ParseWorkerRoles(string role)
         {
             List<string>? arrayRoles = null;
@@ -58,16 +57,12 @@ namespace Minotaur.Areas.Admin.Controllers
 
             return arrayRoles;
         }
-
         private string SerializationWorkerRoles(List<string> arrayRoles)
         {
             string stringRoles = string.Join('|', arrayRoles);
 
             return stringRoles;
         }
-
-
-
         [HttpPost]
         public async Task<IActionResult> SetRoleWorker(string userId, string role)
         {
@@ -93,7 +88,6 @@ namespace Minotaur.Areas.Admin.Controllers
             await _userManager.AddToRoleAsync(minotaurUser, role);
             return Ok();
         }
-
         [HttpPost]
         public async Task<IActionResult> RemoveRoleWorker(string userId, string role)
         {
