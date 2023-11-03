@@ -66,8 +66,9 @@ namespace Minotaur.Areas.PickUp
 
                 var user = await _userManager.GetUserAsync(User);
                 var workerPickUp = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(user.Id));
-
                 var pickUp = await _unitOfWork.Offices.GetAsync(o => o.Id == workerPickUp.OfficeId);
+                var orderMovementHistory = await _unitOfWork.OrderMovementHistory.GetAsync(h => h.OrderId == order.OrderId);
+
 
                 Notification notification = new()
                 {
@@ -78,6 +79,17 @@ namespace Minotaur.Areas.PickUp
                     Text = $"Заказ прибыл в пункт выдачи {pickUp.Name}. По адресу: {pickUp.City}, {pickUp.Street} {pickUp.BuildingNumber}.",
                     TypeNotification = NotificationSD.SimpleNotification,
                 };
+
+
+                orderMovementHistory.CurrentPosition = $"{pickUp.Name}, {pickUp.City}";
+                List<string>? listPointMovementOrder = JsonConvert.DeserializeObject<List<string>>(orderMovementHistory.HistoryOfСonversion);
+                listPointMovementOrder.Add(pickUp.Name + pickUp.City);
+
+                _unitOfWork.OrderMovementHistory.Update(orderMovementHistory);
+
+                orderMovementHistory.HistoryOfСonversion = JsonConvert.SerializeObject(listPointMovementOrder);
+                orderMovementHistory.TimeOfReceiving = MoscowTime.GetTime();
+
 
                 _unitOfWork.Orders.Update(order);
                 await _unitOfWork.Notifications.AddAsync(notification);
@@ -139,10 +151,11 @@ namespace Minotaur.Areas.PickUp
             {
                 var user = await _userManager.GetUserAsync(User);
                 var workerPickUp = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(user.Id));
+                var stock = await _unitOfWork.Offices.GetAsync(o => o.Id == workerPickUp.OfficeId);
 
                 order.ConfirmationCode = 0;
                 order.OrderStatus = StatusByOrder.Сompleted;
-                order.AssemblyResponsibleWorkerId = workerPickUp.WorkerId;                
+                order.AssemblyResponsibleWorkerId = workerPickUp.WorkerId;
 
                 Notification notification = new()
                 {
@@ -154,7 +167,7 @@ namespace Minotaur.Areas.PickUp
                     TypeNotification = NotificationSD.SimpleNotification,
                 };
 
-                await _unitOfWork.Notifications.AddAsync(notification) ;
+                await _unitOfWork.Notifications.AddAsync(notification);
                 _unitOfWork.Orders.Update(order);
                 await _unitOfWork.SaveAsync();
                 return Ok();

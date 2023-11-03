@@ -1,14 +1,11 @@
-﻿using Minotaur.DataAccess;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Minotaur.Models.SD;
-using Minotaur.DataAccess.Repository.IRepository;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Minotaur.Areas.Customer
 {
@@ -50,11 +47,9 @@ namespace Minotaur.Areas.Customer
                     o.City,
                     o.Street,
                     o.HouseNumber,
-                    o.CurrentPosition,
                     o.IsCourierDelivery,
                     o.OrderPickupPointId,
                     o.OrderStatus,
-                    o.TravelHistory
                 }).ToList();
 
 

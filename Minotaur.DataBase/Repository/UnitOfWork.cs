@@ -1,4 +1,5 @@
 ﻿using Minotaur.DataAccess.Repository.IRepository;
+using Minotaur.Models.Models;
 using Minotaur.Models.Models.ModelReview;
 
 namespace Minotaur.DataAccess.Repository
@@ -22,6 +23,7 @@ namespace Minotaur.DataAccess.Repository
         public IPickUpReviewRepository PickUpReviews { get; set; }
         public IWorkerReviewRepository WorkerReviews { get; set; }
         public IDeliveryReviewRepository DeliveryReviews { get; set; }
+        public IOrderMovementHistoryRepository OrderMovementHistory { get; set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
@@ -43,6 +45,7 @@ namespace Minotaur.DataAccess.Repository
             PickUpReviews = new PickUpReviewRepository(_db);
             WorkerReviews = new WorkerReviewRepository(_db);
             DeliveryReviews = new DeliveryReviewRepository(_db);
+            OrderMovementHistory = new OrderMovementHistoryRepository(_db);
         }
 
         public async Task SaveAsync()

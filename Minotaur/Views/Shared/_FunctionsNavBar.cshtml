@@ -7,7 +7,7 @@
 {
     if (User.IsInRole(Roles.Role_Admin))
     {
-        <div class="dropdown">
+        <div class="dropdown pt-2">
             <button class="btn btn-secondary dropdown-toggle mt-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Управление
             </button>
@@ -17,6 +17,15 @@
                 <li><a class="nav-link text-light" asp-area="Admin" asp-controller="Office" asp-action="Office">Офисы </a></li>
                 <li><a class="nav-link text-light" asp-area="Admin" asp-controller="Roles" asp-action="ViewRoles">Сотрудники </a></li>
                 <li><a class="nav-link text-light" asp-area="Operator" asp-controller="Reviews" asp-action="Index">Отзывы на товары</a></li>
+            </ul>
+        </div>
+        <div class="dropdown pt-2 px-1">
+            <button class="btn btn-secondary dropdown-toggle mt-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Аналитика
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="nav-link text-light" asp-area="Analytics" asp-controller="WorkerAnalysis" asp-action="Index">Данные по сотрудникам</a></li>
+                <li><a class="nav-link text-light" asp-area="Analytics" asp-controller="DeliveryAnalysis" asp-action="Index">Данные по доставке</a></li>
             </ul>
         </div>
     }

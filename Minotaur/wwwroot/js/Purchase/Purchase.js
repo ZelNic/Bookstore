@@ -9,7 +9,6 @@ let personalWalletAndPurchaseAmount;
 
 function getInfomationAboutBuyer() {
     let infomationData = document.getElementById("infomationData");
-
     $.ajax({
         url: '/Purchase/Purchase/GetInfomationAboutBuyer',
         type: 'GET',
@@ -164,7 +163,7 @@ function makePayment() {
                     }
                 });
             } else {
-                console.log('Отмена операции');
+                
             }
         });
     });

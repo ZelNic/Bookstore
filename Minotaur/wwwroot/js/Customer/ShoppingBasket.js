@@ -172,13 +172,10 @@ function selectProduct(index, isSelect) {
 
     activeSelectBox();
 }
-
 function removeFromShoppingBasket(productId) {
     $.ajax({
         url: '/Customer/ShoppingBasket/RemoveFromBasket?productsId=' + productId,
         type: 'POST',
-        data: productId,
-
         success: function (responce) {
             selectedProductArray = [];
             getShoppingBasket();

@@ -1,6 +1,4 @@
-﻿using Minotaur.Models.Models.ModelReview;
-
-namespace Minotaur.DataAccess.Repository.IRepository
+﻿namespace Minotaur.DataAccess.Repository.IRepository
 {
     public interface IUnitOfWork
     {
@@ -20,6 +18,7 @@ namespace Minotaur.DataAccess.Repository.IRepository
         IPickUpReviewRepository PickUpReviews { get; }
         IWorkerReviewRepository WorkerReviews { get; }
         IDeliveryReviewRepository DeliveryReviews { get; }
+        IOrderMovementHistoryRepository OrderMovementHistory { get; }
         Task SaveAsync();
     }
 }

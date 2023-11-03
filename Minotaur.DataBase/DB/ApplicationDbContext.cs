@@ -34,6 +34,8 @@ namespace Minotaur.DataAccess
         public DbSet<PickUpReview> PickUpReviews { get; set; }
         public DbSet<WorkerReview> WorkerReviews { get; set; }
         public DbSet<DeliveryReview> DeliveryReviews { get; set; }
+        public DbSet<OrderMovementHistory> OrderMovementHistory { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

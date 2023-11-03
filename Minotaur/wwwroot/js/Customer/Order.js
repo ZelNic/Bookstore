@@ -68,7 +68,7 @@ function generateOrderCards() {
                         <label>Дата и время заказа: ${order.purchaseDate} по МСК</label>
                     </div>
 
-                    <table class="table" id="tableProduct_${order.orderId} style="display: none;"">
+                    <table class="table" id="tableProduct_${order.orderId} style="display: none;">
                         <thead>
                             <tr>
                                 <th scope="col">Id</th>

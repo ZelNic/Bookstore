@@ -208,7 +208,6 @@ namespace Minotaur.Areas.Customer.Controllers
         }
         #endregion
 
-
         #region OrderReview
         [HttpPost]
         public async Task<IActionResult> PostReviewOrder(BaseOrderReviews orderReview)
@@ -262,19 +261,6 @@ namespace Minotaur.Areas.Customer.Controllers
             }
             else { return Ok(); }
         }
-
-        #endregion
-
-        #region PickUpReview
-
-        #endregion
-
-        #region DeliveryReview
-
-        #endregion
-
-        #region WorkerReview
-
         #endregion
     }
 }

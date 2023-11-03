@@ -9,5 +9,8 @@
         public const string Role_Stockkeeper = "Stockkeeper";
         public const string Role_HR = "HR";
         public const string Role_Operator = "Operator";
+        public const string Role_Analyst = "Analyst";
     }
 }
+
+// TODO: добавить роль аналитики

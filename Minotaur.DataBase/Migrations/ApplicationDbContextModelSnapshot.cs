@@ -364,11 +364,17 @@ namespace Minotaur.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("EndPosition")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
+
+                    b.Property<string>("StartingPosition")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("WorkerId")
                         .HasColumnType("uniqueidentifier");
@@ -480,9 +486,6 @@ namespace Minotaur.Migrations
                     b.Property<int>("ConfirmationCode")
                         .HasColumnType("int");
 
-                    b.Property<string>("CurrentPosition")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("HouseNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -528,15 +531,38 @@ namespace Minotaur.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TravelHistory")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("OrderId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Minotaur.Models.Models.OrderMovementHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CurrentPosition")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DispatchTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HistoryOfСonversion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("TimeOfReceiving")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderMovementHistory");
                 });
 
             modelBuilder.Entity("Minotaur.Models.Models.RecordStock", b =>
@@ -668,9 +694,6 @@ namespace Minotaur.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("WorkerRating")
-                        .HasColumnType("int");
 
                     b.HasKey("WorkerId");
 

@@ -267,7 +267,7 @@ function confirmOrderReadiness(orderId, index) {
             if (result.isConfirmed) {
                 Swal.fire('Оправлено!', '', 'success');
                 $.ajax({
-                    url: `/Picker/OrderPicking/SendCollectedOrder?orderId=${orderId}&missingProduct=Отсутствуют`,
+                    url: `/Picker/OrderPicking/PreorderCheck?orderId=${orderId}&missingProduct=Отсутствуют`,
                     type: 'POST',
 
                     success: function (response) {
@@ -275,7 +275,7 @@ function confirmOrderReadiness(orderId, index) {
                         generateDataOrder();
                     },
                     error: function (error) {
-                        Swal.fire(error.responseText);
+                        Swal.fire(error.responseText + "!!");
                     },
                 });
             }
@@ -293,7 +293,7 @@ function confirmOrderReadiness(orderId, index) {
                 if (result.isConfirmed) {
                     Swal.fire('Оправлено!', '', 'success');
                     $.ajax({
-                        url: '/Picker/OrderPicking/SendCollectedOrder?orderId=' + orderId + '&missingProduct=' + jsonMissingProduct,
+                        url: '/Picker/OrderPicking/PreorderCheck?orderId=' + orderId + '&missingProduct=' + jsonMissingProduct,
                         type: 'POST',
 
                         success: function (response) {
@@ -317,7 +317,7 @@ function confirmOrderReadiness(orderId, index) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/Picker/OrderPicking/SendCollectedOrder?orderId=' + orderId + '&missingProduct=' + jsonMissingProduct,
+                        url: '/Picker/OrderPicking/PreorderCheck?orderId=' + orderId + '&missingProduct=' + jsonMissingProduct,
                         type: 'POST',
                         success: function (response) {
                             Swal.fire('Уведомление отправлено');
