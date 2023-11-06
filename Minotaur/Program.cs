@@ -19,7 +19,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")).EnableSensitiveDataLogging());
 
-
 builder.Services.AddIdentity<MinotaurUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -29,9 +28,6 @@ builder.Services.AddScoped<UserManager<MinotaurUser>>();
 builder.Services.AddScoped<SignInManager<MinotaurUser>>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
-
-
-
 builder.Services.ConfigureApplicationCookie(option =>
 {
     option.LoginPath = $"/Areas/Identity/Account/Logout";
@@ -39,29 +35,12 @@ builder.Services.ConfigureApplicationCookie(option =>
     option.AccessDeniedPath = $"/Areas/Identity/Account/AccessDenied";
 });
 
-
 builder.Services.AddSingleton<ITelegramBotClient>(provider =>
 {
     var botToken = "6504892449:AAEDmHDwgkFG_Wg6Gywn-5ivRHcePsySn-4";
     return new TelegramBotClient(botToken);
 });
 builder.Services.AddScoped<TelegramController>();
-
-
-//TODO: обдумать целесобразность внедения системы почасовой смены кода получения заказа
-//builder.Services.AddSingleton<IScheduler>(provider =>
-//{
-//    var schedulerFactory = new StdSchedulerFactory();
-//    return schedulerFactory.GetScheduler().GetAwaiter().GetResult();
-//});
-
-//builder.Services.AddSingleton<QuartzHostedService>();
-//builder.Services.AddSingleton(provider =>
-//{
-//    var unitOfWork = provider.GetRequiredService<IUnitOfWork>();
-//    return new ConfirmationCodeHandler(unitOfWork);
-//});
-
 
 var app = builder.Build();
 
@@ -76,10 +55,7 @@ app.UseStaticFiles();
 
 SeedDatabase();
 
-
 app.UseRouting();
-
-
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -92,7 +68,6 @@ app.MapControllerRoute(
 LifeTelegramBot(app.Services.GetService<IServiceProvider>());
 
 app.Run();
-
 
 void LifeTelegramBot(IServiceProvider serviceProvider)
 {

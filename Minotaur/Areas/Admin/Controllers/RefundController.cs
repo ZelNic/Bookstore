@@ -26,8 +26,6 @@ namespace Minotaur.Areas.Admin.Controllers
             Notification? notification = await _unitOfWork.Notifications.GetAsync(n => n.Id == Guid.Parse(notificationId));
             Order? refundOrder = await _unitOfWork.Orders.GetAsync(o => o.OrderId == notification.OrderId);
 
-            //IDEA создать "банк" и переместить всю логику по денежным операциям в него??
-
             MinotaurUser? admin = await _userManager.GetUserAsync(User);
             MinotaurUser? returnRecipient = await _unitOfWork.MinotaurUsers.GetAsync(u => u.Id == refundOrder.UserId.ToString());
 

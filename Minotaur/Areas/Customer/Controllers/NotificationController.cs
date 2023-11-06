@@ -37,7 +37,7 @@ namespace Minotaur.Areas.Customer
                     n.OrderId,
                     SendingTime = n.SendingTime.ToString("dd.MM.yyyy HH:mm"),
                     n.Text,
-                    n.TypeNotification,
+                    n.TypeNotification
                 });
 
             if (notHiddenNotifications == null)
@@ -59,7 +59,6 @@ namespace Minotaur.Areas.Customer
 
             return Ok();
         }
-
         [HttpPost]
         public async Task<IActionResult> RemoveAllNotifications()
         {
@@ -73,7 +72,6 @@ namespace Minotaur.Areas.Customer
 
             return Ok();
         }
-
         [HttpPost]
         public async Task<IActionResult> SendReplyIncompleteOrder(string notificationId, bool isAgree)
         {

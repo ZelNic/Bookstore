@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
@@ -217,8 +218,7 @@ namespace Minotaur.Areas.Stockkeeper
             return Json(new { data = request });
         }
 
-
-        // TODO: разделить метод на несколько частей с информацией, что операция создания документа удалась, иначе не сохранять изменения
+       
 
         [HttpPost]
         public async Task<IActionResult> OrderProducts([FromBody] RecordStock[] purchaseRequestData)
@@ -246,27 +246,39 @@ namespace Minotaur.Areas.Stockkeeper
 
             await _unitOfWork.StockMagazine.AddAsync(recordStockPurchase);
 
-            //-----------------------------------------------------------------------------------------------------------------------------
-
-
-            string templatePath = "F:\\GitHub\\Minotaur\\Minotaur\\Areas\\Stockkeeper\\Sample\\Заявка на закупку товаров.docx";
-            string nameFile = $"Заявка_{recordStockPurchase.Id}";
-            string filledFilePath = $"F:\\GitHub\\Minotaur\\Minotaur\\Areas\\Stockkeeper\\PurchaseRequisitions\\{nameFile}.docx";
-
-
-            System.IO.File.Copy(templatePath, filledFilePath, true);
-
-            using (WordprocessingDocument doc = WordprocessingDocument.Open(filledFilePath, true))
+            byte[] docx = FileGeneration(purchaseRequestData, recordStockPurchase, dataByStock);
+            if (!docx.IsNullOrEmpty())
             {
-                MainDocumentPart mainPart = doc.MainDocumentPart;
+                await _unitOfWork.SaveAsync();
+                return new FileContentResult(docx, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            }
+            else
+            {
+                return BadRequest("Не удалось сформировать файл");
+            }
+        }
 
-                string docText;
-                using (StreamReader sr = new StreamReader(mainPart.GetStream()))
+        public byte[] FileGeneration(RecordStock[] purchaseRequestData, RecordStock recordStockPurchase, DataByStock dataByStock)
+        {
+            try
+            {
+                string templatePath = "F:\\GitHub\\Minotaur\\Minotaur\\Areas\\Stockkeeper\\Sample\\Заявка на закупку товаров.docx";
+                string nameFile = $"Заявка_{recordStockPurchase.Id}";
+                string filledFilePath = $"F:\\GitHub\\Minotaur\\Minotaur\\Areas\\Stockkeeper\\PurchaseRequisitions\\{nameFile}.docx";
+
+                System.IO.File.Copy(templatePath, filledFilePath, true);
+
+                using (WordprocessingDocument doc = WordprocessingDocument.Open(filledFilePath, true))
                 {
-                    docText = sr.ReadToEnd();
-                }
+                    MainDocumentPart mainPart = doc.MainDocumentPart;
 
-                Dictionary<string, string> replacements = new Dictionary<string, string>{
+                    string docText;
+                    using (StreamReader sr = new StreamReader(mainPart.GetStream()))
+                    {
+                        docText = sr.ReadToEnd();
+                    }
+
+                    Dictionary<string, string> replacements = new Dictionary<string, string>{
                     {"Number", recordStockPurchase.Id.ToString()},
                     {"TypeOffice", dataByStock.Stock.Type.ToString()},
                     {"NameOffice", dataByStock.Stock.Name.ToString()},
@@ -278,68 +290,70 @@ namespace Minotaur.Areas.Stockkeeper
                     {"Phone", dataByStock.MinotaurUser.PhoneNumber.ToString()} };
 
 
-                Regex regexText = new Regex(string.Join("|", replacements.Keys));
-                docText = regexText.Replace(docText, match => replacements[match.Value]);
+                    Regex regexText = new Regex(string.Join("|", replacements.Keys));
+                    docText = regexText.Replace(docText, match => replacements[match.Value]);
 
-                using (StreamWriter sw = new StreamWriter(mainPart.GetStream(FileMode.Create)))
-                {
-                    sw.Write(docText);
+                    using (StreamWriter sw = new StreamWriter(mainPart.GetStream(FileMode.Create)))
+                    {
+                        sw.Write(docText);
+                    }
+
+                    Table? table = mainPart?.Document?.Body?.Elements<Table>().FirstOrDefault();
+                    TableProperties? sourceTableProperties = table?.GetFirstChild<TableProperties>();
+
+                    TableProperties copiedTableProperties = (TableProperties)sourceTableProperties.CloneNode(true);
+
+                    for (int i = 0; i < purchaseRequestData.Length; i++)
+                    {
+                        TableRow newRow = new TableRow();
+
+                        TableCell cellId = new TableCell(new Paragraph(new Run(new Text($"{i + 1}"))));
+                        TableCell productNameCell = new TableCell(new Paragraph(new Run(new Text(purchaseRequestData[i].ProductName + ", " + purchaseRequestData[i].ProductId.ToString()))));
+                        TableCell countCell = new TableCell(new Paragraph(new Run(new Text(purchaseRequestData[i].Count.ToString()))));
+
+                        newRow.AppendChild(cellId);
+                        newRow.AppendChild(productNameCell);
+                        newRow.AppendChild(countCell);
+
+                        TableCellProperties cellProperties = new TableCellProperties();
+                        cellProperties.Append(copiedTableProperties.CloneNode(true));
+
+                        RunProperties runProperties = new(
+                            new RunFonts()
+                            {
+                                Ascii = "Arial",
+                            });
+
+                        runProperties.Append(new FontSize() { Val = "12" });
+
+                        cellProperties.Append(runProperties);
+
+                        cellId.AppendChild(cellProperties.CloneNode(true));
+                        productNameCell.AppendChild(cellProperties.CloneNode(true));
+                        countCell.AppendChild(cellProperties.CloneNode(true));
+
+                        table?.AppendChild(newRow);
+                    }
+                    mainPart?.Document.Save();
                 }
 
-                Table? table = mainPart?.Document?.Body?.Elements<Table>().FirstOrDefault();
-                TableProperties? sourceTableProperties = table?.GetFirstChild<TableProperties>();
 
-                TableProperties copiedTableProperties = (TableProperties)sourceTableProperties.CloneNode(true);
+                byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
 
-                for (int i = 0; i < purchaseRequestData.Length; i++)
+                var contentDispositionHeader = new ContentDispositionHeaderValue("attachment")
                 {
-                    TableRow newRow = new TableRow();
+                    FileName = nameFile
+                };
 
-                    TableCell cellId = new TableCell(new Paragraph(new Run(new Text($"{i + 1}"))));
-                    TableCell productNameCell = new TableCell(new Paragraph(new Run(new Text(purchaseRequestData[i].ProductName + ", " + purchaseRequestData[i].ProductId.ToString()))));
-                    TableCell countCell = new TableCell(new Paragraph(new Run(new Text(purchaseRequestData[i].Count.ToString()))));
-
-                    newRow.AppendChild(cellId);
-                    newRow.AppendChild(productNameCell);
-                    newRow.AppendChild(countCell);
-
-                    TableCellProperties cellProperties = new TableCellProperties();
-                    cellProperties.Append(copiedTableProperties.CloneNode(true));
-
-                    RunProperties runProperties = new(
-                        new RunFonts()
-                        {
-                            Ascii = "Arial",
-                        });
-
-                    runProperties.Append(new FontSize() { Val = "12" });
-
-                    cellProperties.Append(runProperties);
-
-                    cellId.AppendChild(cellProperties.CloneNode(true));
-                    productNameCell.AppendChild(cellProperties.CloneNode(true));
-                    countCell.AppendChild(cellProperties.CloneNode(true));
-
-                    table?.AppendChild(newRow);
-                }
-
-
-
-                mainPart?.Document.Save();
+                Response.Headers.Add(HeaderNames.ContentDisposition, contentDispositionHeader.ToString());
+                Response.Headers.Add(HeaderNames.XContentTypeOptions, "nosniff");
+                return fileBytes;
             }
-
-            byte[] fileBytes = System.IO.File.ReadAllBytes(filledFilePath);
-
-            var contentDispositionHeader = new ContentDispositionHeaderValue("attachment")
+            catch (Exception ex)
             {
-                FileName = nameFile
-            };
-
-            Response.Headers.Add(HeaderNames.ContentDisposition, contentDispositionHeader.ToString());
-            Response.Headers.Add(HeaderNames.XContentTypeOptions, "nosniff");
-
-            await _unitOfWork.SaveAsync();
-            return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+                byte[] fileBytes = new byte[] { };
+                return fileBytes;
+            }
         }
     }
 }

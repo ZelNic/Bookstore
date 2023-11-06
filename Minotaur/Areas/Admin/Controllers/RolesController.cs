@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Minotaur.DataAccess;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
@@ -13,12 +15,15 @@ namespace Minotaur.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<MinotaurUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public RolesController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager)
+        public RolesController(IUnitOfWork unitOfWork, UserManager<MinotaurUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
+             
 
         [HttpGet]
         public IActionResult ViewRoles() => View();
@@ -26,6 +31,8 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDataUserRoles()
         {
+            await _roleManager.CreateAsync(new IdentityRole(role));
+
             var dataWorkerWithUserData = (await _unitOfWork.Workers.GetAllAsync()).Join(_unitOfWork.MinotaurUsers.GetAll(), w => w.UserId, u => Guid.Parse(u.Id), (w, u) => new { Worker = w, User = u })
                 .Select(w => new
                 {

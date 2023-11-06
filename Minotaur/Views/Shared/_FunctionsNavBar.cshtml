@@ -26,6 +26,20 @@
             <ul class="dropdown-menu dropdown-menu-dark">
                 <li><a class="nav-link text-light" asp-area="Analytics" asp-controller="WorkerAnalysis" asp-action="Index">Данные по сотрудникам</a></li>
                 <li><a class="nav-link text-light" asp-area="Analytics" asp-controller="DeliveryAnalysis" asp-action="Index">Данные по доставке</a></li>
+                <li><a class="nav-link text-light" asp-area="Analytics" asp-controller="PickUpAnalysis" asp-action="Index">Данные по пунктам выдачи</a></li>
+            </ul>
+        </div>
+    }
+    if (User.IsInRole(Roles.Role_Analyst))
+    {
+        <div class="dropdown pt-2 px-1">
+            <button class="btn btn-secondary dropdown-toggle mt-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Аналитика
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="nav-link text-light" asp-area="Analytics" asp-controller="WorkerAnalysis" asp-action="Index">Данные по сотрудникам</a></li>
+                <li><a class="nav-link text-light" asp-area="Analytics" asp-controller="DeliveryAnalysis" asp-action="Index">Данные по доставке</a></li>
+                <li><a class="nav-link text-light" asp-area="Analytics" asp-controller="PickUpAnalysis" asp-action="Index">Данные по пунктам выдачи</a></li>
             </ul>
         </div>
     }

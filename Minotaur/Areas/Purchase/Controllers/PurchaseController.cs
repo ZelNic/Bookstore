@@ -115,8 +115,6 @@ namespace Minotaur.Areas.Purchase
         }
 
 
-        //TODO: протестировать, ибо могут быть ошибки
-
         [HttpPost]
         public async Task<IActionResult> Payment(string dataDelivery)
         {
@@ -150,12 +148,10 @@ namespace Minotaur.Areas.Purchase
                     order.OrderStatus = StatusByOrder.Approved;
                     order.PurchaseDate = MoscowTime.GetTime();
 
-
                     user.PersonalWallet -= order.PurchaseAmount;
                     admin.PersonalWallet += order.PurchaseAmount;
 
                     MinotaurUser[] users = new MinotaurUser[] { admin, user };
-
 
                     _unitOfWork.MinotaurUsers.UpdateRange(users);
 

@@ -4,7 +4,6 @@ namespace Minotaur.Models.Models.ModelReview
 {
     public class ProductReview
     {
-        // TODO: добавить в дб контекст репу
         [Key] public Guid Id { get; set; }
         [Required] public Guid OrderId { get; set; }
         [Required] public int ProductId { get; set; }

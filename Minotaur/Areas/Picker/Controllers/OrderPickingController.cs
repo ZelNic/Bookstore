@@ -124,36 +124,26 @@ namespace Minotaur.Areas.Picker.Controllers
         {
             try
             {
-                IActionResult result;
                 Order? order = await _unitOfWork.Orders.GetAsync(i => i.OrderId == Guid.Parse(orderId));
                 Worker? picker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(_userManager.GetUserId(User)));
                 Office? stock = await _unitOfWork.Offices.GetAsync(o => o.Id == picker.OfficeId);
 
                 if (missingProduct == "Отсутствуют")
                 {
-                    result = await SendCompletedOrder(order, picker, stock);
+                    await SendCompletedOrder(order, picker, stock);
                 }
                 else if (order.MissingItems == missingProduct)
                 {
-                    result = await SendUncompletedOrder(order, picker, missingProduct, stock);
+                    await SendIncompleteOrder(order, picker, missingProduct, stock);
                 }
                 else
                 {
-                    result = await NotifyBuyerIncompleteOrder(order, picker, missingProduct);
+                    await NotifyBuyerIncompleteOrder(order, picker, missingProduct);
                 }
-
-                if( result == Ok())
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest("Ошибка");
-                }
-
+                return Ok();
             }
             catch (Exception ex)
-            { 
+            {
                 return BadRequest(ex.Message);
             }
         }
@@ -167,11 +157,13 @@ namespace Minotaur.Areas.Picker.Controllers
                 order.MissingItems = "Отсутствуют";
 
                 string currentPointOrder = $"{stock.Name}, {stock.City}";
+                List<string> pointList = new List<string>();
+                pointList.Add(currentPointOrder);
 
                 OrderMovementHistory orderMovementHistory = new()
                 {
                     CurrentPosition = currentPointOrder,
-                    HistoryOfСonversion = JsonConvert.SerializeObject(currentPointOrder),
+                    HistoryOfСonversion = JsonConvert.SerializeObject(pointList),
                     OrderId = order.OrderId,
                     DispatchTime = MoscowTime.GetTime(),
                 };
@@ -213,7 +205,7 @@ namespace Minotaur.Areas.Picker.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        private async Task<IActionResult> SendUncompletedOrder(Order order, Worker picker, string missingProduct, Office stock)
+        private async Task<IActionResult> SendIncompleteOrder(Order order, Worker picker, string missingProduct, Office stock)
         {
             try
             {
@@ -282,10 +274,14 @@ namespace Minotaur.Areas.Picker.Controllers
                     Text = $"Ваша заказ полностью собран и отправлен"
                 };
 
+                string currentPointOrder = $"{stock.Name}, {stock.City}";
+                List<string> pointList = new List<string>();
+                pointList.Add(currentPointOrder);
+
                 OrderMovementHistory orderMovementHistory = new()
                 {
-                    CurrentPosition = $"{stock.Name}, {stock.City}",
-                    HistoryOfСonversion = JsonConvert.SerializeObject(stock.City),
+                    CurrentPosition = currentPointOrder,
+                    HistoryOfСonversion = JsonConvert.SerializeObject(pointList),
                     OrderId = order.OrderId,
                     DispatchTime = MoscowTime.GetTime(),
                 };

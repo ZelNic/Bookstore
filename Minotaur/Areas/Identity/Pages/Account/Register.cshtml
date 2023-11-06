@@ -4,10 +4,10 @@
     ViewData["Title"] = "Регистрация";
 }
 
-<h1>@ViewData["Title"]</h1>
 
-<div class="row">
+<div class="row justify-content-center">
     <div class="col-md-4">
+        <h1>@ViewData["Title"]</h1>
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <h2>Создать новый аккаунт</h2>
             <hr />
@@ -30,38 +30,6 @@
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Зарегистрироваться</button>
         </form>
     </div>
-   @* <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Использовать сторонние сервисы</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            Внешние службы аутентификации не настроены. См. эту <a href="https://go.microsoft.com/fwlink/?LinkID=532715">
-                                статью.
-                                О настройке этого приложения ASP.NET для поддержки входа в систему через внешние службы.
-                            </a>
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
-    </div>*@
 </div>
 
 @section Scripts {

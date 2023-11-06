@@ -300,6 +300,9 @@ namespace Minotaur.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("OrderPickupPointId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("PickUpRating")
                         .HasColumnType("int");
 

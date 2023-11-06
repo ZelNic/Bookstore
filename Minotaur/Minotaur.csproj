@@ -44,6 +44,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Accounting\Controllers\" />
+    <Folder Include="Areas\Accounting\Data\" />
+    <Folder Include="Areas\Accounting\Models\" />
+    <Folder Include="Areas\Accounting\Views\" />
     <Folder Include="Areas\HR\Controllers\" />
     <Folder Include="Areas\Stockkeeper\PurchaseRequisitions\" />
     <Folder Include="wwwroot\fileStorage\productReviewFiles\" />

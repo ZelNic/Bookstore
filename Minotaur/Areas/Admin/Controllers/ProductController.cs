@@ -17,7 +17,6 @@ namespace Minotaur.Areas.Admin.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
         //TODO: переписать старницу с продуктами для админа, добавить поиск и частичную загрузку страниц
         public async Task<IActionResult> Index()
         {

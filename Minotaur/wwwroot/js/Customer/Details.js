@@ -1,8 +1,5 @@
 ﻿
 
-
-
-
 function changeFunctionButtonWishlist(id, isAdd) {
     let btnWishlist = document.getElementById(`btnWishList_${id}`);
 

@@ -229,6 +229,7 @@ namespace Minotaur.Areas.Customer.Controllers
                     OrderId = orderReview.OrderId,
                     PickUpRating = orderReview.PickUpRating,
                     PickUpReviewText = orderReview.PickUpReviewText,
+                    OrderPickupPointId = orderReview.OrderPickupPointId
                 };
 
                 WorkerReview workerReview = new()

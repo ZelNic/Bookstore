@@ -44,6 +44,30 @@ namespace Minotaur.DataAccess.Repository
             return await query.FirstOrDefaultAsync();
         }
 
+        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
+        {
+            IQueryable<T> query;
+            if (tracked == true)
+            {
+                query = _dbSet;
+            }
+            else
+            {
+                query = _dbSet.AsNoTracking();
+            }
+
+            query = query.Where(filter);
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+            return query.FirstOrDefault();
+        }
+
+
         public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
         {
             IQueryable<T> query = _dbSet;

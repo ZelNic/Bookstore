@@ -90,8 +90,6 @@ namespace Minotaur.Areas.Operator.Controllers
                 var review = await _unitOfWork.ProductReviews.GetAsync(r => r.Id == Guid.Parse(id));
                 review.IsRejected = true;
 
-                // IDEA: Создать контроллер для уведомлвений и создать в нем методы на все ситуации
-
                 Notification notificationForUser = new()
                 {
                     OrderId = review.OrderId,
@@ -115,5 +113,3 @@ namespace Minotaur.Areas.Operator.Controllers
     }
 }
 
-
-// TODO: переписать добавление роли и назначение, сделать более гибким

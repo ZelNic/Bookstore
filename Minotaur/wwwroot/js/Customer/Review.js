@@ -46,6 +46,9 @@ function generateCardReviews() {
 
         sumOfRatings += review.rating;
         totalRating = sumOfRatings / reviews.length;
+
+        // TODO: протестировать работает ли ограничение по количеству символов
+        totalRating = totalRating.toFixed(2);
         divRating.innerHTML = `<div class="fs-5 fw-bolder">Оценка: ${totalRating} <i class="bi bi-star-fill text-warning fs-4"></i></div>`
 
         for (let img of review.photo) {
@@ -272,8 +275,8 @@ function checkFileCountAndSize() {
     // Продолжайте с обработкой выбранных файлов
 }
 
-function reviewOrderHandler(orderId) {
-
+//TODO: проверить, а то дура не хочет обновлять написанный код
+function reviewOrderHandler(orderId, orderPickupPointId) {
     $.ajax({
         url: `/customer/review/CheckForRefeedbackOrder?orderId=${orderId}`,
         type: 'POST',
@@ -281,6 +284,7 @@ function reviewOrderHandler(orderId) {
             let formOrderReview = `
                         <form id="formOrderReview" enctype="multipart/form-data">
                         <input name="OrderId" value="${orderId}" hidden> 
+                        <input name="OrderPickupPointId" value="${orderPickupPointId}" hidden>
                         <div class="form-row">
                             <div class="form-group col-md-12 mb-1">
                                 <label for="deliveryRating">Оценка доставки:</label>

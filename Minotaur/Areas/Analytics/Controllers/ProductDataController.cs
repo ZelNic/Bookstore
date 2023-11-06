@@ -2,7 +2,7 @@
 
 namespace Minotaur.Areas.Analytics.Controllers
 {
-    // TODO: сделать аналитз продукции
+    // TODO: сделать анализ продукции
     public class ProductDataController : Controller
     {
         public IActionResult Index()

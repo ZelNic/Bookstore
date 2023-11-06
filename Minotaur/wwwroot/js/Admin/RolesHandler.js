@@ -37,6 +37,7 @@ function getDataUserRoles() {
                                 <input type="checkbox" class="role-checkbox" value="HR" ${roleArray.includes("HR") ? 'checked' : ''} userId="${userId}"/> HR<br>
                                 <input type="checkbox" class="role-checkbox" value="Stockkeeper" ${roleArray.includes("Stockkeeper") ? 'checked' : ''} userId="${userId}"/> Кладовщик<br>   
                                 <input type="checkbox" class="role-checkbox" value="Operator" ${roleArray.includes("Operator") ? 'checked' : ''} userId="${userId}"/> Оператор<br>  
+                                <input type="checkbox" class="role-checkbox" value="Analyst" ${roleArray.includes("Analyst") ? 'checked' : ''} userId="${userId}"/> Аналитик<br>
                             </div>`;
                 },
                 "width": "30%"
@@ -85,35 +86,4 @@ function getDataUserRoles() {
        
 
     });
-}
-
-
-
-// IDEA: сделать проверку на админа
-async function сonfirmActionAsync(userId) {
-    const { value: password } = await Swal.fire({
-        title: 'Введите пароль',
-        input: 'password',
-        inputLabel: 'Password',
-        inputPlaceholder: '',
-        inputAttributes: {
-            maxlength: 50,
-            autocapitalize: 'off',
-            autocorrect: 'off'
-        }
-    })
-
-    if (password) {
-        const operation = "Изменение роли";
-        $.ajax({
-            url: '/Admin/AuthenticationAdmin/ConfirmAction?password=' + password + "&operation=" + operation + "&userId" + userId,
-            type: 'GET',
-            success: function (response) {
-                Swal.fire("Успешно");
-            },
-            error: function (error) {
-                Swal.fire("Доступ отказан");
-            }
-        });
-    }
 }
