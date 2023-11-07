@@ -10,7 +10,7 @@
         public const string Role_HR = "HR";
         public const string Role_Operator = "Operator";
         public const string Role_Analyst = "Analyst";
-        public const string Role_Accounting = "Accounting";
+        public const string Role_Accountant = "Accountant";
     }
 }
 

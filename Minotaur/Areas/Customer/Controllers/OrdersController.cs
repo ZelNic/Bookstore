@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Minotaur.DataAccess.Repository.IRepository;
 using Minotaur.Models;
 using Minotaur.Models.Models;
 using Minotaur.Models.SD;
+using Minotaur.Utility;
 using Newtonsoft.Json;
 
 namespace Minotaur.Areas.Customer
@@ -25,9 +27,7 @@ namespace Minotaur.Areas.Customer
         {
             return View();
         }
-
-
-        public async Task<IActionResult> GetOrders()
+        public async Task<IActionResult> Get()
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -50,10 +50,40 @@ namespace Minotaur.Areas.Customer
                     o.IsCourierDelivery,
                     o.OrderPickupPointId,
                     o.OrderStatus,
-                }).ToList();
+                }).OrderByDescending(u => u.PurchaseDate).ToList();
 
 
             return Json(new { data = formatedOrders });
+        }
+        public async Task<IActionResult> Cancel(string orderId)
+        {
+            try
+            {
+                var order = await _unitOfWork.Orders.GetAsync(i => i.OrderId == Guid.Parse(orderId));
+                var picker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(_userManager.GetUserId(User)));
+                order.OrderStatus = StatusByOrder.StatusCancelled;
+                order.RefundAmount = order.PurchaseAmount;
+
+                Notification notificationAboutCancellation = new()
+                {
+                    OrderId = order.OrderId,
+                    RecipientId = Guid.Parse("604c075d-c691-49d6-9d6f-877cfa866e59"),
+                    SenderId = picker.WorkerId,
+                    SendingTime = MoscowTime.GetTime(),
+                    TypeNotification = NotificationSD.Refund,
+                    Text = $"Необходимо осуществить возврат средств в сумме {order.RefundAmount} за заказ под номером: {order.OrderId}."
+                };
+
+                await _unitOfWork.Notifications.AddAsync(notificationAboutCancellation);
+                _unitOfWork.Orders.Update(order);
+                await _unitOfWork.SaveAsync();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

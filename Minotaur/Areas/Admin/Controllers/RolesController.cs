@@ -22,17 +22,13 @@ namespace Minotaur.Areas.Admin.Controllers
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _roleManager = roleManager;
-        }
-             
+        }             
 
         [HttpGet]
         public IActionResult ViewRoles() => View();
-
         [HttpGet]
         public async Task<IActionResult> GetDataUserRoles()
         {
-            await _roleManager.CreateAsync(new IdentityRole(role));
-
             var dataWorkerWithUserData = (await _unitOfWork.Workers.GetAllAsync()).Join(_unitOfWork.MinotaurUsers.GetAll(), w => w.UserId, u => Guid.Parse(u.Id), (w, u) => new { Worker = w, User = u })
                 .Select(w => new
                 {

@@ -271,6 +271,29 @@ namespace Minotaur.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Minotaur.Models.Models.AccountingEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Info")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("RecordingTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Sum")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccountingForOrders");
+                });
+
             modelBuilder.Entity("Minotaur.Models.Models.ModelReview.DeliveryReview", b =>
                 {
                     b.Property<Guid>("Id")

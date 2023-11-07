@@ -102,27 +102,29 @@ function generateCardNotitfications() {
 
 
         cardsNotification += `
-        <div id="cardNotification_${notification.id}" class="border border-1 rounded rounded-1 p-3 col-7 m-2">
-            <style>
-                .mr {
-                    margin-right: 5px;
-                }
-            </style>
-            <div class="d-inline-flex align-items-center position-relative">
-                <label class="">Номер заказа: </label>
-                <div class="rouden rounded-1 ${colorForNotification} col-auto mr">
-                    ${notification.orderId}
+        <div class="col-md-6">
+            <div id="cardNotification_${notification.id}" class="border border-1 rounded rounded-1 p-3 m-2">
+                <style>
+                    .mr {
+                        margin-right: 5px;
+                    }
+                </style>
+                <div class="d-inline-flex align-items-center position-relative">
+                    <label class="">Номер заказа: </label>
+                    <div class="rouden rounded-1 ${colorForNotification} col-auto mr">
+                        ${notification.orderId}
+                    </div>
+                    <div class="rouden rounded-1 text-bg-warning col-auto">
+                        ${notification.sendingTime.toString()} по МСК
+                    </div>
                 </div>
-                <div class="rouden rounded-1 text-bg-warning col-auto">
-                    ${notification.sendingTime.toString()} по МСК
+                <div class="col-1">
                 </div>
+                <div>
+                    ${notification.text}
+                </div>
+                ${functionForNotification}
             </div>
-            <div class="col-1">
-            </div>
-            <div>
-                ${notification.text}
-            </div>
-            ${functionForNotification}
         </div>
         `;
     }

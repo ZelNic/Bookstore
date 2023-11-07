@@ -129,7 +129,7 @@ namespace Minotaur.Areas.Purchase
             if (confirmedPrice != order.PurchaseAmount) { return BadRequest("Ошибочная стоимость заказа."); }
 
 
-            var shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAsync(b => b.UserId == Guid.Parse(user.Id) &&  b.IsPurchased == false);
+            var shoppingBasket = await _unitOfWork.ShoppingBaskets.GetAsync(b => b.UserId == Guid.Parse(user.Id) && b.IsPurchased == false);
             if (shoppingBasket == null) return BadRequest("Запись о списке покупок не найдена.");
 
 
@@ -150,16 +150,24 @@ namespace Minotaur.Areas.Purchase
 
                     user.PersonalWallet -= order.PurchaseAmount;
                     admin.PersonalWallet += order.PurchaseAmount;
-
-                    MinotaurUser[] users = new MinotaurUser[] { admin, user };
-
-                    _unitOfWork.MinotaurUsers.UpdateRange(users);
-
                     shoppingBasket.IsPurchased = true;
 
+                    MinotaurUser[] users = new MinotaurUser[] { admin, user };
+                    _unitOfWork.MinotaurUsers.UpdateRange(users);
                     _unitOfWork.ShoppingBaskets.Update(shoppingBasket);
-
                     await _unitOfWork.Orders.AddAsync(order);
+                    await _unitOfWork.SaveAsync();
+
+
+                    AccountingEntry entry = new()
+                    {
+                        OrderId = order.OrderId,
+                        Info = $"Прибыль с заказа",
+                        RecordingTime = MoscowTime.GetTime(),
+                        Sum = order.PurchaseAmount,
+                    };
+
+                    await _unitOfWork.AccountingForOrders.AddAsync(entry);
                     await _unitOfWork.SaveAsync();
 
                     return Ok();

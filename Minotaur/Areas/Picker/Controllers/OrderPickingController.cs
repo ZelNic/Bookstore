@@ -90,36 +90,6 @@ namespace Minotaur.Areas.Picker.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        public async Task<IActionResult> CancelAsseblyOrder(string orderId)
-        {
-            try
-            {
-                var order = await _unitOfWork.Orders.GetAsync(i => i.OrderId == Guid.Parse(orderId));
-                var picker = await _unitOfWork.Workers.GetAsync(w => w.UserId == Guid.Parse(_userManager.GetUserId(User)));
-                order.OrderStatus = StatusByOrder.Approved;
-                order.AssemblyResponsibleWorkerId = picker.WorkerId;
-                order.RefundAmount = order.PurchaseAmount;
-
-                Notification notificationForAdminForRefund = new()
-                {
-                    OrderId = order.OrderId,
-                    RecipientId = Guid.Parse("604c075d-c691-49d6-9d6f-877cfa866e59"),
-                    SenderId = picker.WorkerId,
-                    SendingTime = MoscowTime.GetTime(),
-                    TypeNotification = NotificationSD.Refund,
-                    Text = $"Необходимо осуществить возврат средств в сумме {order.AssemblyResponsibleWorkerId} за заказ под номером: {order.OrderId}."
-                };
-                await _unitOfWork.Notifications.AddAsync(notificationForAdminForRefund);
-                _unitOfWork.Orders.Update(order);
-                await _unitOfWork.SaveAsync();
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
         public async Task<IActionResult> PreorderCheck(string orderId, string? missingProduct = null)
         {
             try

@@ -1,4 +1,7 @@
-﻿namespace Minotaur.DataAccess.Repository.IRepository
+﻿using Microsoft.EntityFrameworkCore;
+using Minotaur.Models.Models;
+
+namespace Minotaur.DataAccess.Repository.IRepository
 {
     public interface IUnitOfWork
     {
@@ -19,6 +22,7 @@
         IWorkerReviewRepository WorkerReviews { get; }
         IDeliveryReviewRepository DeliveryReviews { get; }
         IOrderMovementHistoryRepository OrderMovementHistory { get; }
+        IAccountingForOrdersRepository AccountingForOrders { get; }
         Task SaveAsync();
     }
 }

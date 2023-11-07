@@ -4,12 +4,11 @@ let ordersData;
 $(document).ready(function () {
     getOrders();
 });
-
 function getOrders() {
     let orders = document.getElementById("orders");
 
     $.ajax({
-        url: '/Customer/Orders/GetOrders',
+        url: '/Customer/Orders/Get',
         type: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -26,32 +25,40 @@ function generateOrderCards() {
         let countProduct = 0;
         let sumPrice = 0;
         var tableOrder = ``;
-        let orderReviewButton = ``;
+        let functionBtnForOrder = ``;
         let showProduct;
 
-        showProduct = order.shippedProducts != null ? order.shippedProducts : order.orderedProducts;
+        showProduct = order.shippedProducts == null ? order.orderedProducts : order.shippedProducts;
 
-        if (order.orderStatus == "Завершен")
-            for (let [indexProduct, product] of showProduct.entries()) {
-                tableOrder += `
-                        <tbody class="table-group-divider">
-                            <tr>
-                                <td>${product.id}</td>
-                                <td id="nameProduct_${product.id}">
-                                    <a href="/Customer/Home/Details?id=${product.id}">${product.productName}</a>
-                                </td>
-                                <td>${product.price} ₽ </td>
-                                <td>${product.count}</td>
-                                <td><button  onclick="reviewProductHandler('${indexOrder}', '${indexProduct}')" class="btn btn-success">Отзыв</button></td>
-                            </tr>
-                        </tbody>
-                        `;
+        if (order.orderStatus == "Завершен") {
+            functionBtnForOrder = `<button onclick="reviewOrderHandler('${order.orderId}','${order.orderPickupPointId}')" class="btn btn-success"> Отзыв о заказе</button >`;
+        }
+        else if (order.orderStatus == "Заказ отменен, ожидается возврат средств") {
+            functionBtnForOrder = ``;
+        }
+        else {
+            functionBtnForOrder = `<button onclick="cancelOrder('${order.orderId}')" class="btn btn-success"> Отменить заказ</button>`;
+        }
 
-                orderReviewButton = `<button onclick="reviewOrderHandler('${order.orderId}','${order.orderPickupPointId}')" class="btn btn-success"> Отзыв о заказе</button >`;
 
-                countProduct += product.count;
-                sumPrice += product.count * product.price;
-            }
+        for (let [indexProduct, product] of showProduct.entries()) {
+            tableOrder += `
+            <tbody class="table-group-divider">
+                <tr>
+                    <td>${product.id}</td>
+                    <td id="nameProduct_${product.id}">
+                        <a href="/Customer/Home/Details?id=${product.id}">${product.productName}</a>
+                    </td>
+                    <td>${product.price} ₽ </td>
+                    <td>${product.count}</td>
+                   <td>${order.orderStatus == "Завершен" ? `<button onclick="reviewProductHandler('${indexOrder}', '${indexProduct}')" class="btn btn-success">Отзыв</button>` : ``}</td>
+                </tr>
+            </tbody>
+            `;
+
+            countProduct += product.count;
+            sumPrice += product.count * product.price;
+        }
 
         html += `
                     <div class="mb-5">
@@ -107,10 +114,35 @@ function generateOrderCards() {
                         </div>
                     </div>
                     <hr/>
-                    ${orderReviewButton}                    
+                    ${functionBtnForOrder}  
                 </div>
             </div>
         `;
     }
     return html;
+}
+function cancelOrder(orderId) {
+    Swal.fire({
+        title: "Отменить заказ?",
+        showCancelButton: true,
+        confirmButtonText: "Да, отменить",
+        denyButtonText: `Нет, не отменять`
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `/customer/Orders/Cancel?orderId=${orderId}`,
+                method: 'POST',
+                success: function (response) {
+                    Swal.fire("Заказ отменен. Ожидайте возврат средств");
+                    getOrders();
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire("Не удалось отменить заказ");
+                    getOrders();
+                }
+            });
+        } else if (result.isDenied) {
+        }
+    });
+
 }

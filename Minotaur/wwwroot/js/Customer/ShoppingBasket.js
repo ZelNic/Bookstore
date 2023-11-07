@@ -62,43 +62,46 @@ function generateCardProducts() {
         totalPrice += product.price * product.count;
         countProduct += product.count;
 
-        html += ` <div class="mb-3" >
-                    <div class="card card-subtitle h-100 shadow pt-1 border-0 m-0 p-0">
-                        <img src="${product.image}" class="card-img-top mx-auto rounded-1" alt="Product Image" style="object-fit: cover; width: 70%;" />
-                        <div class="card-body mt-0 pb-0">
-                            <div class="fs-6">
-                                ${product.nameProduct}
-                            </div>
-                        </div>
-                        <div class="card card-footer bg-transparent border-0">
-                            <hr />
-                            <div class="text-center">
-                                ${product.author}
-                            </div>
-                            <hr />
-                            <div class="text-center fs-5">
-                                ${product.price} ₽
-                            </div>
-                            <div>
-                            <button onclick="removeFromShoppingBasket(${product.productId})" class="btn btn-outline-danger border-0 bi bi-x-circle"></button>
-                            <button id="selector_${product.productId}" onclick="selectProduct(${index}, ${true})" class="btn btn-outline-secondary border-0 bi bi-check-circle"></button>
-                            </div>
-                            <hr />
-                            <div class="mx-auto pb-1">
-                                <button onclick="changeCountProduct(${product}, 'minus')" type="submit" class="btn bi bi-dash-circle opacity-100"></button>
-                                <input onblur="changeCountProduct( ${product}, 'input', document.getElementById('countProduct_${product}').value)"
-                                    id="countProduct_${product.productId}" type="number" min="1" max="50" name="count" value="${product.count}" style="object-fit: width: 4px; height: 20px; " required />
-                                <button onclick="changeCountProduct( ${product},'plus')" type="submit" class="btn bi bi-plus-circle opacity-100"></button>
-                            </div>
+        html += 
+            `<div class="mb-3" >
+                <div class="card card-subtitle h-100 shadow pt-1 border-0 m-0 p-0">
+                    <img src="${product.image}" class="card-img-top mx-auto rounded-1" alt="Product Image" style="object-fit: cover; width: 70%;" />
+                    <div class="card-body mt-0 pb-0">
+                        <div class="fs-6">
+                            ${product.nameProduct}
                         </div>
                     </div>
-                </div >`;
+                    <div class="card card-footer bg-transparent border-0">
+                        <hr />
+                        <div class="text-center">
+                            ${product.author}
+                        </div>
+                        <hr />
+                        <div class="text-center fs-5">
+                            ${product.price} ₽
+                        </div>
+                        <div>
+                        <button onclick="removeFromShoppingBasket(${product.productId})" class="btn btn-outline-danger border-0 bi bi-x-circle"></button>
+                        <button id="selector_${product.productId}" onclick="selectProduct(${index}, ${true})" class="btn btn-outline-secondary border-0 bi bi-check-circle"></button>
+                        </div>
+                        <hr />
+                        <div class="mx-auto pb-1">
+                            <button onclick="changeCountProduct(${index}, 'minus')" type="submit" class="btn bi bi-dash-circle opacity-100"></button>
+                            <input id="countProduct_${index}" onblur="changeCountProduct( ${index}, 'input', document.getElementById('countProduct_${index}').value)" type="number" min="1" max="50" name="count" value="${product.count}" required />
+                            <button onclick="changeCountProduct( ${index},'plus')" type="submit" class="btn bi bi-plus-circle opacity-100"></button>
+                        </div>
+                    </div>
+                </div>
+            </div >`;
     };
 
     return html;
 }
 function showBtnSaveChange() {
     let btnIsSave = document.getElementById("isSave");
+
+    console.log(btnIsSave);
+
     if (btnIsSave.hasAttribute('hidden')) {
         btnIsSave.removeAttribute('hidden');
     }
@@ -207,41 +210,43 @@ function removeFromShoppingBasket(productId) {
         }
     });
 }
-function changeCountProduct(product, operation, count = 1) {
+function changeCountProduct(index, operation, count = 1) {
 
     if (parseInt(count) == 0) {
-        removeFromShoppingBasket(dataShoppingBasket[product].productId);
+        removeFromShoppingBasket(dataShoppingBasket[index].productId);
         showBtnSaveChange();
         return;
     }
 
     showBtnSaveChange();
 
-    let indicateCountProduct = document.getElementById(`countProduct_${product.productId}`);
+    let indicateCountProduct = document.getElementById(`countProduct_${index}`);
 
     switch (operation) {
         case "minus":
-            dataShoppingBasket[product].count--;
+            dataShoppingBasket[index].count--;
             countProduct--;
-            totalPrice -= dataShoppingBasket[product].price
-            if (dataShoppingBasket[product].count <= 0) {
+            totalPrice -= dataShoppingBasket[index].price
+            if (dataShoppingBasket[index].count <= 0) {
                 showBtnSaveChange();
-                removeFromShoppingBasket(dataShoppingBasket[product].productId)
+                removeFromShoppingBasket(dataShoppingBasket[index].productId)
             }
             break;
         case "plus":
-            dataShoppingBasket[product].count++;
+            dataShoppingBasket[index].count++;
             countProduct++;
-            totalPrice += dataShoppingBasket[product].price;
+            totalPrice += dataShoppingBasket[index].price;
+            showBtnSaveChange();
             break;
         case "input":
             count = parseInt(count);
-            countProduct -= dataShoppingBasket[product].count;
-            totalPrice -= dataShoppingBasket[product].count * dataShoppingBasket[product].price;
+            countProduct -= dataShoppingBasket[index].count;
+            totalPrice -= dataShoppingBasket[index].count * dataShoppingBasket[index].price;
 
-            dataShoppingBasket[product].count = count;
-            countProduct += dataShoppingBasket[product].count;
-            totalPrice += dataShoppingBasket[product].count * dataShoppingBasket[product].price;
+            dataShoppingBasket[index].count = count;
+            countProduct += dataShoppingBasket[index].count;
+            totalPrice += dataShoppingBasket[index].count * dataShoppingBasket[index].price;
+            showBtnSaveChange();
             break
         default:
             Swal.fire({
@@ -252,11 +257,11 @@ function changeCountProduct(product, operation, count = 1) {
     }
 
 
-    if (!selectedProductArray.includes(product)) {
-        selectedProductArray.push(product);
+    if (!selectedProductArray.includes(index)) {
+        selectedProductArray.push(index);
     }
 
-    indicateCountProduct.setAttribute("value", dataShoppingBasket[product].count);
+    indicateCountProduct.setAttribute("value", dataShoppingBasket[index].count);
     showTotal();
 }
 function confirmChangeCount() {
@@ -365,5 +370,5 @@ function addToWishlist(selectedProductArray) {
         }
     });
 
-    activeSelectBox()
+    activeSelectBox();
 }

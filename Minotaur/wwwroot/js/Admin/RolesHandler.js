@@ -38,6 +38,7 @@ function getDataUserRoles() {
                                 <input type="checkbox" class="role-checkbox" value="Stockkeeper" ${roleArray.includes("Stockkeeper") ? 'checked' : ''} userId="${userId}"/> Кладовщик<br>   
                                 <input type="checkbox" class="role-checkbox" value="Operator" ${roleArray.includes("Operator") ? 'checked' : ''} userId="${userId}"/> Оператор<br>  
                                 <input type="checkbox" class="role-checkbox" value="Analyst" ${roleArray.includes("Analyst") ? 'checked' : ''} userId="${userId}"/> Аналитик<br>
+                                <input type="checkbox" class="role-checkbox" value="Accountant" ${roleArray.includes("Accountant") ? 'checked' : ''} userId="${userId}"/> Бухгалтер<br>
                             </div>`;
                 },
                 "width": "30%"

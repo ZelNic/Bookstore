@@ -63,7 +63,7 @@ namespace Minotaur.Areas.Customer
         public async Task<IActionResult> RemoveAllNotifications()
         {
             var user = await _userManager.GetUserAsync(User);
-            var notifications = await _unitOfWork.Notifications.GetAllAsync(u => u.RecipientId == Guid.Parse(user.Id));
+            var notifications = await _unitOfWork.Notifications.GetAllAsync(n => n.RecipientId == Guid.Parse(user.Id) && n.TypeNotification == NotificationSD.SimpleNotification);
 
             if (notifications == null) { return BadRequest("Уведомлений нет"); }
 
@@ -101,7 +101,7 @@ namespace Minotaur.Areas.Customer
             }
             else
             {
-                order.OrderStatus = StatusByOrder.BuyerDontAgreesNeedRefunded;
+                order.OrderStatus = StatusByOrder.StatusCancelled;
                 notificationForCustomer.Text = "Ожидается возврат средств";
 
                 Notification notificationForPicker = new()

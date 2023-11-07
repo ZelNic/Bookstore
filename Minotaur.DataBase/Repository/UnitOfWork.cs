@@ -25,6 +25,8 @@ namespace Minotaur.DataAccess.Repository
         public IDeliveryReviewRepository DeliveryReviews { get; set; }
         public IOrderMovementHistoryRepository OrderMovementHistory { get; set; }
 
+        public IAccountingForOrdersRepository AccountingForOrders { get; set; }
+
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -46,6 +48,7 @@ namespace Minotaur.DataAccess.Repository
             WorkerReviews = new WorkerReviewRepository(_db);
             DeliveryReviews = new DeliveryReviewRepository(_db);
             OrderMovementHistory = new OrderMovementHistoryRepository(_db);
+            AccountingForOrders = new AccountingForOrdersRepository(_db);
         }
 
         public async Task SaveAsync()
