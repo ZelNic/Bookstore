@@ -45,16 +45,16 @@ namespace Minotaur.TelegramController
 
         private async Task Error(ITelegramBotClient client, Exception exception, CancellationToken token)
         {
-            Notification notificationAboutError = new()
-            {
-                RecipientId = Guid.Parse("604c075d-c691-49d6-9d6f-877cfa866e59"),
-                EmailSender = "TelegramBot",
-                Text = $"{exception}.",
-                SendingTime = MoscowTime.GetTime(),
-                TypeNotification = NotificationSD.ErrorNotification,
-            };
-            await _unitOfWork.Notifications.AddAsync(notificationAboutError);
-            await _unitOfWork.SaveAsync();
+            //Notification notificationAboutError = new()
+            //{
+            //    RecipientId = Guid.Parse("604c075d-c691-49d6-9d6f-877cfa866e59"),
+            //    EmailSender = "TelegramBot",
+            //    Text = $"{exception}.",
+            //    SendingTime = MoscowTime.GetTime(),
+            //    TypeNotification = NotificationSD.ErrorNotification,
+            //};
+            //await _unitOfWork.Notifications.AddAsync(notificationAboutError);
+            //await _unitOfWork.SaveAsync();
         }
 
         private async Task Update(ITelegramBotClient client, Update update, CancellationToken token)

@@ -24,6 +24,7 @@ function updateOrAddProduct() {
                 showConfirmButton: false,
                 timer: 1500
             })
+            window.location.href = '/Admin/Product/index';
         },
 
         error: function (error) {

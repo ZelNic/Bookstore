@@ -104,8 +104,7 @@ namespace Minotaur.Areas.Stockkeeper
                     ProductId = productId,
                     Count = productCount,
                     ShelfNumber = numberShelf,
-                    Operation = OperationStock.ReceiptOfGoods,
-                    IsNeed = _unitOfWork.StockMagazine.GetAsync(u => u.ProductId == productId).Result.IsNeed
+                    Operation = OperationStock.ReceiptOfGoods                    
                 };
                 await _unitOfWork.StockMagazine.AddAsync(record);
             }

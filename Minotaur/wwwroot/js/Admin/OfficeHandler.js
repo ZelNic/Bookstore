@@ -27,7 +27,7 @@ function getTableOffice() {
             {
                 data: 'id',
                 render: function (data, type, row) {
-                    return '<button class="btn btn-warning">edit</button>';
+                    return '<button class="btn btn-warning">Редактировать</button>';
                 },
                 "width": "15%"
             }

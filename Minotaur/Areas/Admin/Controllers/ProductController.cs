@@ -33,13 +33,24 @@ namespace Minotaur.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> DetailsProduct(int? productId)
         {
-            ProductVM bookVM = new()
+
+            if (productId == null)
+            {
+                ProductVM newProductVMnew = new()
+                {
+                    CategoriesList = await _unitOfWork.Categories.GetAllAsync()
+                };
+                return View(newProductVMnew);
+            }
+
+
+            ProductVM productVM = new()
             {
                 Product = await _unitOfWork.Products.GetAsync(u => u.ProductId == productId),
                 CategoriesList = await _unitOfWork.Categories.GetAllAsync()
             };
 
-            return View(bookVM);
+            return View(productVM);
         }
 
 

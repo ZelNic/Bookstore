@@ -2,7 +2,7 @@
 
 <div class="container">
     <div class="text-center">
-        @if (Model.Product.ProductId != 0)
+        @if (Model.Product != null)
         {
             <h2>Обновить данные по товару</h2>
         }
@@ -68,7 +68,7 @@
                     <div class="container mt-4 ">
                         <div class="row justify-content-center align-items-center">
                             <div class="text-center">
-                                @if (Model.Product.ProductId == 0)
+                                @if (Model.Product == null)
                                 {
                                     <button onclick="updateOrAddProduct()" type="submit" class="btn btn-success form-control">Создать</button>
                                 }

@@ -87,7 +87,10 @@ function generateCardProducts() {
                         <hr />
                         <div class="mx-auto pb-1">
                             <button onclick="changeCountProduct(${index}, 'minus')" type="submit" class="btn bi bi-dash-circle opacity-100"></button>
-                            <input id="countProduct_${index}" onblur="changeCountProduct( ${index}, 'input', document.getElementById('countProduct_${index}').value)" type="number" min="1" max="50" name="count" value="${product.count}" required />
+                           <input id="countProduct_${index}" style="width: 50%" 
+                                onblur="changeCountProduct(${index}, 'input', document.getElementById('countProduct_${index}').value)" 
+                                type="number" min="1" max="50" name="count" 
+                                value="${product.count}" maxlength="10" required />
                             <button onclick="changeCountProduct( ${index},'plus')" type="submit" class="btn bi bi-plus-circle opacity-100"></button>
                         </div>
                     </div>
